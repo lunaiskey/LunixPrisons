@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import java.math.BigInteger;
 import java.util.List;
 
-public abstract class PyrexEnchant {
+public abstract class LunixEnchant {
 
     private String name;
     private int maxLevel;
@@ -20,7 +20,7 @@ public abstract class PyrexEnchant {
     private List<String> description;
     private CurrencyType currencyType;
 
-    public PyrexEnchant(String name,List<String> description, int maxLevel, CurrencyType currencyType, boolean enabled) {
+    public LunixEnchant(String name, List<String> description, int maxLevel, CurrencyType currencyType, boolean enabled) {
         this.name = name;
         this.description = description;
         this.maxLevel = maxLevel;

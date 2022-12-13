@@ -11,7 +11,7 @@ public enum CurrencyType {
     public String getUnicode() {
         return switch (this) {
             case TOKENS -> "⛁";
-            case GEMS -> "❈";
+            case GEMS -> "◎";
             case LUNIX_POINTS -> "☀";
         };
     }

@@ -18,8 +18,8 @@ public class CommandEnchant implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player) {
             Player p = (Player) sender;
-            //CompoundTag pyrexDataMap = NBTTags.getPyrexDataMap(p.getInventory().getItemInMainHand());
-            if (p.hasPermission("pyrex.enchant")) {
+            //CompoundTag lunixDataMap = NBTTags.getlunixDataMap(p.getInventory().getItemInMainHand());
+            if (p.hasPermission("lunix.enchant")) {
                 if (args.length == 0) {
                     p.sendMessage(
                         StringUtil.color("&bEnchant Commands:"),

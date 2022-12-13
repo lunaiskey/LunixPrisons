@@ -29,7 +29,7 @@ public class CommandManager {
         registerCommand("gemstones",new CommandGemstones());
         registerCommand("booster",new CommandBooster());
 
-        registerCommand("litem",new CommandPItem());
+        registerCommand("litem",new CommandLItem());
 
         registerCommand("viewplayer",new CommandViewPlayer());
         registerCommand("rank",new CommandRank());

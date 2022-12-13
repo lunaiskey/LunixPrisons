@@ -44,7 +44,7 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
                 return true;
             }
             if (args[0].equalsIgnoreCase("reset")) {
-                if (p.hasPermission("pyrex.resetcooldown.bypass") || !resetCooldown.containsKey(p.getUniqueId()) || System.currentTimeMillis() >= resetCooldown.get(p.getUniqueId())+300000) {
+                if (p.hasPermission("lunix.resetcooldown.bypass") || !resetCooldown.containsKey(p.getUniqueId()) || System.currentTimeMillis() >= resetCooldown.get(p.getUniqueId())+300000) {
                     if (mine != null) {
                         p.sendMessage("PMine resetting...");
                         mine.reset();
@@ -83,7 +83,7 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
                         "| /pmine tp",
                         "| /pmine fly",
                         "| /pmine checkmineblocks");
-                if (p.hasPermission("pyrex.debug")) {
+                if (p.hasPermission("lunix.debug")) {
                     p.sendMessage("| /pmine debug getposition",
                             "| /pmine debug getgridposition"
                             //"| /pmine debug genbedrock (DOESNT NEED TO RUN.)"
@@ -96,7 +96,7 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
                 p.sendMessage(StringUtil.color("&aChecked your blocks. You have "+mine.getComposition().size()+" Available blocks."));
                 return true;
             }
-            if (p.hasPermission("pyrex.debug")) {
+            if (p.hasPermission("lunix.debug")) {
                 if (args[0].equalsIgnoreCase("debug")) {
                     if (args.length >= 2) {
                         if (args[1].equalsIgnoreCase("getposition")) {
@@ -154,13 +154,13 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
             completions.add("tp");
             completions.add("fly");
             completions.add("checkmineblocks");
-            if (sender.hasPermission("pyrex.debug")) {
+            if (sender.hasPermission("lunix.debug")) {
                 completions.add("debug");
             }
         }
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("debug")) {
-                if (sender.hasPermission("pyrex.debug")) {
+                if (sender.hasPermission("lunix.debug")) {
                     completions.add("getposition");
                     completions.add("getgridposition");
                 }

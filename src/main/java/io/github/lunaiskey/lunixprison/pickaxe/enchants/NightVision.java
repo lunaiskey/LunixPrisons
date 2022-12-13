@@ -1,6 +1,6 @@
 package io.github.lunaiskey.lunixprison.pickaxe.enchants;
 
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -12,7 +12,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.math.BigInteger;
 import java.util.List;
 
-public class NightVision extends PyrexEnchant {
+public class NightVision extends LunixEnchant {
 
     public NightVision() {
         super("Night Vision", List.of("Gives you permanent Night Vision ","while holding your pickaxe."), 1, CurrencyType.TOKENS, true);

@@ -25,7 +25,7 @@ public class GemPouch extends LunixItem {
         String texture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjY2MjRhN2JkZWU2MjQwZGRkYmVkODI2ODA5MGUyMzRkMGJhNDcwZWE4OTZlODkyOWY0ZWZiMjEzZjIyNjk0NCJ9fX0=";
         UUID skulluuid = UUID.fromString("2ce42c30-dbf7-4e0d-afcb-c54eaefbf937");
         ItemStack item = ItemBuilder.getSkull(getRarityString()+" "+getName(), getLore(),texture,skulluuid);
-        item = NBTTags.addPyrexData(item,"id",getItemID().name());
+        item = NBTTags.addLunixData(item,"id",getItemID().name());
         return item;
     }
 

@@ -109,7 +109,7 @@ public class PlayerEvents implements Listener {
     @EventHandler
     public void onPlace(BlockPlaceEvent e) {
         Player p = e.getPlayer();
-        CompoundTag tag = NBTTags.getPyrexDataMap(e.getItemInHand());
+        CompoundTag tag = NBTTags.getLunixDataMap(e.getItemInHand());
         if (tag.contains("id")) {
             String id = tag.getString("id");
             try {
@@ -227,7 +227,7 @@ public class PlayerEvents implements Listener {
             if (e.getView().getType() == InventoryType.CRAFTING) {
                 switch (e.getRawSlot()) {
                     case 5,6,7,8 -> {
-                        CompoundTag tag = NBTTags.getPyrexDataMap(e.getCurrentItem());
+                        CompoundTag tag = NBTTags.getLunixDataMap(e.getCurrentItem());
                         if (tag.getString("id").toUpperCase().contains("PYREX_ARMOR_")) {
                             e.setCancelled(true);
                             p.sendMessage(StringUtil.color("&cTo unequip this armor please do so from /armor."));
@@ -272,7 +272,7 @@ public class PlayerEvents implements Listener {
         Player p = e.getPlayer();
         ItemStack item = e.getItem();
         if (item != null && item.getType() != Material.AIR) {
-            CompoundTag pyrexDataMap = NBTTags.getPyrexDataMap(e.getItem());
+            CompoundTag pyrexDataMap = NBTTags.getLunixDataMap(e.getItem());
             if (pyrexDataMap.contains("id")) {
                 // is custom pickaxe
                 if (pyrexDataMap.getString("id").equals(PickaxeHandler.getId())) {
@@ -307,14 +307,14 @@ public class PlayerEvents implements Listener {
     public void onDrop(PlayerDropItemEvent e) {
         Player p = e.getPlayer();
         ItemStack item = e.getItemDrop().getItemStack();
-        CompoundTag pyrexData = NBTTags.getPyrexDataMap(item);
+        CompoundTag pyrexData = NBTTags.getLunixDataMap(item);
         if (pyrexData.contains("id")) {
             if (pyrexData.getString("id").equalsIgnoreCase(PickaxeHandler.getId())) {
                 e.setCancelled(true);
                 LunixPickaxe pickaxe = plugin.getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
                 for (EnchantType enchantType : pickaxe.getEnchants().keySet()) {
                     if (!pickaxe.getDisabledEnchants().contains(enchantType)) {
-                        PyrexEnchant enchant = plugin.getPickaxeHandler().getEnchantments().get(enchantType);
+                        LunixEnchant enchant = plugin.getPickaxeHandler().getEnchantments().get(enchantType);
                         if (enchant.isEnabled()) {
                             enchant.onDrop(e,pickaxe.getEnchants().get(enchantType));
                         }
@@ -448,8 +448,8 @@ public class PlayerEvents implements Listener {
         Player p = e.getPlayer();
         ItemStack oldItem = p.getInventory().getItem(e.getPreviousSlot()) != null ? p.getInventory().getItem(e.getPreviousSlot()) : new ItemStack(Material.AIR);
         ItemStack newItem = p.getInventory().getItem(e.getNewSlot()) != null ? p.getInventory().getItem(e.getNewSlot()) : new ItemStack(Material.AIR);
-        CompoundTag oldMap = NBTTags.getPyrexDataMap(oldItem);
-        CompoundTag newMap = NBTTags.getPyrexDataMap(newItem);
+        CompoundTag oldMap = NBTTags.getLunixDataMap(oldItem);
+        CompoundTag newMap = NBTTags.getLunixDataMap(newItem);
         LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(e.getPlayer().getUniqueId()).getPickaxe();
         if (oldMap.contains("id")) {
             // is custom pickaxe

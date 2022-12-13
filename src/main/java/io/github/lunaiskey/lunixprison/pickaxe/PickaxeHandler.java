@@ -17,8 +17,8 @@ import java.util.*;
 
 public class PickaxeHandler {
 
-    private static final String id = "PYREX_PICKAXE";
-    private final Map<EnchantType,PyrexEnchant> enchantments = new HashMap<>();
+    private static final String ID = "LUNIX_PICKAXE";
+    private final Map<EnchantType, LunixEnchant> enchantments = new HashMap<>();
 
     public PickaxeHandler() {
         registerEnchants();
@@ -42,23 +42,19 @@ public class PickaxeHandler {
         enchantments.put(EnchantType.MINE_BOMB,new MineBomb());
     }
 
-    public Map<EnchantType, PyrexEnchant> getEnchantments() {
+    public Map<EnchantType, LunixEnchant> getEnchantments() {
         return enchantments;
     }
 
     public static String getId() {
-        return id;
+        return ID;
     }
 
     public ItemStack updatePickaxe(ItemStack item, UUID p) {
-        CompoundTag pyrexDataMap = NBTTags.getPyrexDataMap(item);
-        if (pyrexDataMap.contains("id")) {
+        CompoundTag lunixDataMap = NBTTags.getLunixDataMap(item);
+        if (lunixDataMap.contains("id")) {
             // is custom pickaxe
-            if (pyrexDataMap.getString("id").equals("PyrexPickaxe")) {
-                pyrexDataMap.putString("id","PYREX_PICKAXE");
-                item = NBTTags.addPyrexData(item,"id","PYREX_PICKAXE");
-            }
-            if (pyrexDataMap.getString("id").equals("PYREX_PICKAXE")) {
+            if (lunixDataMap.getString("id").equals("LUNIX_PICKAXE")) {
                 ItemMeta meta = item.getItemMeta();
                 OfflinePlayer player = Bukkit.getOfflinePlayer(p);
                 meta.setDisplayName(StringUtil.color("&d"+player.getName()+"'s &fPickaxe"));
@@ -71,9 +67,9 @@ public class PickaxeHandler {
                 lore.add(" ");
                 lore.add(StringUtil.color("&d&lEnchants"));
                 for (EnchantType enchantType : EnchantType.getSortedSet()) {
-                    PyrexEnchant pyrexEnchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(enchantType);
+                    LunixEnchant lunixEnchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(enchantType);
                     if (enchants.containsKey(enchantType) && enchants.get(enchantType) > 0) {
-                        lore.add(StringUtil.color("&d&l| &f"+pyrexEnchant.getName()+" "+enchants.get(enchantType)));
+                        lore.add(StringUtil.color("&d&l| &f"+ lunixEnchant.getName()+" "+enchants.get(enchantType)));
                         if (enchantType == EnchantType.EFFICIENCY) {
                             meta.addEnchant(Enchantment.DIG_SPEED,enchants.get(enchantType),true);
                         }
@@ -110,7 +106,7 @@ public class PickaxeHandler {
     public boolean hasOrGivePickaxe(Player p) {
         boolean hasPickaxe = false;
         for(ItemStack item : p.getInventory().getContents()) {
-            if (NBTTags.getPyrexDataMap(item).getString("id").equals("PYREX_PICKAXE")) {
+            if (NBTTags.getLunixDataMap(item).getString("id").equals(ID)) {
                 hasPickaxe = true;
                 break;
             }

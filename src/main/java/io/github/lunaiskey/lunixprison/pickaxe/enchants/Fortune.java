@@ -1,6 +1,6 @@
 package io.github.lunaiskey.lunixprison.pickaxe.enchants;
 
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import java.math.BigInteger;
 import java.util.List;
 
-public class Fortune extends PyrexEnchant {
+public class Fortune extends LunixEnchant {
 
 
     public Fortune() {

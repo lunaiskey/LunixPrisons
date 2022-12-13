@@ -27,7 +27,7 @@ public class GemStone extends LunixItem {
 
     public ItemStack getItemStack() {
         ItemStack item = ItemBuilder.getSkull(StringUtil.color("&f" + getName() + " Gemstone"), getLore(),getSkullTexture(),getSkullUUID());
-        item = NBTTags.addPyrexData(item,"id",getItemID().name());
+        item = NBTTags.addLunixData(item,"id",getItemID().name());
         return item;
     }
 

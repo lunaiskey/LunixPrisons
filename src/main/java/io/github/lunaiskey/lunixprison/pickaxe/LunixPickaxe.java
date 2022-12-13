@@ -52,7 +52,7 @@ public class LunixPickaxe {
 
     public ItemStack getItemStack() {
         ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE);
-        item = NBTTags.addPyrexData(item,"id",PickaxeHandler.getId());
+        item = NBTTags.addLunixData(item,"id",PickaxeHandler.getId());
         return LunixPrison.getPlugin().getPickaxeHandler().updatePickaxe(item,player);
     }
 
@@ -71,7 +71,7 @@ public class LunixPickaxe {
                     e.setExpToDrop(0);
                     pMine.addMineBlocks(1);
                     for (EnchantType type : getEnchants().keySet()) {
-                        PyrexEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
+                        LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
                         if (enchant.isEnabled()) {
                             if (!getDisabledEnchants().contains(type)) {
                                 enchant.onBlockBreak(e,getEnchants().get(type));

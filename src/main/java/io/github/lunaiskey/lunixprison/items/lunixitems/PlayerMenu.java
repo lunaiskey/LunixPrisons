@@ -25,7 +25,7 @@ public class PlayerMenu extends LunixItem {
     @Override
     public ItemStack getItemStack() {
         ItemStack item = ItemBuilder.createItem(getName(),getMaterial(), getLore());
-        item = NBTTags.addPyrexData(item,"id",getItemID().name());
+        item = NBTTags.addLunixData(item,"id",getItemID().name());
         return item;
     }
 

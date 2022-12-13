@@ -41,11 +41,11 @@ public class NBTTags {
         CompoundTag voucherTag = new CompoundTag();
         voucherTag.putString("type",type.name());
         voucherTag.putString("amount",amount.toString());
-        return addPyrexData(item,"voucherData",voucherTag);
+        return addLunixData(item,"voucherData",voucherTag);
     }
 
     public static Pair<CurrencyType,BigInteger> getVoucherValue(ItemStack item) {
-        CompoundTag itemTag = getPyrexDataMap(item);
+        CompoundTag itemTag = getLunixDataMap(item);
         CompoundTag voucherTag = itemTag.getCompound("voucherData");
         try {
             CurrencyType type = CurrencyType.valueOf(voucherTag.getString("type"));
@@ -57,75 +57,75 @@ public class NBTTags {
         return null;
     }
 
-    public static ItemStack addPyrexDataContainer(ItemStack item) {
+    public static ItemStack addLunixDataContainer(ItemStack item) {
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
         CompoundTag itemTag = nmsStack.getOrCreateTag();
-        CompoundTag pyrexDataTag = new CompoundTag();
-        if (itemTag.getAllKeys().contains("PyrexData")) {
+        CompoundTag LunixDataTag = new CompoundTag();
+        if (itemTag.getAllKeys().contains("LunixData")) {
             return item;
         }
-        itemTag.put("PyrexData",pyrexDataTag);
+        itemTag.put("LunixData",LunixDataTag);
         nmsStack.setTag(itemTag);
         return CraftItemStack.asBukkitCopy(nmsStack);
     }
 
-    public static ItemStack addPyrexData(ItemStack item, String identifier, Object value) {
-        item = addPyrexDataContainer(item);
+    public static ItemStack addLunixData(ItemStack item, String identifier, Object value) {
+        item = addLunixDataContainer(item);
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
         CompoundTag itemTag = nmsStack.getOrCreateTag();
-        CompoundTag pyrexDataTag = itemTag.getCompound("PyrexData");
+        CompoundTag LunixDataTag = itemTag.getCompound("LunixData");
         if (value instanceof Integer) {
-            pyrexDataTag.putInt(identifier,(int)value);
+            LunixDataTag.putInt(identifier,(int)value);
         }
         if (value instanceof Short) {
-            pyrexDataTag.putShort(identifier,(short)value);
+            LunixDataTag.putShort(identifier,(short)value);
         }
         if (value instanceof Long) {
-            pyrexDataTag.putLong(identifier,(long)value);
+            LunixDataTag.putLong(identifier,(long)value);
         }
         if (value instanceof Double) {
-            pyrexDataTag.putDouble(identifier,(double)value);
+            LunixDataTag.putDouble(identifier,(double)value);
         }
         if (value instanceof String) {
-            pyrexDataTag.putString(identifier,(String) value);
+            LunixDataTag.putString(identifier,(String) value);
         }
         if (value instanceof Boolean) {
-            pyrexDataTag.putBoolean(identifier,(boolean)value);
+            LunixDataTag.putBoolean(identifier,(boolean)value);
         }
         if (value instanceof Byte) {
-            pyrexDataTag.putByte(identifier,(byte) value);
+            LunixDataTag.putByte(identifier,(byte) value);
         }
         if (value instanceof Float) {
-            pyrexDataTag.putFloat(identifier,(float) value);
+            LunixDataTag.putFloat(identifier,(float) value);
         }
         if (value instanceof UUID) {
-            pyrexDataTag.putUUID(identifier,(UUID) value);
+            LunixDataTag.putUUID(identifier,(UUID) value);
         }
         if (value instanceof Tag) {
             if (value instanceof CompoundTag) {
-                pyrexDataTag.put(identifier,(CompoundTag) value);
+                LunixDataTag.put(identifier,(CompoundTag) value);
             } else {
-                pyrexDataTag.put(identifier, (Tag) value);
+                LunixDataTag.put(identifier, (Tag) value);
             }
         }
-        itemTag.put("PyrexData",pyrexDataTag);
+        itemTag.put("LunixData",LunixDataTag);
         nmsStack.setTag(itemTag);
         return CraftItemStack.asBukkitCopy(nmsStack);
     }
 
-    public static CompoundTag getPyrexDataMap(ItemStack item) {
-        item = addPyrexDataContainer(item);
+    public static CompoundTag getLunixDataMap(ItemStack item) {
+        item = addLunixDataContainer(item);
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
         CompoundTag itemTag = nmsStack.getOrCreateTag();
-        if (itemTag.contains("PyrexData")) {
-            return itemTag.getCompound("PyrexData");
+        if (itemTag.contains("LunixData")) {
+            return itemTag.getCompound("LunixData");
         }
         return new CompoundTag();
     }
 
     public static ItemID getItemID(ItemStack item) {
         try {
-            return ItemID.valueOf(getPyrexDataMap(item).getString("id"));
+            return ItemID.valueOf(getLunixDataMap(item).getString("id"));
         } catch (Exception ignored) {
             return null;
         }

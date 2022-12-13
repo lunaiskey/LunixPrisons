@@ -4,7 +4,7 @@ import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.gui.LunixHolder;
 import io.github.lunaiskey.lunixprison.gui.LunixInvType;
 import io.github.lunaiskey.lunixprison.pickaxe.EnchantType;
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.pickaxe.LunixPickaxe;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
@@ -80,7 +80,7 @@ public class PickaxeEnchantGUI {
     }
 
     private ItemStack getEnchantPlaceholder(EnchantType type) {
-        PyrexEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
+        LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
         Material mat = Material.ENCHANTED_BOOK;
         if (!enchant.isEnabled()) {
             mat = Material.BARRIER;
@@ -125,7 +125,7 @@ public class PickaxeEnchantGUI {
             return;
         }
         if (enchantLocation.containsKey(slot)) {
-            PyrexEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(enchantLocation.get(slot));
+            LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(enchantLocation.get(slot));
             int level = pickaxe.getEnchants().getOrDefault(enchantLocation.get(slot), 0);
             if (enchant.isEnabled()) {
                 if (level < enchant.getMaxLevel()) {

@@ -17,21 +17,21 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 
-public class CommandPItem implements CommandExecutor, TabCompleter {
+public class CommandLItem implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (sender.hasPermission("pyrex.pitem")) {
+        if (sender.hasPermission("lunix.litem")) {
             if (args.length == 0) {
                 sender.sendMessage(
                         StringUtil.color("&b&lPItem:"),
-                        StringUtil.color("&b&l| &f/pitem <id> [amount]"),
-                        StringUtil.color("&b&l| &f/pitem give <player> <id> [amount]")
+                        StringUtil.color("&b&l| &f/litem <id> [amount]"),
+                        StringUtil.color("&b&l| &f/litem give <player> <id> [amount]")
                 );
                 return true;
             }
             if (args[0].equalsIgnoreCase("give")) {
                 if (args.length == 1) {
-                    sender.sendMessage(StringUtil.color("Usage: /pitem give <player> <id> [amount]"));
+                    sender.sendMessage(StringUtil.color("Usage: /litem give <player> <id> [amount]"));
                     return true;
                 }
                 try {

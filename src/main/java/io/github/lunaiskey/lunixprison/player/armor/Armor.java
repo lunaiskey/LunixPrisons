@@ -94,7 +94,7 @@ public class Armor {
         } else {
             item.setItemMeta(meta);
         }
-        item = NBTTags.addPyrexData(item,"id","PYREX_ARMOR_"+type.name());
+        item = NBTTags.addLunixData(item,"id","PYREX_ARMOR_"+type.name());
         return item;
     }
 

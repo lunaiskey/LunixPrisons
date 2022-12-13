@@ -3,7 +3,7 @@ package io.github.lunaiskey.lunixprison.pickaxe.enchants;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.mines.PMine;
 import io.github.lunaiskey.lunixprison.mines.generator.PMineWorld;
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.util.ShapeUtil;
 import org.apache.commons.lang3.tuple.Pair;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class MineBomb extends PyrexEnchant {
+public class MineBomb extends LunixEnchant {
     public MineBomb() {
         super("Mine Bomb", List.of("&c[WIP]"), 2000, CurrencyType.TOKENS, true);
     }

@@ -140,7 +140,7 @@ public class PlayerManager {
     public int getPyrexItemCount(Player p, ItemID id) {
         int count = 0;
         for (ItemStack item : p.getInventory().getContents()) {
-            CompoundTag tag = NBTTags.getPyrexDataMap(item);
+            CompoundTag tag = NBTTags.getLunixDataMap(item);
             if (tag.contains("id")) {
                 if (tag.getString("id").equals(id.name())) {
                     count += item.getAmount();
@@ -154,7 +154,7 @@ public class PlayerManager {
         ItemStack[] inv = p.getInventory().getContents();
         for (int i = 0;i<inv.length;i++) {
             ItemStack item = inv[i];
-            CompoundTag tag = NBTTags.getPyrexDataMap(item);
+            CompoundTag tag = NBTTags.getLunixDataMap(item);
             if (tag.contains("id")) {
                 if (tag.getString("id").equals(id.name())) {
                     if (amount > 0) {

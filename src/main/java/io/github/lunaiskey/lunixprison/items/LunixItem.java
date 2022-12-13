@@ -40,7 +40,7 @@ public abstract class LunixItem {
 
     public ItemStack getItemStack() {
         ItemStack item = new ItemStack(mat);
-        item = NBTTags.addPyrexData(item,"id",getItemID().name());
+        item = NBTTags.addLunixData(item,"id",getItemID().name());
         ItemMeta meta = item.getItemMeta();
         if (name != null) {
             meta.setDisplayName(StringUtil.color(name));

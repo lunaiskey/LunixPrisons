@@ -5,7 +5,7 @@ import io.github.lunaiskey.lunixprison.gui.LunixHolder;
 import io.github.lunaiskey.lunixprison.gui.LunixInvType;
 import io.github.lunaiskey.lunixprison.gui.LunixInventory;
 import io.github.lunaiskey.lunixprison.pickaxe.EnchantType;
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.pickaxe.LunixPickaxe;
 import io.github.lunaiskey.lunixprison.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
@@ -72,7 +72,7 @@ public class PickaxeEnchantToggleGUI implements LunixInventory {
     }
 
     private ItemStack getEnchantPlaceholder(EnchantType type) {
-        PyrexEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
+        LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
         String name = StringUtil.color("&b"+enchant.getName());
         String status = disabledEnchants.contains(type) ? "&cDisabled" : "&aEnabled";
         Material mat = disabledEnchants.contains(type) ? Material.GRAY_DYE : Material.LIME_DYE;

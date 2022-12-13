@@ -250,7 +250,7 @@ public class CommandCurrency implements CommandExecutor, TabCompleter {
         return switch (type) {
             case TOKENS -> "&e";
             case GEMS -> "&a";
-            case LUNIX_POINTS -> "&d";
+            case LUNIX_POINTS -> "&3";
         };
     }
 

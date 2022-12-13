@@ -1,6 +1,6 @@
 package io.github.lunaiskey.lunixprison.pickaxe.enchants;
 
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -12,7 +12,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.math.BigInteger;
 import java.util.List;
 
-public class Haste extends PyrexEnchant {
+public class Haste extends LunixEnchant {
 
     public Haste() {
         super("Haste", List.of("Gives you permanent Haste ","while holding your pickaxe."), 3, CurrencyType.TOKENS,  true);

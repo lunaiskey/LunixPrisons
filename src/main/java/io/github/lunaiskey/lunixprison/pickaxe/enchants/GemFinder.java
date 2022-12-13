@@ -3,7 +3,7 @@ package io.github.lunaiskey.lunixprison.pickaxe.enchants;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.items.ItemID;
 import io.github.lunaiskey.lunixprison.items.LunixItem;
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 
-public class GemFinder extends PyrexEnchant {
+public class GemFinder extends LunixEnchant {
     public GemFinder() {
         super("Gemstone Finder", List.of("Increases your chances of finding Gemstones."),1000, CurrencyType.TOKENS,  true);
     }

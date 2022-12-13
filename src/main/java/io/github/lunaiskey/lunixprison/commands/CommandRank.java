@@ -31,7 +31,7 @@ public class CommandRank implements CommandExecutor {
                 return true;
             }
             if (otherPlayer != null) {
-                if (p.hasPermission("pyrex.rank.set")) {
+                if (p.hasPermission("lunix.rank.set")) {
                     if (args[1].equalsIgnoreCase("set")) {
                         if (args.length >= 3) {
                             try {

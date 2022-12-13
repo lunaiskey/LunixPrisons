@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,21 +18,22 @@ public class Reward {
     private List<String> commands;
     private List<ItemStack> items;
 
-    public Reward(String rewardName, double chance, List<ItemStack> items, List<String> commands) {
+    public Reward(String rewardName, double chance, List<ItemStack> items, List<String> commandsList) {
         this.rewardName = rewardName;
         this.chance = chance;
-        if (commands != null && commands.size() > 0) {
-            for (int i = 0;i<commands.size();i++) {
-                String command = commands.get(i);
-                StringBuilder builder = new StringBuilder(command);
-                if (builder.charAt(0) == '/') {
-                    builder.deleteCharAt(0);
-                }
-                commands.set(i,builder.toString());
-            }
-        }
-        this.commands = commands;
+        this.commands = commandsList;
         this.items = items;
+        if (commands == null) return;
+        commands = new ArrayList<>(commands);
+        if (commandsList.size() <= 0) return;
+        for (int i = 0;i<commands.size();i++) {
+            String command = commands.get(i);
+            StringBuilder builder = new StringBuilder(command);
+            if (builder.charAt(0) == '/') {
+                builder.deleteCharAt(0);
+            }
+            commands.set(i,builder.toString());
+        }
     }
 
     public String getRewardName() {

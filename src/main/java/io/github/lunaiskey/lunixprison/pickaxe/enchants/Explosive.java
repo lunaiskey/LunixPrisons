@@ -2,7 +2,7 @@ package io.github.lunaiskey.lunixprison.pickaxe.enchants;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.mines.PMine;
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Location;
@@ -17,7 +17,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 
-public class Explosive extends PyrexEnchant {
+public class Explosive extends LunixEnchant {
     public Explosive() {
         super("Explosive", List.of("Breaks a cube around the broken block"), 1000, CurrencyType.TOKENS, true);
     }

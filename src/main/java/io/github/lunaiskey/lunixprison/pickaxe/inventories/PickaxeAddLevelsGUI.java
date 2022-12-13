@@ -4,7 +4,7 @@ import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.gui.LunixInvType;
 import io.github.lunaiskey.lunixprison.pickaxe.EnchantLunixHolder;
 import io.github.lunaiskey.lunixprison.pickaxe.EnchantType;
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.pickaxe.LunixPickaxe;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.player.LunixPlayer;
@@ -36,7 +36,7 @@ public class PickaxeAddLevelsGUI {
     private CurrencyType currencyType;
     private LunixPickaxe pickaxe;
     private LunixPlayer player;
-    private PyrexEnchant enchant;
+    private LunixEnchant enchant;
     private Map<Integer,Integer> amountLoc = new HashMap<>();
 
     public PickaxeAddLevelsGUI(Player p, EnchantType type) {

@@ -2,7 +2,7 @@ package io.github.lunaiskey.lunixprison.pickaxe.enchants;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.mines.PMine;
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,7 +16,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 
-public class JackHammer extends PyrexEnchant {
+public class JackHammer extends LunixEnchant {
     public JackHammer() {
         super("Jackhammer", List.of("Has a chance to break an","entire layer of your mine"), 1000, CurrencyType.TOKENS,   true);
     }

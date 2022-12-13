@@ -39,7 +39,7 @@ public class BoosterItem extends LunixItem {
 
     public BoosterItem(ItemStack booster) {
         super(ItemID.BOOSTER,null,null,Material.BEACON);
-        CompoundTag tag = NBTTags.getPyrexDataMap(booster);
+        CompoundTag tag = NBTTags.getLunixDataMap(booster);
         CompoundTag boosterData = tag.getCompound("boosterData");
         try {
             boosterType = BoosterType.valueOf(boosterData.getString("type"));
@@ -64,13 +64,13 @@ public class BoosterItem extends LunixItem {
             name = ChatColor.GRAY + "Null Booster";
         }
         ItemStack item = ItemBuilder.createItem(name,getMaterial(),lore);
-        item = NBTTags.addPyrexData(item,"id",getItemID().name());
+        item = NBTTags.addLunixData(item,"id",getItemID().name());
         CompoundTag boosterData = new CompoundTag();
         boosterData.putString("type",boosterType.name());
         boosterData.putInt("length",length);
         boosterData.putDouble("multiplier",multiplier);
-        item = NBTTags.addPyrexData(item,"boosterData",boosterData);
-        item = NBTTags.addPyrexData(item, "uuid", UUID.randomUUID().toString());
+        item = NBTTags.addLunixData(item,"boosterData",boosterData);
+        item = NBTTags.addLunixData(item, "uuid", UUID.randomUUID().toString());
         return item;
     }
 

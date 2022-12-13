@@ -32,7 +32,7 @@ public class CommandArmor implements CommandExecutor {
                     String action = args[2];
                     Armor armor = lunixPlayer.getArmor().get(armorType);
                     if (action.equalsIgnoreCase("set")) {
-                        if (p.hasPermission("pyrex.armor.set")) {
+                        if (p.hasPermission("lunix.armor.set")) {
                             if (args.length >= 5) {
                                 String changeType = args[3];
                                 String value = args[4];

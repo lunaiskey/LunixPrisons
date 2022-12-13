@@ -2,7 +2,7 @@ package io.github.lunaiskey.lunixprison.pickaxe.enchants;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.mines.PMine;
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.apache.commons.lang3.tuple.Pair;
@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 
-public class Nuke extends PyrexEnchant {
+public class Nuke extends LunixEnchant {
     public Nuke() {
         super("Nuke", List.of("Obliterates the entire mine."), 5000, CurrencyType.TOKENS, true);
     }

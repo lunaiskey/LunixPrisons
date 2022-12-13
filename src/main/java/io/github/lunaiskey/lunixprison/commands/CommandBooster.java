@@ -23,7 +23,7 @@ public class CommandBooster implements CommandExecutor {
             return true;
         }
         if (args[0].equalsIgnoreCase("give")) {
-            if (sender.hasPermission("pyrex.booster.give")) {
+            if (sender.hasPermission("lunix.booster.give")) {
                 if (args.length == 1) {
                     sender.sendMessage(StringUtil.color("&cUsage: /booster give <player> <type> <multiplier> <length>"));
                     return true;

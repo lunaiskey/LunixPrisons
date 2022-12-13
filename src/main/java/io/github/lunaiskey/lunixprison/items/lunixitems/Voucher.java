@@ -65,7 +65,7 @@ public class Voucher extends LunixItem {
         lore.add(" ");
         lore.add(StringUtil.color("&eRight Click to redeem!"));
         ItemStack item = ItemBuilder.createItem(name,getMaterial(),lore);
-        item = NBTTags.addPyrexData(item,"id",getItemID().name());
+        item = NBTTags.addLunixData(item,"id",getItemID().name());
         item = NBTTags.setCurrencyVoucherTags(item,amount,type);
         return item;
 

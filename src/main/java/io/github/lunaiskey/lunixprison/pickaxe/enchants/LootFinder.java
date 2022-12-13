@@ -4,7 +4,7 @@ import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.items.ItemID;
 import io.github.lunaiskey.lunixprison.items.ItemManager;
 import io.github.lunaiskey.lunixprison.items.LunixItem;
-import io.github.lunaiskey.lunixprison.pickaxe.PyrexEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class LootFinder extends PyrexEnchant {
+public class LootFinder extends LunixEnchant {
     public LootFinder() {
         super("Loot Finder", List.of("Gives a chance to find Geodes."), 250, CurrencyType.TOKENS, true);
     }

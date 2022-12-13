@@ -25,7 +25,7 @@ public class TokenPouch extends LunixItem {
         String texture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzk2Y2UxM2ZmNjE1NWZkZjMyMzVkOGQyMjE3NGM1ZGU0YmY1NTEyZjFhZGVkYTFhZmEzZmMyODE4MGYzZjcifX19";
         UUID skulluuid = UUID.fromString("a12e0e3c-25d6-418c-9b8b-685e3010c1d8");
         ItemStack item = ItemBuilder.getSkull(getRarityString()+" "+getName(), getLore(),texture,skulluuid);
-        item = NBTTags.addPyrexData(item,"id",getItemID().name());
+        item = NBTTags.addLunixData(item,"id",getItemID().name());
         return item;
     }
 

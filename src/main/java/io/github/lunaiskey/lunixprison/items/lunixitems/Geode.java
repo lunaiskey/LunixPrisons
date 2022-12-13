@@ -45,7 +45,7 @@ public class Geode extends LunixItem {
         lore.add("");
         lore.add(StringUtil.color("&eR-Click to crack open!"));
         ItemStack item = ItemBuilder.getSkull(displayName,lore,base64,profileUUID);
-        item = NBTTags.addPyrexData(item,"id",getItemID().name());
+        item = NBTTags.addLunixData(item,"id",getItemID().name());
         return item;
     }
 
