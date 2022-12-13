@@ -6,7 +6,7 @@ import java.util.List;
 public enum ItemID {
 
     VOUCHER(false),
-    PYREX_PICKAXE,
+    LUNIX_PICKAXE,
     PLAYER_MENU,
 
     COMMON_GEODE,

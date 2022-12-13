@@ -36,7 +36,7 @@ public class Currency {
         switch (type) {
             case TOKENS -> pPlayer.giveTokens(amount);
             case GEMS -> pPlayer.giveGems(amount.longValue());
-            case LUNIX_POINTS -> pPlayer.givePyrexPoints(amount.longValue());
+            case LUNIX_POINTS -> pPlayer.giveLunixPoints(amount.longValue());
         }
     }
 
@@ -77,8 +77,8 @@ public class Currency {
                 }
                 pPlayer.takeGems(amount.longValue());}
             case LUNIX_POINTS -> {
-                if (amount.longValue() >= pPlayer.getPyrexPoints()) {
-                    pPlayer.setPyrexPoints(0);
+                if (amount.longValue() >= pPlayer.getLunixPoints()) {
+                    pPlayer.setLunixPoints(0);
                     break;
                 }
                 pPlayer.takePyrexPoints(amount.longValue());}
@@ -97,7 +97,7 @@ public class Currency {
         switch (type) {
             case TOKENS -> pPlayer.setTokens(newAmount);
             case GEMS -> pPlayer.setGems(newAmount.longValue());
-            case LUNIX_POINTS -> pPlayer.setPyrexPoints(newAmount.longValue());
+            case LUNIX_POINTS -> pPlayer.setLunixPoints(newAmount.longValue());
         }
     }
 

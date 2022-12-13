@@ -21,7 +21,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getIdentifier() {
-        return "pyrex";
+        return "lunix";
     }
 
     @Override
@@ -46,7 +46,7 @@ public class PlaceholderHook extends PlaceholderExpansion {
             return switch(params.toLowerCase()) {
                 case "tokens" -> Numbers.formattedNumber(lunixPlayer.getTokens());
                 case "gems" -> Numbers.formattedNumber(lunixPlayer.getGems());
-                case "points" -> Numbers.formattedNumber(lunixPlayer.getPyrexPoints());
+                case "points" -> Numbers.formattedNumber(lunixPlayer.getLunixPoints());
                 case "unicode_tokens" -> CurrencyType.TOKENS.getUnicode();
                 case "unicode_gems" -> CurrencyType.GEMS.getUnicode();
                 case "unicode_points" -> CurrencyType.LUNIX_POINTS.getUnicode();

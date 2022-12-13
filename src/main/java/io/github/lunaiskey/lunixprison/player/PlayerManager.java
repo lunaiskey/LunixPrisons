@@ -42,7 +42,7 @@ public class PlayerManager {
     public Map<String, UUID> getPlayerNameMap() {
         return playerNameMap;
     }
-    public void createPyrexPlayer(UUID pUUID) {
+    public void createLunixPlayer(UUID pUUID) {
         Player player = Bukkit.getPlayer(pUUID);
         if (player != null) {
             playerMap.put(pUUID,new LunixPlayer(pUUID, player.getName()));

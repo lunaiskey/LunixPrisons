@@ -54,8 +54,8 @@ public class Voucher extends LunixItem {
                 strAmount = "&a"+type.getUnicode()+"&f"+Numbers.formattedNumber(amount);
             }
             case LUNIX_POINTS -> {
-                strType = "&dPyrex Points";
-                strAmount = "&d"+type.getUnicode()+"&f"+Numbers.formattedNumber(amount);
+                strType = "&3Lunix Points";
+                strAmount = "&3"+type.getUnicode()+"&f"+Numbers.formattedNumber(amount);
             }
         }
         List<String> lore = new ArrayList<>();
@@ -91,7 +91,7 @@ public class Voucher extends LunixItem {
             switch(type) {
                 case TOKENS -> p.sendMessage(StringUtil.color("&eRedeemed "+type.getUnicode()+"&f"+ Numbers.formattedNumber(amount)+" &eTokens."));
                 case GEMS -> p.sendMessage(StringUtil.color("&aRedeemed "+type.getUnicode()+"&f"+Numbers.formattedNumber(amount)+" &aGems."));
-                case LUNIX_POINTS -> p.sendMessage(StringUtil.color("&dRedeemed "+type.getUnicode()+"&f"+Numbers.formattedNumber(amount)+" &dPyrex Points."));
+                case LUNIX_POINTS -> p.sendMessage(StringUtil.color("&dRedeemed "+type.getUnicode()+"&f"+Numbers.formattedNumber(amount)+" &3Lunix Points."));
             }
         } else {
             p.sendMessage(StringUtil.color("&cInvalid Voucher..."));

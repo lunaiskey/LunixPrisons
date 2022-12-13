@@ -23,7 +23,7 @@ import java.util.*;
 public class LunixPlayer {
     private BigInteger tokens;
     private long gems;
-    private long pyrexPoints;
+    private long lunixPoints;
     private int rank;
     private final UUID pUUID;
     private String name;
@@ -37,12 +37,12 @@ public class LunixPlayer {
 
     private Map<BoosterType,Integer> maxBooster;
 
-    public LunixPlayer(UUID pUUID, String name, BigInteger tokens, long gems, long pyrexPoints, int rank, LunixPickaxe pickaxe, boolean isArmorEquiped, Map<ArmorType,Armor> armor, ItemID selectedGemstone, int gemstoneCount, List<Booster> boosters) {
+    public LunixPlayer(UUID pUUID, String name, BigInteger tokens, long gems, long lunixPoints, int rank, LunixPickaxe pickaxe, boolean isArmorEquiped, Map<ArmorType,Armor> armor, ItemID selectedGemstone, int gemstoneCount, List<Booster> boosters) {
         this.pUUID = pUUID;
         this.name = name;
         this.tokens = tokens;
         this.gems = gems;
-        this.pyrexPoints = pyrexPoints;
+        this.lunixPoints = lunixPoints;
         this.rank = rank;
         this.pickaxe = pickaxe;
         this.isArmorEquiped = isArmorEquiped;
@@ -74,15 +74,15 @@ public class LunixPlayer {
         return tokens;
     }
 
-    public long getPyrexPoints() {
-        return pyrexPoints;
+    public long getLunixPoints() {
+        return lunixPoints;
     }
 
     public BigInteger getCurrency(CurrencyType type) {
         BigInteger amount = BigInteger.ZERO;
         switch (type) {
             case GEMS -> amount = BigInteger.valueOf(getGems()) ;
-            case LUNIX_POINTS -> amount = BigInteger.valueOf(getPyrexPoints());
+            case LUNIX_POINTS -> amount = BigInteger.valueOf(getLunixPoints());
             case TOKENS -> amount = getTokens();
         }
         return amount;
@@ -136,8 +136,8 @@ public class LunixPlayer {
         this.tokens = tokens;
     }
 
-    public void setPyrexPoints(long pyrexPoints) {
-        this.pyrexPoints = pyrexPoints;
+    public void setLunixPoints(long lunixPoints) {
+        this.lunixPoints = lunixPoints;
     }
 
     public void setName(String name) {
@@ -167,8 +167,8 @@ public class LunixPlayer {
     public void giveGems(long gems) {
         this.gems += gems;
     }
-    public void givePyrexPoints(long pyrexPoints) {
-        this.pyrexPoints += pyrexPoints;
+    public void giveLunixPoints(long pyrexPoints) {
+        this.lunixPoints += pyrexPoints;
     }
 
     public void giveCurrency(CurrencyType type, long amount) {
@@ -178,7 +178,7 @@ public class LunixPlayer {
     public void giveCurrency(CurrencyType type, BigInteger amount) {
         switch (type) {
             case GEMS -> giveGems(amount.longValue());
-            case LUNIX_POINTS -> givePyrexPoints(amount.longValue());
+            case LUNIX_POINTS -> giveLunixPoints(amount.longValue());
             case TOKENS -> giveTokens(amount);
         }
     }
@@ -190,7 +190,7 @@ public class LunixPlayer {
         this.gems -= gems;
     }
     public void takePyrexPoints(long pyrexPoints) {
-        this.pyrexPoints -= pyrexPoints;
+        this.lunixPoints -= pyrexPoints;
     }
 
     public void takeCurrency(CurrencyType type, BigInteger amount) {
@@ -283,7 +283,7 @@ public class LunixPlayer {
         Map<String, Object> currencyMap = new LinkedHashMap<>();
         currencyMap.put("tokens", tokens);
         currencyMap.put("gems", gems);
-        currencyMap.put("pyrexpoints", pyrexPoints);
+        currencyMap.put("pyrexpoints", lunixPoints);
         data.createSection("currencies", currencyMap);
         Map<String, Object> playerData = new LinkedHashMap<>();
         playerData.put("name",name);

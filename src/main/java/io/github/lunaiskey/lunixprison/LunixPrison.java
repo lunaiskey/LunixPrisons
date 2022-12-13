@@ -151,7 +151,7 @@ public final class LunixPrison extends JavaPlugin {
     private void checkPlayerData() {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (!playerManager.getPlayerMap().containsKey(p.getUniqueId())) {
-                playerManager.createPyrexPlayer(p.getUniqueId());
+                playerManager.createLunixPlayer(p.getUniqueId());
             } else {
                 playerManager.getPlayerMap().get(p.getUniqueId()).setName(p.getName());
             }

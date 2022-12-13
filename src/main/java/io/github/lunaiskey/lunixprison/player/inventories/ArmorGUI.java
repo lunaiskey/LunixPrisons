@@ -79,7 +79,7 @@ public class ArmorGUI implements LunixInventory {
                     for (ItemStack item : p.getInventory().getArmorContents()) {
                         if (item != null) {
                             if (NBTTags.getLunixDataMap(item).get("id") != null) {
-                                if (!NBTTags.getLunixDataMap(item).get("id").getAsString().contains("PYREX_ARMOR_")) {
+                                if (!NBTTags.getLunixDataMap(item).get("id").getAsString().contains("LUNIX_ARMOR_")) {
                                     allSlotsEmpty = false;
                                 }
                             } else {

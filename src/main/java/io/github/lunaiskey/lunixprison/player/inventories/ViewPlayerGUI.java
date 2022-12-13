@@ -67,7 +67,7 @@ public class ViewPlayerGUI implements LunixInventory {
         lore.add(" ");
         lore.add(StringUtil.color("&eTokens: &f"+ Numbers.formattedNumber(lunixPlayer.getTokens())));
         lore.add(StringUtil.color("&aGems: &f"+ Numbers.formattedNumber(lunixPlayer.getGems())));
-        lore.add(StringUtil.color("&dPyrexPoints: &f"+ Numbers.formattedNumber(lunixPlayer.getPyrexPoints())));
+        lore.add(StringUtil.color("&3LunixPoints: &f"+ Numbers.formattedNumber(lunixPlayer.getLunixPoints())));
         lore.add(StringUtil.color("&bRank: &f"+ lunixPlayer.getRank()));
         meta.setLore(lore);
         item.setItemMeta(meta);

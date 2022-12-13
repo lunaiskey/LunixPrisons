@@ -80,11 +80,11 @@ permissions:
   lunix.gems.set:
     description: Set a players Gems.
   lunix.points.give:
-    description: Give PyrexPoints to players.
+    description: Give LunixPoints to players.
   lunix.points.take:
-    description: Take PyrexPoints from players.
+    description: Take LunixPoints from players.
   lunix.points.set:
-    description: Set a players PyrexPoints.
+    description: Set a players LunixPoints.
   lunix.debug:
     description: Gives access to debug commands.
   lunix.resetcooldown.bypass:

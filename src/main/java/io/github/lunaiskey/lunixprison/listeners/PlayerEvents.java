@@ -79,7 +79,7 @@ public class PlayerEvents implements Listener {
         if (itemID != null) {
             switch (itemID) {
                 case BOOSTER -> new BoosterItem(mainHand).onBlockBreak(e);
-                case PYREX_PICKAXE -> {
+                case LUNIX_PICKAXE -> {
                     if (playerMap.containsKey(p.getUniqueId())) {
                         LunixPickaxe pickaxe = playerMap.get(p.getUniqueId()).getPickaxe();
                         pickaxe.onBlockBreak(e);
@@ -133,7 +133,7 @@ public class PlayerEvents implements Listener {
         }
         Map<UUID, LunixPlayer> playerMap = LunixPrison.getPlugin().getPlayerManager().getPlayerMap();
         if (!playerMap.containsKey(p.getUniqueId())) {
-            LunixPrison.getPlugin().getPlayerManager().createPyrexPlayer(p.getUniqueId());
+            LunixPrison.getPlugin().getPlayerManager().createLunixPlayer(p.getUniqueId());
         } else {
             LunixPlayer lunixPlayer = playerMap.get(p.getUniqueId());
             if (!lunixPlayer.getName().equals(p.getName())) {
