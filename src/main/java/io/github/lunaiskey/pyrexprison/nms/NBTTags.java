@@ -7,7 +7,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TagType;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.bukkit.craftbukkit.v1_18_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigInteger;
