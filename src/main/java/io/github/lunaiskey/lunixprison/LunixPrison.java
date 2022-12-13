@@ -75,7 +75,7 @@ public final class LunixPrison extends JavaPlugin {
     @Override
     public void onDisable() {
         Bukkit.getScheduler().cancelTask(saveTaskID);
-        closeAllPyrexInvs();
+        closeAllLunixInvs();
         saveAll();
         this.getLogger().info("Saved "+savePending.size()+" Players.");
     }
@@ -84,7 +84,7 @@ public final class LunixPrison extends JavaPlugin {
         return plugin;
     }
 
-    private void closeAllPyrexInvs() {
+    private void closeAllLunixInvs() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getOpenInventory().getTopInventory().getHolder() instanceof LunixHolder) {
                 player.closeInventory();

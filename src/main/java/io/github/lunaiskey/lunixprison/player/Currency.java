@@ -81,7 +81,7 @@ public class Currency {
                     pPlayer.setLunixPoints(0);
                     break;
                 }
-                pPlayer.takePyrexPoints(amount.longValue());}
+                pPlayer.takeLunixPoints(amount.longValue());}
         }
     }
     public static void setCurrency(UUID pUUID, CurrencyType type, long amount) {

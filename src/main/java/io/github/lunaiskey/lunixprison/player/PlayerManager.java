@@ -69,7 +69,7 @@ public class PlayerManager {
             }
             BigInteger tokens = new BigInteger(currencyMap.getOrDefault("tokens",BigInteger.ZERO).toString());
             long gems = ((Number) currencyMap.getOrDefault("gems",0L)).longValue();
-            long pyrexPoints = ((Number) currencyMap.getOrDefault("pyrexpoints",0L)).longValue();
+            long lunixPoints = ((Number) currencyMap.getOrDefault("pyrexpoints",0L)).longValue();
 
             //Load Pyrex Data from map
             Map<String,Object> playerData = new HashMap<>();
@@ -132,7 +132,7 @@ public class PlayerManager {
                 } catch (Exception ignored) {}
             }
             //Finished Loading
-            getPlayerMap().put(pUUID,new LunixPlayer(pUUID,cachedName,tokens,gems,pyrexPoints,rank,pickaxe,isArmorEquiped,armorMap,selectedGemstone,gemstoneCount,null));
+            getPlayerMap().put(pUUID,new LunixPlayer(pUUID,cachedName,tokens,gems,lunixPoints,rank,pickaxe,isArmorEquiped,armorMap,selectedGemstone,gemstoneCount,null));
             playerNameMap.put(cachedName.toUpperCase(),pUUID);
         }
     }

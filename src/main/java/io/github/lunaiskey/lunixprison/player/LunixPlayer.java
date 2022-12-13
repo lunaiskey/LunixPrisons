@@ -189,14 +189,14 @@ public class LunixPlayer {
     public void takeGems(long gems) {
         this.gems -= gems;
     }
-    public void takePyrexPoints(long pyrexPoints) {
-        this.lunixPoints -= pyrexPoints;
+    public void takeLunixPoints(long lunixPoints) {
+        this.lunixPoints -= lunixPoints;
     }
 
     public void takeCurrency(CurrencyType type, BigInteger amount) {
         switch (type) {
             case GEMS -> takeGems(amount.longValue());
-            case LUNIX_POINTS -> takePyrexPoints(amount.longValue());
+            case LUNIX_POINTS -> takeLunixPoints(amount.longValue());
             case TOKENS -> takeTokens(amount);
         }
     }
