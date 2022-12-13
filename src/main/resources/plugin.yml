@@ -1,11 +1,11 @@
-name: PyrexPrison
+name: LunixPrisons
 version: '${project.version}'
-main: io.github.lunaiskey.pyrexprison.PyrexPrison
+main: io.github.lunaiskey.lunixprison.LunixPrison
 api-version: 1.18
 authors: [ Lunaiskey ]
 softdepend:
   - PlaceholderAPI
-description: Made for PyrexMC Prison.
+description: A Continuation of the old PyrexPrison plugin.
 commands:
   gang:
     usage: /<command>
@@ -19,7 +19,7 @@ commands:
     usage: /<command>
     aliases:
       - gemstone
-  pyrexpoints:
+  lunixpoints:
     usage: /<command>
   enchants:
     usage: /<command>
@@ -33,9 +33,9 @@ commands:
   multiplier:
     usage: /<command>
     aliases: [multi]
-  pitem:
+  litem:
     usage: /<command>
-    permission: pyrex.admin.pitem
+    permission: lunix.admin.litem
   viewplayer:
     usage: /<command>
   rank:
@@ -52,40 +52,40 @@ commands:
       - leaderboards
       - lb
 permissions:
-  pyrex.*:
+  lunix.*:
     description: Gives access to every command.
     children:
-      pyrex.tokens.give: true
-      pyrex.tokens.take: true
-      pyrex.tokens.set: true
-      pyrex.gems.give: true
-      pyrex.gems.take: true
-      pyrex.gems.set: true
-      pyrex.points.give: true
-      pyrex.points.take: true
-      pyrex.points.set: true
-      pyrex.debug: true
-      pyrex.resetcooldown.bypass: true
-      pyrex.admin.getitem: true
-  pyrex.tokens.give:
+      lunix.tokens.give: true
+      lunix.tokens.take: true
+      lunix.tokens.set: true
+      lunix.gems.give: true
+      lunix.gems.take: true
+      lunix.gems.set: true
+      lunix.points.give: true
+      lunix.points.take: true
+      lunix.points.set: true
+      lunix.debug: true
+      lunix.resetcooldown.bypass: true
+      lunix.admin.getitem: true
+  lunix.tokens.give:
     description: Give Tokens to players.
-  pyrex.tokens.take:
+  lunix.tokens.take:
     description: Take Tokens from players.
-  pyrex.tokens.set:
+  lunix.tokens.set:
     description: Set a players Tokens.
-  pyrex.gems.give:
+  lunix.gems.give:
     description: Give Gems to players.
-  pyrex.gems.take:
+  lunix.gems.take:
     description: Take Gems from players.
-  pyrex.gems.set:
+  lunix.gems.set:
     description: Set a players Gems.
-  pyrex.points.give:
+  lunix.points.give:
     description: Give PyrexPoints to players.
-  pyrex.points.take:
+  lunix.points.take:
     description: Take PyrexPoints from players.
-  pyrex.points.set:
+  lunix.points.set:
     description: Set a players PyrexPoints.
-  pyrex.debug:
+  lunix.debug:
     description: Gives access to debug commands.
-  pyrex.resetcooldown.bypass:
+  lunix.resetcooldown.bypass:
     description: Bypass private mine reset cooldown.
