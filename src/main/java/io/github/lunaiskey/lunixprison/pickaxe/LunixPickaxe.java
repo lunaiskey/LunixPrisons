@@ -4,12 +4,14 @@ import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.mines.PMine;
 import io.github.lunaiskey.lunixprison.mines.generator.PMineWorld;
 import io.github.lunaiskey.lunixprison.nms.NBTTags;
+import io.github.lunaiskey.lunixprison.pickaxe.inventories.PickaxeEnchantGUI;
 import io.github.lunaiskey.lunixprison.player.LunixPlayer;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -28,13 +30,13 @@ public class LunixPickaxe {
         if (enchants == null) {
             enchants = new HashMap<>();
         }
-        for (EnchantType type : EnchantType.getDefaultMap().keySet()) {
+        for (EnchantType type : EnchantType.getDefaultEnchants().keySet()) {
             if (enchants.containsKey(type)) {
-                if (enchants.get(type) < EnchantType.getDefaultMap().get(type)) {
-                    enchants.put(type,EnchantType.getDefaultMap().get(type));
+                if (enchants.get(type) < EnchantType.getDefaultEnchants().get(type)) {
+                    enchants.put(type,EnchantType.getDefaultEnchants().get(type));
                 }
             } else {
-                enchants.put(type,EnchantType.getDefaultMap().get(type));
+                enchants.put(type,EnchantType.getDefaultEnchants().get(type));
             }
         }
         this.enchants = enchants;
@@ -90,7 +92,10 @@ public class LunixPickaxe {
     }
 
     public void onInteract(PlayerInteractEvent e) {
-
+        Player p = e.getPlayer();
+        if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            p.openInventory(new PickaxeEnchantGUI(p).getInv());
+        }
     }
 
     public long getBlocksBroken() {

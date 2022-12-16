@@ -90,12 +90,14 @@ public class ArmorUpgradeGUI implements LunixInventory {
         switch (slot) {
             case 21,22,23 -> {
                 if (abilitySlots.containsKey(slot)) {
-                    Ability ability = armor.getAbilties().get(abilitySlots.get(slot));
-                    if (ability.getLevel() < ability.getMaxLevel()) {
-                        if (lunixPlayer.getGems() >= ability.getCost()) {
-                            lunixPlayer.takeGems(ability.getCost());
-                            ability.setLevel(ability.getLevel() + 1);
-                            player.sendMessage(StringUtil.color("&aUpgraded " + abilitySlots.get(slot).name() + " to level " + ability.getLevel() + "."));
+                    AbilityType abilityType = abilitySlots.get(slot);
+                    Ability ability = LunixPrison.getPlugin().getPlayerManager().getArmorAbilityMap().get(abilityType);
+                    int level = armor.getAbilties().get(abilityType);
+                    if (level < ability.getMaxLevel()) {
+                        if (lunixPlayer.getGems() >= ability.getCost(level)) {
+                            lunixPlayer.takeGems(ability.getCost(level));
+                            armor.getAbilties().put(abilityType,level+1);
+                            player.sendMessage(StringUtil.color("&aUpgraded " + abilitySlots.get(slot).name() + " to level " + armor.getAbilties().get(abilityType) + "."));
                             if (isEquiped) {
                                 p.getInventory().setItem(type.getSlot(), armor.getItemStack());
                             }
@@ -111,8 +113,8 @@ public class ArmorUpgradeGUI implements LunixInventory {
                 if (armor.getTier() < armor.getTierMax()) {
                     int cost = armor.getCostAmount(armor.getTier()+1);
                     ItemID gemStoneType = armor.getGemstone(armor.getTier()+1);
-                    if (LunixPrison.getPlugin().getPlayerManager().getPyrexItemCount(player,gemStoneType) >= cost) {
-                        LunixPrison.getPlugin().getPlayerManager().removePyrexItem(player,gemStoneType,cost);
+                    if (LunixPrison.getPlugin().getPlayerManager().getLunixItemCount(player,gemStoneType) >= cost) {
+                        LunixPrison.getPlugin().getPlayerManager().removeLunixItem(player,gemStoneType,cost);
                         armor.setTier(armor.getTier()+1);
                         player.sendMessage(StringUtil.color("&aSuccessfully upgraded armor to Tier "+armor.getTier()+"."));
                         if (isEquiped) {
@@ -147,24 +149,22 @@ public class ArmorUpgradeGUI implements LunixInventory {
     }
 
     private ItemStack getUpgradeButton(AbilityType abilityType) {
-        Material mat = abilityType.getUpgradeMaterial();
-        String name = abilityType.getUpgradeName();
+        Material mat = abilityType.getMaterial();
+        String name = abilityType.getFormattedName();
         Armor armor = lunixPlayer.getArmor().get(type);
-        int level = armor.getAbilties().get(abilityType).getLevel();
-        int maxLevel = armor.getAbilties().get(abilityType).getMaxLevel();
-        long cost = armor.getAbilties().get(abilityType).getCost();
-        ItemStack item = new ItemStack(mat);
-        ItemMeta meta = item.getItemMeta();
+        int level = armor.getAbilties().get(abilityType);
+        Ability ability = LunixPrison.getPlugin().getPlayerManager().getArmorAbilityMap().get(abilityType);
+        int maxLevel = ability.getMaxLevel();
+        long cost = ability.getCost(level+1);
         String levelStr = level > 0 ? ""+level : "";
-        meta.setDisplayName(StringUtil.color(name+" "+levelStr));
+        String formattedName = StringUtil.color(name+" "+levelStr);
         List<String> lore = new ArrayList<>();
-        Ability ability = armor.getAbilties().get(abilityType);
         for (String str : ability.getDescription()) {
             lore.add(StringUtil.color("&7"+str));
         }
         if (level < maxLevel) {
             lore.add(" ");
-            lore.add(StringUtil.color("&7Upgrade: "+armor.getAbilties().get(abilityType).getLoreAddon() +" -> "+armor.getAbilties().get(abilityType).getLoreAddon(level+1)));
+            lore.add(StringUtil.color("&7Upgrade: "+ability.getLoreAddon(level) +" -> "+ability.getLoreAddon(level+1)));
             lore.add(StringUtil.color("&7Cost: &a"+ CurrencyType.GEMS.getUnicode()+"&f"+cost));
             lore.add("");
             lore.add(StringUtil.color("&eClick to upgrade!"));
@@ -172,9 +172,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
             lore.add(" ");
             lore.add(StringUtil.color("&cYou have maxed this upgrade."));
         }
-        meta.setLore(lore);
-        item.setItemMeta(meta);
-        return item;
+        return ItemBuilder.createItem(formattedName,mat,lore);
     }
 
     private ItemStack getTierUpButton() {

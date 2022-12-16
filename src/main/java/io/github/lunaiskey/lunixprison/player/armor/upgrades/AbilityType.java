@@ -19,7 +19,7 @@ public enum AbilityType {
         return list;
     }
 
-    public Material getUpgradeMaterial() {
+    public Material getMaterial() {
         return switch (this) {
             case SALES_BOOST -> Material.SUNFLOWER;
             case ENCHANTMENT_PROC -> Material.NETHER_STAR;
@@ -27,7 +27,7 @@ public enum AbilityType {
         };
     }
 
-    public String getUpgradeName() {
+    public String getFormattedName() {
         return switch (this) {
             case SALES_BOOST -> "&eSales Boost";
             case ENCHANTMENT_PROC -> "&eEnchantment Proc";

@@ -1,8 +1,10 @@
 package io.github.lunaiskey.lunixprison.pickaxe;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.items.ItemID;
 import io.github.lunaiskey.lunixprison.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.pickaxe.enchants.*;
+import io.github.lunaiskey.lunixprison.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Bukkit;
@@ -42,46 +44,35 @@ public class PickaxeHandler {
         enchantments.put(EnchantType.MINE_BOMB,new MineBomb());
     }
 
-    public Map<EnchantType, LunixEnchant> getEnchantments() {
-        return enchantments;
-    }
 
-    public static String getId() {
-        return ID;
-    }
 
     public ItemStack updatePickaxe(ItemStack item, UUID p) {
-        CompoundTag lunixDataMap = NBTTags.getLunixDataMap(item);
-        if (lunixDataMap.contains("id")) {
-            // is custom pickaxe
-            if (lunixDataMap.getString("id").equals("LUNIX_PICKAXE")) {
-                ItemMeta meta = item.getItemMeta();
-                OfflinePlayer player = Bukkit.getOfflinePlayer(p);
-                meta.setDisplayName(StringUtil.color("&d"+player.getName()+"'s &fPickaxe"));
-                List<String> lore = new ArrayList<>();
-                LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p).getPickaxe();
-                Map<EnchantType, Integer> enchants = pickaxe.getEnchants();
-                lore.add(" ");
-                lore.add(StringUtil.color("&d&lPickaxe Stats:"));
-                lore.add(StringUtil.color("&d&l| &fBlocks: "+pickaxe.getBlocksBroken()));
-                lore.add(" ");
-                lore.add(StringUtil.color("&d&lEnchants"));
-                for (EnchantType enchantType : EnchantType.getSortedSet()) {
-                    LunixEnchant lunixEnchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(enchantType);
-                    if (enchants.containsKey(enchantType) && enchants.get(enchantType) > 0) {
-                        lore.add(StringUtil.color("&d&l| &f"+ lunixEnchant.getName()+" "+enchants.get(enchantType)));
-                        if (enchantType == EnchantType.EFFICIENCY) {
-                            meta.addEnchant(Enchantment.DIG_SPEED,enchants.get(enchantType),true);
-                        }
-                    }
+        ItemID id = NBTTags.getItemID(item);
+        if (id != ItemID.LUNIX_PICKAXE) return item;
+        ItemMeta meta = item.getItemMeta();
+        LunixPlayer player = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p);
+        meta.setDisplayName(StringUtil.color("&d"+player.getName()+"'s &fPickaxe"));
+        List<String> lore = new ArrayList<>();
+        LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p).getPickaxe();
+        Map<EnchantType, Integer> enchants = pickaxe.getEnchants();
+        lore.add(" ");
+        lore.add(StringUtil.color("&d&lPickaxe Stats:"));
+        lore.add(StringUtil.color("&d&l| &fBlocks: "+pickaxe.getBlocksBroken()));
+        lore.add(" ");
+        lore.add(StringUtil.color("&d&lEnchants"));
+        for (EnchantType enchantType : EnchantType.getSortedEnchants()) {
+            LunixEnchant lunixEnchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(enchantType);
+            if (enchants.containsKey(enchantType) && enchants.get(enchantType) > 0) {
+                lore.add(StringUtil.color("&d&l| &f"+ lunixEnchant.getName()+" "+enchants.get(enchantType)));
+                if (enchantType == EnchantType.EFFICIENCY) {
+                    meta.addEnchant(Enchantment.DIG_SPEED,enchants.get(enchantType),true);
                 }
-                meta.setLore(lore);
-                meta.setUnbreakable(true);
-                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS,ItemFlag.HIDE_ATTRIBUTES,ItemFlag.HIDE_UNBREAKABLE);
-                item.setItemMeta(meta);
-                return item;
             }
         }
+        meta.setLore(lore);
+        meta.setUnbreakable(true);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS,ItemFlag.HIDE_ATTRIBUTES,ItemFlag.HIDE_UNBREAKABLE);
+        item.setItemMeta(meta);
         return item;
     }
 
@@ -115,6 +106,14 @@ public class PickaxeHandler {
             p.getInventory().addItem(LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe().getItemStack());
         }
         return hasPickaxe;
+    }
+
+    public Map<EnchantType, LunixEnchant> getEnchantments() {
+        return enchantments;
+    }
+
+    public static String getId() {
+        return ID;
     }
 
 }

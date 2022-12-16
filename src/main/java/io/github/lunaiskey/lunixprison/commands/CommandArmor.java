@@ -100,14 +100,14 @@ public class CommandArmor implements CommandExecutor {
                                 }
                                 try {
                                     AbilityType abilityType = AbilityType.valueOf(changeType.toUpperCase());
-                                    Ability ability = armor.getAbilties().get(abilityType);
+                                    Ability ability = LunixPrison.getPlugin().getPlayerManager().getArmorAbilityMap().get(abilityType);
                                     int newValue = Integer.parseInt(value);
                                     if (newValue < 0) {
                                         newValue = 0;
                                     } else if (newValue > ability.getMaxLevel()) {
                                         newValue = ability.getMaxLevel();
                                     }
-                                    ability.setLevel(newValue);
+                                    armor.getAbilties().put(abilityType,newValue);
                                     if (lunixPlayer.isArmorEquiped()) {
                                         other.getInventory().setItem(armorType.getSlot(), armor.getItemStack());
                                     }

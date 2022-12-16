@@ -1,9 +1,6 @@
 package io.github.lunaiskey.lunixprison.pickaxe;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public enum EnchantType {
     EFFICIENCY,
@@ -25,36 +22,29 @@ public enum EnchantType {
     //VERTICAL_BREAK,
     ;
 
-    public static Set<EnchantType> getSortedSet() {
-        Set<EnchantType> type = new LinkedHashSet<>();
-        type.add(EFFICIENCY);
-        type.add(FORTUNE);
-        type.add(HASTE);
-        type.add(SPEED);
-        type.add(JUMP_BOOST);
-        type.add(NIGHT_VISION);
-        type.add(MINE_BOMB);
-        type.add(JACK_HAMMER);
-        type.add(STRIKE);
-        type.add(EXPLOSIVE);
-        //type.add(HORIZONTAL_BREAK);
-        //type.add(VERTICAL_BREAK);
-        type.add(NUKE);
-        type.add(GEM_FINDER);
-        type.add(KEY_FINDER);
-        type.add(LOOT_FINDER);
-        type.add(XP_BOOST);
-        return type;
+    private static final Set<EnchantType> SORTED_ENCHANTS = new LinkedHashSet<>();
+    private static final Map<EnchantType,Integer> DEFAULT_ENCHANTS = new HashMap<>();
+
+    static {
+        SORTED_ENCHANTS.addAll(List.of(
+                EFFICIENCY,FORTUNE,HASTE,SPEED,JUMP_BOOST,NIGHT_VISION,
+                MINE_BOMB,JACK_HAMMER,STRIKE,EXPLOSIVE,NUKE,
+                GEM_FINDER,KEY_FINDER,LOOT_FINDER,XP_BOOST
+        ));
+        DEFAULT_ENCHANTS.put(EnchantType.EFFICIENCY, 100);
+        DEFAULT_ENCHANTS.put(EnchantType.HASTE,6);
+        DEFAULT_ENCHANTS.put(EnchantType.SPEED,3);
+        DEFAULT_ENCHANTS.put(EnchantType.JUMP_BOOST,3);
+        DEFAULT_ENCHANTS.put(EnchantType.NIGHT_VISION,1);
+        DEFAULT_ENCHANTS.put(EnchantType.FORTUNE,5);
     }
 
-    public static Map<EnchantType,Integer> getDefaultMap() {
-        Map<EnchantType,Integer> map = new HashMap<>();
-        map.put(EnchantType.EFFICIENCY, 100);
-        map.put(EnchantType.HASTE,6);
-        map.put(EnchantType.SPEED,3);
-        map.put(EnchantType.JUMP_BOOST,3);
-        map.putIfAbsent(EnchantType.NIGHT_VISION,1);
-        map.putIfAbsent(EnchantType.FORTUNE,5);
-        return map;
+
+    public static Set<EnchantType> getSortedEnchants() {
+        return SORTED_ENCHANTS;
+    }
+
+    public static Map<EnchantType,Integer> getDefaultEnchants() {
+        return DEFAULT_ENCHANTS;
     }
 }

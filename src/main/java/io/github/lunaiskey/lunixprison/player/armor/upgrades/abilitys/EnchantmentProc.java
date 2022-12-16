@@ -7,32 +7,21 @@ import java.util.List;
 
 public class EnchantmentProc extends Ability {
 
-    public EnchantmentProc(int level) {
-        super("Enchant Proc", List.of("Increases the chance your enchantments will proc."), level, 15);
+    private final int[] costArray = {
+            0,500,750,1000,1500,2000,2500,3000,3500,4250,5000,
+            6000,7500,10000,15000,20000
+    };
+
+    public EnchantmentProc() {
+        super("Enchant Proc", List.of("Increases the chance your enchantments will proc."), 15);
     }
 
     @Override
     public long getCost(int level) {
-        long cost = 0;
-        switch (level+1) {
-            case 1 -> cost = 500;
-            case 2 -> cost = 750;
-            case 3 -> cost = 1000;
-            case 4 -> cost = 1500;
-            case 5 -> cost = 2000;
-            case 6 -> cost = 2500;
-            case 7 -> cost = 3000;
-            case 8 -> cost = 3500;
-            case 9 -> cost = 4250;
-            case 10 -> cost = 5000;
-            case 11 -> cost = 6000;
-            case 12 -> cost = 7500;
-            case 13 -> cost = 10000;
-            case 14 -> cost = 15000;
-            case 15 -> cost = 20000;
+        if (level < costArray.length) {
+            return costArray[level];
         }
-
-        return cost;
+        return costArray[0];
     }
 
     @Override

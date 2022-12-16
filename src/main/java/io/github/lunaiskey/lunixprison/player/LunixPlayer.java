@@ -216,9 +216,9 @@ public class LunixPlayer {
 
     public double getArmorMultiplier() {
         double multiplier = 0;
+        SalesBoost boost = (SalesBoost) LunixPrison.getPlugin().getPlayerManager().getArmorAbilityMap().get(AbilityType.SALES_BOOST);
         for (Armor armor : getArmor().values()) {
-            SalesBoost boost = (SalesBoost) armor.getAbilties().getOrDefault(AbilityType.SALES_BOOST,new SalesBoost(0));
-            multiplier += boost.getMultiplier(boost.getLevel());
+            multiplier += boost.getMultiplier(armor.getAbilties().get(AbilityType.SALES_BOOST));
         }
         return multiplier;
     }
@@ -238,9 +238,9 @@ public class LunixPlayer {
 
     public int getXPBoostTotal() {
         int total = 0;
+        XPBoost boost = (XPBoost) LunixPrison.getPlugin().getPlayerManager().getArmorAbilityMap().get(AbilityType.XP_BOOST);
         for (Armor armor : getArmor().values()) {
-            XPBoost boost = (XPBoost) armor.getAbilties().getOrDefault(AbilityType.XP_BOOST,new XPBoost(0));
-            total += boost.getBoost(boost.getLevel());
+            total += boost.getBoost(armor.getAbilties().get(AbilityType.XP_BOOST));
         }
         return total;
     }
@@ -283,14 +283,14 @@ public class LunixPlayer {
         Map<String, Object> currencyMap = new LinkedHashMap<>();
         currencyMap.put("tokens", tokens);
         currencyMap.put("gems", gems);
-        currencyMap.put("pyrexpoints", lunixPoints);
+        currencyMap.put("lunixpoints", lunixPoints);
         data.createSection("currencies", currencyMap);
         Map<String, Object> playerData = new LinkedHashMap<>();
         playerData.put("name",name);
         playerData.put("rank",rank);
         playerData.put("selectedGemstone",selectedGemstone.name());
         playerData.put("gemstoneCount",gemstoneCount);
-        data.createSection("pyrexData",playerData);
+        data.createSection("playerData",playerData);
         Map<String, Object> armorData = new LinkedHashMap<>();
         armorData.put("isArmorEquiped",isArmorEquiped);
         data.createSection("armor",armorData);
@@ -318,7 +318,7 @@ public class LunixPlayer {
             data.createSection("armor."+armor.getType().getName(),pieceData);
             Map<String,Object> abilityData = new LinkedHashMap<>();
             for(AbilityType type : armor.getAbilties().keySet()) {
-                abilityData.put(type.name(),armor.getAbilties().get(type).getLevel());
+                abilityData.put(type.name(),armor.getAbilties().get(type));
             }
             data.createSection("armor."+armor.getType().getName()+".abilities",abilityData);
         }

@@ -34,14 +34,22 @@ public class PlayerManager {
     private Map<UUID, LunixPlayer> playerMap = new HashMap<>();
     private Map<String, UUID> playerNameMap = new HashMap<>();
 
+    private Map<AbilityType, Ability> armorAbilityMap = new HashMap<>();
 
-    public Map<UUID, LunixPlayer> getPlayerMap() {
-        return playerMap;
+    public PlayerManager() {
+        registerArmorAbilities();
     }
 
-    public Map<String, UUID> getPlayerNameMap() {
-        return playerNameMap;
+    private void registerArmorAbilities() {
+        armorAbilityMap.put(AbilityType.SALES_BOOST,new SalesBoost());
+        armorAbilityMap.put(AbilityType.ENCHANTMENT_PROC,new EnchantmentProc());
+        armorAbilityMap.put(AbilityType.XP_BOOST,new XPBoost());
     }
+
+    public Map<AbilityType, Ability> getArmorAbilityMap() {
+        return armorAbilityMap;
+    }
+
     public void createLunixPlayer(UUID pUUID) {
         Player player = Bukkit.getPlayer(pUUID);
         if (player != null) {
@@ -50,6 +58,7 @@ public class PlayerManager {
             playerMap.put(pUUID,new LunixPlayer(pUUID, Bukkit.getOfflinePlayer(pUUID).getName()));
         }
     }
+
 
     public void loadPlayers() {
         File[] playerFiles = new File(LunixPrison.getPlugin().getDataFolder(), "playerdata").listFiles(new PMineManager.IsPMineFile());
@@ -65,16 +74,16 @@ public class PlayerManager {
             } catch (Exception ignored) {
                 currencyMap.put("tokens",BigInteger.ZERO);
                 currencyMap.put("gems",0);
-                currencyMap.put("pyrexpoints",0);
+                currencyMap.put("lunixpoints",0);
             }
             BigInteger tokens = new BigInteger(currencyMap.getOrDefault("tokens",BigInteger.ZERO).toString());
             long gems = ((Number) currencyMap.getOrDefault("gems",0L)).longValue();
-            long lunixPoints = ((Number) currencyMap.getOrDefault("pyrexpoints",0L)).longValue();
+            long lunixPoints = ((Number) currencyMap.getOrDefault("lunixpoints",0L)).longValue();
 
-            //Load Pyrex Data from map
+            //Load Lunix Data from map
             Map<String,Object> playerData = new HashMap<>();
             try {
-                playerData = fileConf.getConfigurationSection("pyrexData").getValues(false);
+                playerData = fileConf.getConfigurationSection("playerData").getValues(false);
             } catch (Exception ignored) {}
             String cachedName = (String) playerData.getOrDefault("name",Bukkit.getOfflinePlayer(pUUID).getName());
             if (cachedName.equals("null")) {
@@ -111,7 +120,7 @@ public class PlayerManager {
             for (ArmorType type : ArmorType.values()) {
                 Color color = armorData.get(type.getName()+".customColor") != null ? Color.fromRGB((Integer) armorData.get(type.getName()+".customColor")) : null;
                 int tier = (int) armorData.getOrDefault(type.getName()+".tier",0);
-                Map<AbilityType, Ability> abilityMap = new HashMap<>();
+                Map<AbilityType, Integer> abilityMap = new HashMap<>();
                 Map<String,Object> abilities;
                 try {
                     abilities = fileConf.getConfigurationSection("armor."+type.getName()+".abilities").getValues(false);
@@ -119,11 +128,7 @@ public class PlayerManager {
                         try {
                             int level = (Integer) abilities.get(str);
                             AbilityType abilityType = AbilityType.valueOf(str);
-                            switch (abilityType) {
-                                case SALES_BOOST -> abilityMap.put(abilityType,new SalesBoost(level));
-                                case ENCHANTMENT_PROC -> abilityMap.put(abilityType,new EnchantmentProc(level));
-                                case XP_BOOST -> abilityMap.put(abilityType,new XPBoost(level));
-                            }
+                            abilityMap.put(abilityType,level);
                         } catch (Exception ignored) {
                         }
                     }
@@ -137,7 +142,7 @@ public class PlayerManager {
         }
     }
 
-    public int getPyrexItemCount(Player p, ItemID id) {
+    public int getLunixItemCount(Player p, ItemID id) {
         int count = 0;
         for (ItemStack item : p.getInventory().getContents()) {
             CompoundTag tag = NBTTags.getLunixDataMap(item);
@@ -150,7 +155,7 @@ public class PlayerManager {
         return count;
     }
 
-    public void removePyrexItem(Player p, ItemID id, int amount) {
+    public void removeLunixItem(Player p, ItemID id, int amount) {
         ItemStack[] inv = p.getInventory().getContents();
         for (int i = 0;i<inv.length;i++) {
             ItemStack item = inv[i];
@@ -241,6 +246,14 @@ public class PlayerManager {
             mineOwner.giveTokens(new BigDecimal(tokens).multiply(BigDecimal.valueOf(tax)).toBigInteger());
             LunixPrison.getPlugin().getSavePending().add(mineOwner.getpUUID());
         }
+    }
 
+
+    public Map<UUID, LunixPlayer> getPlayerMap() {
+        return playerMap;
+    }
+
+    public Map<String, UUID> getPlayerNameMap() {
+        return playerNameMap;
     }
 }

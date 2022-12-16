@@ -6,21 +6,21 @@ import io.github.lunaiskey.lunixprison.util.StringUtil;
 import java.util.List;
 
 public class XPBoost extends Ability {
-    public XPBoost(int level) {
-        super("XP Boost", List.of("Boosts XP while mining."), level, 5);
+
+    private final int[] costArray = {
+            0,1000,2500,5000,7500,10000
+    };
+
+    public XPBoost() {
+        super("XP Boost",List.of("Boosts XP while mining."),5);
     }
 
     @Override
     public long getCost(int level) {
-        long cost = 0;
-        switch (level+1) {
-            case 1 -> cost = 1000;
-            case 2 -> cost = 2500;
-            case 3 -> cost = 5000;
-            case 4 -> cost = 7500;
-            case 5 -> cost = 10000;
+        if (level < costArray.length) {
+            return costArray[level];
         }
-        return cost;
+        return costArray[0];
     }
 
     @Override

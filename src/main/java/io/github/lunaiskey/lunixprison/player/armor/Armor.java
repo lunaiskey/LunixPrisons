@@ -28,23 +28,18 @@ public class Armor {
     private final ArmorType type;
     private Color customColor;
     private int tier;
-    private Map<AbilityType, Ability> abilties = new HashMap<>();
+    private Map<AbilityType, Integer> abilties;
 
 
-    public Armor(ArmorType type, int tier,Color customColor, Map<AbilityType,Ability> abilityMap) {
+    public Armor(ArmorType type, int tier, Color customColor, Map<AbilityType,Integer> abilityMap) {
         this.type = type;
         this.customColor = customColor;
         this.tier = tier;
-        if (abilityMap != null) {
-            abilties.put(AbilityType.SALES_BOOST,abilityMap.getOrDefault(AbilityType.SALES_BOOST,new SalesBoost(0)));
-            abilties.put(AbilityType.ENCHANTMENT_PROC,abilityMap.getOrDefault(AbilityType.ENCHANTMENT_PROC,new EnchantmentProc(0)));
-            abilties.put(AbilityType.XP_BOOST,abilityMap.getOrDefault(AbilityType.XP_BOOST,new XPBoost(0)));
-        } else {
-            abilties.put(AbilityType.SALES_BOOST,new SalesBoost(0));
-            abilties.put(AbilityType.ENCHANTMENT_PROC,new EnchantmentProc(0));
-            abilties.put(AbilityType.XP_BOOST,new XPBoost(0));
+        if (abilityMap == null) abilityMap = new HashMap<>();
+        for (AbilityType abilityType : AbilityType.values()) {
+            abilityMap.putIfAbsent(abilityType,0);
         }
-
+        this.abilties = abilityMap;
     }
 
     public Armor(ArmorType type) {
@@ -67,11 +62,13 @@ public class Armor {
         lore.add(" ");
         lore.add(StringUtil.color("&f&lPiece Abilities:"));
         boolean hasAbilities = false;
+        Map<AbilityType,Ability> abilityMap = LunixPrison.getPlugin().getPlayerManager().getArmorAbilityMap();
         for (AbilityType type : AbilityType.getSortedList()) {
-            Ability ability = abilties.get(type);
-            if (ability.getLevel() > 0) {
+            Ability ability = abilityMap.get(type);
+            int level = abilties.get(type);
+            if (level > 0) {
                 hasAbilities = true;
-                lore.add(" "+ability.getLoreTitle()+ability.getLoreAddon());
+                lore.add(" "+ability.getLoreTitle(level)+ability.getLoreAddon(level));
             }
         }
         if (!hasAbilities) {
@@ -161,7 +158,7 @@ public class Armor {
         return type;
     }
 
-    public Map<AbilityType, Ability> getAbilties() {
+    public Map<AbilityType, Integer> getAbilties() {
         return abilties;
     }
 

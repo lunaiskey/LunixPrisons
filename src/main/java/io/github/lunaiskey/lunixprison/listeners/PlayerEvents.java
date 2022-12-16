@@ -4,6 +4,7 @@ import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.commands.CommandPMine;
 import io.github.lunaiskey.lunixprison.gui.LunixHolder;
 import io.github.lunaiskey.lunixprison.items.ItemID;
+import io.github.lunaiskey.lunixprison.items.LunixItem;
 import io.github.lunaiskey.lunixprison.items.lunixitems.BoosterItem;
 import io.github.lunaiskey.lunixprison.items.lunixitems.Voucher;
 import io.github.lunaiskey.lunixprison.leaderboards.LeaderboardGUI;
@@ -31,6 +32,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.apache.commons.lang3.tuple.*;
 
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -38,6 +40,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -271,34 +274,28 @@ public class PlayerEvents implements Listener {
     public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
         ItemStack item = e.getItem();
-        if (item != null && item.getType() != Material.AIR) {
-            CompoundTag pyrexDataMap = NBTTags.getLunixDataMap(e.getItem());
-            if (pyrexDataMap.contains("id")) {
-                // is custom pickaxe
-                if (pyrexDataMap.getString("id").equals(PickaxeHandler.getId())) {
-                    if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                        p.openInventory(new PickaxeEnchantGUI(p).getInv());
-                    }
+        if (item == null || item.getType() == Material.AIR) return;
+        ItemID id = NBTTags.getItemID(item);
+        if (id == null) return;
+        switch (id) {
+            case LUNIX_PICKAXE -> {
+                LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+                if (lunixPlayer == null) return;
+                lunixPlayer.getPickaxe().onInteract(e);
+            }
+            case BOOSTER -> new BoosterItem(e.getItem()).onInteract(e);
+            case VOUCHER -> {
+                Pair<CurrencyType, BigInteger> pair = NBTTags.getVoucherValue(e.getItem());
+                if (pair != null) {
+                    new Voucher(pair.getLeft(),pair.getRight()).onInteract(e);
+                } else {
+                    new Voucher(null,null).onInteract(e);
                 }
-                try {
-                    ItemID itemID = ItemID.valueOf(pyrexDataMap.getString("id"));
-                    if (LunixPrison.getPlugin().getItemManager().getItemMap().containsKey(itemID)) {
-                        LunixPrison.getPlugin().getItemManager().getItemMap().get(itemID).onInteract(e);
-                        return;
-                    }
-                    //CompoundTag tag = NBTTags.getPyrexDataMap(e.getItem());
-                    switch (itemID) {
-                        case BOOSTER -> new BoosterItem(e.getItem()).onInteract(e);
-                        case VOUCHER -> {
-                            Pair<CurrencyType, BigInteger> pair = NBTTags.getVoucherValue(e.getItem());
-                            if (pair != null) {
-                                new Voucher(pair.getLeft(),pair.getRight()).onInteract(e);
-                            } else {
-                                new Voucher(null,null).onInteract(e);
-                            }
-                        }
-                    }
-                } catch (Exception ignored) {}
+            }
+            default -> {
+                LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getItemMap().get(id);
+                if (lunixItem == null) return;
+                LunixPrison.getPlugin().getItemManager().getItemMap().get(id).onInteract(e);
             }
         }
     }
