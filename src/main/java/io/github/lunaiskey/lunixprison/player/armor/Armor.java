@@ -6,9 +6,6 @@ import io.github.lunaiskey.lunixprison.items.lunixitems.GemStone;
 import io.github.lunaiskey.lunixprison.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.Ability;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.AbilityType;
-import io.github.lunaiskey.lunixprison.player.armor.upgrades.abilitys.EnchantmentProc;
-import io.github.lunaiskey.lunixprison.player.armor.upgrades.abilitys.SalesBoost;
-import io.github.lunaiskey.lunixprison.player.armor.upgrades.abilitys.XPBoost;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
@@ -25,13 +22,13 @@ import java.util.Map;
 
 public class Armor {
 
-    private final ArmorType type;
+    private final ArmorSlot type;
     private Color customColor;
     private int tier;
     private Map<AbilityType, Integer> abilties;
 
 
-    public Armor(ArmorType type, int tier, Color customColor, Map<AbilityType,Integer> abilityMap) {
+    public Armor(ArmorSlot type, int tier, Color customColor, Map<AbilityType,Integer> abilityMap) {
         this.type = type;
         this.customColor = customColor;
         this.tier = tier;
@@ -42,11 +39,11 @@ public class Armor {
         this.abilties = abilityMap;
     }
 
-    public Armor(ArmorType type) {
+    public Armor(ArmorSlot type) {
         this(type,0,null,null);
     }
 
-    public Armor(ArmorType type, int tier) {
+    public Armor(ArmorSlot type, int tier) {
         this(type,tier,null,null);
     }
 
@@ -95,7 +92,7 @@ public class Armor {
         return item;
     }
 
-    public Material getMaterial(ArmorType type) {
+    public Material getMaterial(ArmorSlot type) {
         Material mat = Material.AIR;
         switch(type) {
             case HELMET -> mat = Material.LEATHER_HELMET;
@@ -154,7 +151,7 @@ public class Armor {
         return 10;
     }
 
-    public ArmorType getType() {
+    public ArmorSlot getType() {
         return type;
     }
 

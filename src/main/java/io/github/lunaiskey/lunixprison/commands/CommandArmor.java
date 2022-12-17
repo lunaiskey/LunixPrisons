@@ -3,7 +3,7 @@ package io.github.lunaiskey.lunixprison.commands;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.player.armor.Armor;
-import io.github.lunaiskey.lunixprison.player.armor.ArmorType;
+import io.github.lunaiskey.lunixprison.player.armor.ArmorSlot;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.Ability;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.AbilityType;
 import io.github.lunaiskey.lunixprison.player.inventories.ArmorGUI;
@@ -28,9 +28,9 @@ public class CommandArmor implements CommandExecutor {
             if (other != null) {
                 LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(other.getUniqueId());
                 if (args.length >= 3) {
-                    ArmorType armorType = ArmorType.valueOf(args[1].toUpperCase());
+                    ArmorSlot armorSlot = ArmorSlot.valueOf(args[1].toUpperCase());
                     String action = args[2];
-                    Armor armor = lunixPlayer.getArmor().get(armorType);
+                    Armor armor = lunixPlayer.getArmor().get(armorSlot);
                     if (action.equalsIgnoreCase("set")) {
                         if (p.hasPermission("lunix.armor.set")) {
                             if (args.length >= 5) {
@@ -45,9 +45,9 @@ public class CommandArmor implements CommandExecutor {
                                             newTier = armor.getTierMax();
                                         }
                                         armor.setTier(newTier);
-                                        p.sendMessage("Set " + other.getName() + "'s " + armorType.getName() + "'s " + changeType.toLowerCase() + " to " + value);
+                                        p.sendMessage("Set " + other.getName() + "'s " + armorSlot.getName() + "'s " + changeType.toLowerCase() + " to " + value);
                                         if (lunixPlayer.isArmorEquiped()) {
-                                            other.getInventory().setItem(armorType.getSlot(), armor.getItemStack());
+                                            other.getInventory().setItem(armorSlot.getSlot(), armor.getItemStack());
                                         }
                                     } catch (NumberFormatException ignored) {
                                         p.sendMessage("Invalid Number");
@@ -90,9 +90,9 @@ public class CommandArmor implements CommandExecutor {
                                         return true;
                                     } else {
                                         armor.setCustomColor(Color.fromRGB(newValue));
-                                        p.sendMessage("Set " + other.getName() + "'s " + armorType.getName() + "'s " + changeType.toLowerCase() + " to " + value);
+                                        p.sendMessage("Set " + other.getName() + "'s " + armorSlot.getName() + "'s " + changeType.toLowerCase() + " to " + value);
                                         if (lunixPlayer.isArmorEquiped()) {
-                                            other.getInventory().setItem(armorType.getSlot(), armor.getItemStack());
+                                            other.getInventory().setItem(armorSlot.getSlot(), armor.getItemStack());
                                         }
 
                                     }
@@ -109,9 +109,9 @@ public class CommandArmor implements CommandExecutor {
                                     }
                                     armor.getAbilties().put(abilityType,newValue);
                                     if (lunixPlayer.isArmorEquiped()) {
-                                        other.getInventory().setItem(armorType.getSlot(), armor.getItemStack());
+                                        other.getInventory().setItem(armorSlot.getSlot(), armor.getItemStack());
                                     }
-                                    p.sendMessage("Set " + other.getName() + "'s " + armorType.getName() + "'s " + changeType.toLowerCase() + " to " + value);
+                                    p.sendMessage("Set " + other.getName() + "'s " + armorSlot.getName() + "'s " + changeType.toLowerCase() + " to " + value);
                                 } catch (Exception ignored) {
                                     if (ignored instanceof NumberFormatException) {
                                         p.sendMessage("Invalid number.");

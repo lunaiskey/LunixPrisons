@@ -6,9 +6,10 @@ import io.github.lunaiskey.lunixprison.gui.LunixInvType;
 import io.github.lunaiskey.lunixprison.gui.LunixInventory;
 import io.github.lunaiskey.lunixprison.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.player.LunixPlayer;
-import io.github.lunaiskey.lunixprison.player.armor.ArmorType;
+import io.github.lunaiskey.lunixprison.player.armor.ArmorSlot;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
+import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,13 +28,13 @@ public class ArmorGUI implements LunixInventory {
     private final int size = 27;
     private final Inventory inv = new LunixHolder(name,size, LunixInvType.ARMOR).getInventory();
     private final Player p;
-    private static final Map<Integer, ArmorType> armorSlots = new HashMap<>();
+    private static final Map<Integer, ArmorSlot> armorSlots = new HashMap<>();
 
     static {
-        armorSlots.put(10,ArmorType.HELMET);
-        armorSlots.put(11,ArmorType.CHESTPLATE);
-        armorSlots.put(12,ArmorType.LEGGINGS);
-        armorSlots.put(13,ArmorType.BOOTS);
+        armorSlots.put(10, ArmorSlot.HELMET);
+        armorSlots.put(11, ArmorSlot.CHESTPLATE);
+        armorSlots.put(12, ArmorSlot.LEGGINGS);
+        armorSlots.put(13, ArmorSlot.BOOTS);
     }
 
     public ArmorGUI(Player p) {
@@ -77,16 +78,16 @@ public class ArmorGUI implements LunixInventory {
                 } else {
                     boolean allSlotsEmpty = true;
                     for (ItemStack item : p.getInventory().getArmorContents()) {
-                        if (item != null) {
-                            if (NBTTags.getLunixDataMap(item).get("id") != null) {
-                                if (!NBTTags.getLunixDataMap(item).get("id").getAsString().contains("LUNIX_ARMOR_")) {
-                                    allSlotsEmpty = false;
-                                }
-                            } else {
+                        if (item == null) continue;
+                        CompoundTag armorTag = NBTTags.getLunixDataMap(item);
+                        if (armorTag.get("id") != null) {
+                            if (!armorTag.get("id").getAsString().contains("LUNIX_ARMOR_")) {
                                 allSlotsEmpty = false;
                             }
-                            break;
+                        } else {
+                            allSlotsEmpty = false;
                         }
+                        break;
                     }
                     if (allSlotsEmpty) {
                         p.getInventory().setHelmet(lunixPlayer.getHelmet().getItemStack());

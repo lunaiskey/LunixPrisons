@@ -6,7 +6,7 @@ import io.github.lunaiskey.lunixprison.mines.PMine;
 import io.github.lunaiskey.lunixprison.pickaxe.EnchantType;
 import io.github.lunaiskey.lunixprison.pickaxe.LunixPickaxe;
 import io.github.lunaiskey.lunixprison.player.armor.Armor;
-import io.github.lunaiskey.lunixprison.player.armor.ArmorType;
+import io.github.lunaiskey.lunixprison.player.armor.ArmorSlot;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.AbilityType;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.abilitys.SalesBoost;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.abilitys.XPBoost;
@@ -28,7 +28,7 @@ public class LunixPlayer {
     private final UUID pUUID;
     private String name;
     private LunixPickaxe pickaxe;
-    private final Map<ArmorType,Armor> armor;
+    private final Map<ArmorSlot,Armor> armor;
     private boolean isArmorEquiped;
     private ItemID selectedGemstone;
     private int gemstoneCount;
@@ -37,7 +37,7 @@ public class LunixPlayer {
 
     private Map<BoosterType,Integer> maxBooster;
 
-    public LunixPlayer(UUID pUUID, String name, BigInteger tokens, long gems, long lunixPoints, int rank, LunixPickaxe pickaxe, boolean isArmorEquiped, Map<ArmorType,Armor> armor, ItemID selectedGemstone, int gemstoneCount, List<Booster> boosters) {
+    public LunixPlayer(UUID pUUID, String name, BigInteger tokens, long gems, long lunixPoints, int rank, LunixPickaxe pickaxe, boolean isArmorEquiped, Map<ArmorSlot,Armor> armor, ItemID selectedGemstone, int gemstoneCount, List<Booster> boosters) {
         this.pUUID = pUUID;
         this.name = name;
         this.tokens = tokens;
@@ -48,17 +48,16 @@ public class LunixPlayer {
         this.isArmorEquiped = isArmorEquiped;
         this.gemstoneCount = gemstoneCount;
         this.armor = Objects.requireNonNullElseGet(armor, HashMap::new);
-        this.armor.putIfAbsent(ArmorType.HELMET,new Armor(ArmorType.HELMET));
-        this.armor.putIfAbsent(ArmorType.CHESTPLATE,new Armor(ArmorType.CHESTPLATE));
-        this.armor.putIfAbsent(ArmorType.LEGGINGS,new Armor(ArmorType.LEGGINGS));
-        this.armor.putIfAbsent(ArmorType.BOOTS,new Armor(ArmorType.BOOTS));
+        this.armor.putIfAbsent(ArmorSlot.HELMET,new Armor(ArmorSlot.HELMET));
+        this.armor.putIfAbsent(ArmorSlot.CHESTPLATE,new Armor(ArmorSlot.CHESTPLATE));
+        this.armor.putIfAbsent(ArmorSlot.LEGGINGS,new Armor(ArmorSlot.LEGGINGS));
+        this.armor.putIfAbsent(ArmorSlot.BOOTS,new Armor(ArmorSlot.BOOTS));
         this.selectedGemstone = Objects.requireNonNullElse(selectedGemstone, ItemID.AMETHYST_GEMSTONE);
         this.boosters = Objects.requireNonNullElseGet(boosters, ArrayList::new);
         save();
     }
 
     public LunixPlayer(UUID pUUID, String name) {
-
         this(pUUID,name,BigInteger.ZERO,0,0,0,new LunixPickaxe(pUUID),false,null,ItemID.AMETHYST_GEMSTONE,0,null);
     }
 
@@ -100,24 +99,24 @@ public class LunixPlayer {
         return pickaxe;
     }
 
-    public Map<ArmorType, Armor> getArmor() {
+    public Map<ArmorSlot, Armor> getArmor() {
         return armor;
     }
 
     public Armor getHelmet() {
-        return armor.get(ArmorType.HELMET);
+        return armor.get(ArmorSlot.HELMET);
     }
 
     public Armor getChestplate() {
-        return armor.get(ArmorType.CHESTPLATE);
+        return armor.get(ArmorSlot.CHESTPLATE);
     }
 
     public Armor getLeggings() {
-        return armor.get(ArmorType.LEGGINGS);
+        return armor.get(ArmorSlot.LEGGINGS);
     }
 
     public Armor getBoots() {
-        return armor.get(ArmorType.BOOTS);
+        return armor.get(ArmorSlot.BOOTS);
     }
 
     public List<Booster> getBoosters() {

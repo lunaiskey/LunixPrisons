@@ -5,7 +5,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum ArmorType {
+public enum ArmorSlot {
     HELMET(5),
     CHESTPLATE(6),
     LEGGINGS(7),
@@ -14,7 +14,7 @@ public enum ArmorType {
 
     private final int slot;
 
-    ArmorType(int i) {
+    ArmorSlot(int i) {
         slot=i;
     }
 
@@ -23,19 +23,16 @@ public enum ArmorType {
     }
 
     public String getName() {
-        String str;
-        switch(this) {
-            case HELMET -> str = "Helmet";
-            case CHESTPLATE -> str = "Chestplate";
-            case LEGGINGS -> str = "Leggings";
-            case BOOTS -> str = "Boots";
-            default -> str = "";
-        }
-        return str;
+        return switch(this) {
+            case HELMET -> "Helmet";
+            case CHESTPLATE -> "Chestplate";
+            case LEGGINGS -> "Leggings";
+            case BOOTS -> "Boots";
+        };
     }
 
-    public static List<ArmorType> getSortedList() {
-        List<ArmorType> list = new ArrayList<>();
+    public static List<ArmorSlot> getSortedList() {
+        List<ArmorSlot> list = new ArrayList<>();
         list.add(HELMET);
         list.add(CHESTPLATE);
         list.add(LEGGINGS);

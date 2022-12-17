@@ -22,7 +22,7 @@ import io.github.lunaiskey.lunixprison.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.player.ViewPlayerHolder;
 import io.github.lunaiskey.lunixprison.player.armor.Armor;
-import io.github.lunaiskey.lunixprison.player.armor.ArmorType;
+import io.github.lunaiskey.lunixprison.player.armor.ArmorSlot;
 import io.github.lunaiskey.lunixprison.player.inventories.*;
 import io.github.lunaiskey.lunixprison.player.armor.ArmorLunixHolder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
@@ -32,15 +32,12 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.apache.commons.lang3.tuple.*;
 
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -343,8 +340,8 @@ public class PlayerEvents implements Listener {
             Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineBlocksGUI(p).getInv()));
             PMineBlocksGUI.getEditMap().remove(p.getUniqueId());
         } else if (ArmorUpgradeGUI.getCustomColorMap().containsKey(p.getUniqueId())) {
-            Map<UUID, ArmorType> map = ArmorUpgradeGUI.getCustomColorMap();
-            ArmorType type = map.get(p.getUniqueId());
+            Map<UUID, ArmorSlot> map = ArmorUpgradeGUI.getCustomColorMap();
+            ArmorSlot type = map.get(p.getUniqueId());
             boolean equipped = lunixPlayer.isArmorEquiped();
             try {
                 Armor armor = lunixPlayer.getArmor().get(type);

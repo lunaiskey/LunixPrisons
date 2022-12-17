@@ -8,7 +8,7 @@ import io.github.lunaiskey.lunixprison.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.pickaxe.EnchantType;
 import io.github.lunaiskey.lunixprison.pickaxe.LunixPickaxe;
 import io.github.lunaiskey.lunixprison.player.armor.Armor;
-import io.github.lunaiskey.lunixprison.player.armor.ArmorType;
+import io.github.lunaiskey.lunixprison.player.armor.ArmorSlot;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.Ability;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.AbilityType;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.abilitys.EnchantmentProc;
@@ -116,8 +116,8 @@ public class PlayerManager {
                 armorData = fileConf.getConfigurationSection("armor").getValues(true);
             } catch (Exception ignored) {}
             boolean isArmorEquiped = (boolean) armorData.getOrDefault("isArmorEquiped",false);
-            Map<ArmorType, Armor> armorMap = new HashMap<>();
-            for (ArmorType type : ArmorType.values()) {
+            Map<ArmorSlot, Armor> armorMap = new HashMap<>();
+            for (ArmorSlot type : ArmorSlot.values()) {
                 Color color = armorData.get(type.getName()+".customColor") != null ? Color.fromRGB((Integer) armorData.get(type.getName()+".customColor")) : null;
                 int tier = (int) armorData.getOrDefault(type.getName()+".tier",0);
                 Map<AbilityType, Integer> abilityMap = new HashMap<>();

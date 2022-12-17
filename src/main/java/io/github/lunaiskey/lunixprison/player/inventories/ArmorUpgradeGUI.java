@@ -8,7 +8,7 @@ import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.player.armor.Armor;
 import io.github.lunaiskey.lunixprison.player.armor.ArmorLunixHolder;
-import io.github.lunaiskey.lunixprison.player.armor.ArmorType;
+import io.github.lunaiskey.lunixprison.player.armor.ArmorSlot;
 import io.github.lunaiskey.lunixprison.items.lunixitems.GemStone;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.Ability;
 import io.github.lunaiskey.lunixprison.player.armor.upgrades.AbilityType;
@@ -34,9 +34,9 @@ public class ArmorUpgradeGUI implements LunixInventory {
     private final Player player;
     private final LunixPlayer lunixPlayer;
     private final Inventory inv;
-    private ArmorType type;
+    private ArmorSlot type;
     private static Map<Integer,AbilityType> abilitySlots = new HashMap<>();
-    private static Map<UUID,ArmorType> customColorMap = new HashMap<>();
+    private static Map<UUID, ArmorSlot> customColorMap = new HashMap<>();
 
     static {
         abilitySlots.put(21,AbilityType.SALES_BOOST);
@@ -44,7 +44,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
         //abilitySlots.put(23,AbilityType.XP_BOOST);
     }
 
-    public ArmorUpgradeGUI(Player player, ArmorType type) {
+    public ArmorUpgradeGUI(Player player, ArmorSlot type) {
         this.player = player;
         this.lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId());
         this.type = type;
@@ -217,7 +217,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
         return item;
     }
 
-    public static Map<UUID,ArmorType> getCustomColorMap() {
+    public static Map<UUID, ArmorSlot> getCustomColorMap() {
         return customColorMap;
     }
 }

@@ -5,14 +5,14 @@ import io.github.lunaiskey.lunixprison.gui.LunixInvType;
 
 public class ArmorLunixHolder extends LunixHolder {
 
-    private ArmorType type;
+    private ArmorSlot type;
 
-    public ArmorLunixHolder(String name, int size, LunixInvType invType, ArmorType type) {
+    public ArmorLunixHolder(String name, int size, LunixInvType invType, ArmorSlot type) {
         super(name, size, invType);
         this.type = type;
     }
 
-    public ArmorType getType() {
+    public ArmorSlot getType() {
         return type;
     }
 }
