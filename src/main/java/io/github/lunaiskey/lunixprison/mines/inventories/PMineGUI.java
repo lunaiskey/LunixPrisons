@@ -1,8 +1,8 @@
 package io.github.lunaiskey.lunixprison.mines.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
-import io.github.lunaiskey.lunixprison.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.gui.LunixInvType;
+import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
+import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
 import io.github.lunaiskey.lunixprison.mines.PMine;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;

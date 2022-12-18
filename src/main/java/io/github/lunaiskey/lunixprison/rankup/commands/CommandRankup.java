@@ -1,9 +1,9 @@
-package io.github.lunaiskey.lunixprison.commands;
+package io.github.lunaiskey.lunixprison.rankup.commands;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.player.LunixPlayer;
-import io.github.lunaiskey.lunixprison.player.rankup.Rankup;
+import io.github.lunaiskey.lunixprison.rankup.Rankup;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.command.Command;

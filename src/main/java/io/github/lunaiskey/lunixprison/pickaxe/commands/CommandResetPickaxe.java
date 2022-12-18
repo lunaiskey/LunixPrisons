@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.commands;
+package io.github.lunaiskey.lunixprison.pickaxe.commands;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.pickaxe.LunixPickaxe;

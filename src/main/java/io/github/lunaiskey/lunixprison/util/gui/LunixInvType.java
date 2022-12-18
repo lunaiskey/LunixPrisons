@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.gui;
+package io.github.lunaiskey.lunixprison.util.gui;
 
 public enum LunixInvType {
     PMINE_MAIN,

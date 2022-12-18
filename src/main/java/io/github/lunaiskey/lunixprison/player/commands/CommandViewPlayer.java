@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.commands;
+package io.github.lunaiskey.lunixprison.player.commands;
 
 import io.github.lunaiskey.lunixprison.player.inventories.ViewPlayerGUI;
 import io.github.lunaiskey.lunixprison.util.StringUtil;

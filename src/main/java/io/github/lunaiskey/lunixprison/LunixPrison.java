@@ -2,7 +2,7 @@ package io.github.lunaiskey.lunixprison;
 
 import io.github.lunaiskey.lunixprison.gangs.Gang;
 import io.github.lunaiskey.lunixprison.gangs.GangManager;
-import io.github.lunaiskey.lunixprison.gui.LunixHolder;
+import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
 import io.github.lunaiskey.lunixprison.items.ItemManager;
 import io.github.lunaiskey.lunixprison.leaderboards.LeaderboardStorage;
 import io.github.lunaiskey.lunixprison.listeners.PlayerEvents;
@@ -10,7 +10,6 @@ import io.github.lunaiskey.lunixprison.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.mines.generator.PMineWorld;
 import io.github.lunaiskey.lunixprison.pickaxe.PickaxeHandler;
 import io.github.lunaiskey.lunixprison.player.PlayerManager;
-import io.github.lunaiskey.lunixprison.player.boosters.Booster;
 import io.github.lunaiskey.lunixprison.player.boosters.Boosters;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

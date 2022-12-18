@@ -1,20 +1,19 @@
-package io.github.lunaiskey.lunixprison.commands;
+package io.github.lunaiskey.lunixprison.leaderboards.commands;
 
-import io.github.lunaiskey.lunixprison.player.inventories.GemStoneGUI;
+import io.github.lunaiskey.lunixprison.leaderboards.LeaderboardGUI;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class CommandGemstones implements CommandExecutor {
+public class CommandLeaderboard implements CommandExecutor {
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player) {
             Player p = (Player) sender;
-            p.openInventory(new GemStoneGUI(p).getInv());
-        } else {
-            sender.sendMessage("This is a player only command.");
+            p.openInventory(new LeaderboardGUI().getInv());
         }
         return true;
     }

@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.commands;
+package io.github.lunaiskey.lunixprison.mines.commands;
 
 import io.github.lunaiskey.lunixprison.Messages;
 import io.github.lunaiskey.lunixprison.LunixPrison;

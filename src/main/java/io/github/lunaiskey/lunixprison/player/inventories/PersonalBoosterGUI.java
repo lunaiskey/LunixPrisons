@@ -1,9 +1,9 @@
 package io.github.lunaiskey.lunixprison.player.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
-import io.github.lunaiskey.lunixprison.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.gui.LunixInvType;
-import io.github.lunaiskey.lunixprison.gui.LunixInventory;
+import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
+import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
+import io.github.lunaiskey.lunixprison.util.gui.LunixInventory;
 import io.github.lunaiskey.lunixprison.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.player.boosters.Booster;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;

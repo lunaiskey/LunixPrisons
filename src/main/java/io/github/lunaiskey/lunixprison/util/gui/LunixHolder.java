@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.gui;
+package io.github.lunaiskey.lunixprison.util.gui;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;

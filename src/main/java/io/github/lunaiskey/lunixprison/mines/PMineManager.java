@@ -5,8 +5,8 @@ import java.io.FilenameFilter;
 import java.util.*;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
-import io.github.lunaiskey.lunixprison.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.gui.LunixInvType;
+import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
+import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
 import io.github.lunaiskey.lunixprison.mines.generator.PMineWorld;
 import io.github.lunaiskey.lunixprison.mines.inventories.PMinePublicGUI;
 import io.github.lunaiskey.lunixprison.mines.upgrades.PMineUpgradeType;

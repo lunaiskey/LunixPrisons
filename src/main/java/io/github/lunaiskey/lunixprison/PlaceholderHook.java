@@ -2,7 +2,7 @@ package io.github.lunaiskey.lunixprison;
 
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.player.LunixPlayer;
-import io.github.lunaiskey.lunixprison.player.rankup.Rankup;
+import io.github.lunaiskey.lunixprison.rankup.Rankup;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;

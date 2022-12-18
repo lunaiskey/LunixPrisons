@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.player.rankup;
+package io.github.lunaiskey.lunixprison.rankup;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.player.LunixPlayer;

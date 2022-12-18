@@ -1,9 +1,9 @@
 package io.github.lunaiskey.lunixprison.pickaxe.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
-import io.github.lunaiskey.lunixprison.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.gui.LunixInvType;
-import io.github.lunaiskey.lunixprison.gui.LunixInventory;
+import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
+import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
+import io.github.lunaiskey.lunixprison.util.gui.LunixInventory;
 import io.github.lunaiskey.lunixprison.pickaxe.EnchantType;
 import io.github.lunaiskey.lunixprison.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.pickaxe.LunixPickaxe;

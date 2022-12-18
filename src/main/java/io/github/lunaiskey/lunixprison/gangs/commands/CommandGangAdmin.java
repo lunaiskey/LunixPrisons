@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.commands;
+package io.github.lunaiskey.lunixprison.gangs.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

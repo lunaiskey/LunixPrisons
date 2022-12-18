@@ -1,8 +1,8 @@
 package io.github.lunaiskey.lunixprison.listeners;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
-import io.github.lunaiskey.lunixprison.commands.CommandPMine;
-import io.github.lunaiskey.lunixprison.gui.LunixHolder;
+import io.github.lunaiskey.lunixprison.mines.commands.CommandPMine;
+import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
 import io.github.lunaiskey.lunixprison.items.ItemID;
 import io.github.lunaiskey.lunixprison.items.LunixItem;
 import io.github.lunaiskey.lunixprison.items.lunixitems.BoosterItem;

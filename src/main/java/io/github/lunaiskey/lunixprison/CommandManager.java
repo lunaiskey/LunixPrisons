@@ -1,7 +1,17 @@
 package io.github.lunaiskey.lunixprison;
 
-import io.github.lunaiskey.lunixprison.commands.*;
+import io.github.lunaiskey.lunixprison.gangs.commands.CommandGang;
+import io.github.lunaiskey.lunixprison.items.commands.CommandGemstones;
+import io.github.lunaiskey.lunixprison.items.commands.CommandLItem;
+import io.github.lunaiskey.lunixprison.leaderboards.commands.CommandLeaderboard;
+import io.github.lunaiskey.lunixprison.mines.commands.CommandPMine;
+import io.github.lunaiskey.lunixprison.pickaxe.commands.CommandEnchant;
+import io.github.lunaiskey.lunixprison.pickaxe.commands.CommandGetPickaxe;
+import io.github.lunaiskey.lunixprison.pickaxe.commands.CommandResetPickaxe;
 import io.github.lunaiskey.lunixprison.player.CurrencyType;
+import io.github.lunaiskey.lunixprison.player.commands.*;
+import io.github.lunaiskey.lunixprison.rankup.commands.CommandRank;
+import io.github.lunaiskey.lunixprison.rankup.commands.CommandRankup;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
