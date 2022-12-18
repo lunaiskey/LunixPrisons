@@ -10,6 +10,7 @@ import io.github.lunaiskey.lunixprison.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.mines.generator.PMineWorld;
 import io.github.lunaiskey.lunixprison.pickaxe.PickaxeHandler;
 import io.github.lunaiskey.lunixprison.player.PlayerManager;
+import io.github.lunaiskey.lunixprison.player.boosters.Booster;
 import io.github.lunaiskey.lunixprison.player.boosters.Boosters;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -28,6 +29,8 @@ public final class LunixPrison extends JavaPlugin {
     private ItemManager itemManager;
     private GangManager gangManager;
     private LeaderboardStorage leaderboardStorage;
+
+    private Boosters boosters;
     private Random rand = new Random();
     private final Set<UUID> savePending = new HashSet<>();
 
@@ -56,7 +59,7 @@ public final class LunixPrison extends JavaPlugin {
         gangManager.loadGangs();
         itemManager.registerItems();
         new CommandManager(plugin);
-        new Boosters();
+        boosters = new Boosters();
 
         checkPlayerData();
         leaderboardStorage.startTasks();
