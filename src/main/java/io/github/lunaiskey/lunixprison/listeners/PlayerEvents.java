@@ -1,30 +1,31 @@
 package io.github.lunaiskey.lunixprison.listeners;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
-import io.github.lunaiskey.lunixprison.mines.commands.CommandPMine;
+import io.github.lunaiskey.lunixprison.modules.mines.PMine;
+import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
+import io.github.lunaiskey.lunixprison.modules.mines.commands.CommandPMine;
+import io.github.lunaiskey.lunixprison.modules.mines.inventories.*;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.*;
+import io.github.lunaiskey.lunixprison.modules.player.inventories.*;
 import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.items.ItemID;
-import io.github.lunaiskey.lunixprison.items.LunixItem;
-import io.github.lunaiskey.lunixprison.items.lunixitems.BoosterItem;
-import io.github.lunaiskey.lunixprison.items.lunixitems.Voucher;
-import io.github.lunaiskey.lunixprison.leaderboards.LeaderboardGUI;
-import io.github.lunaiskey.lunixprison.mines.*;
-import io.github.lunaiskey.lunixprison.mines.generator.PMineWorld;
-import io.github.lunaiskey.lunixprison.mines.inventories.*;
-import io.github.lunaiskey.lunixprison.nms.NBTTags;
-import io.github.lunaiskey.lunixprison.pickaxe.*;
-import io.github.lunaiskey.lunixprison.pickaxe.enchants.MineBomb;
-import io.github.lunaiskey.lunixprison.pickaxe.inventories.PickaxeAddLevelsGUI;
-import io.github.lunaiskey.lunixprison.pickaxe.inventories.PickaxeEnchantGUI;
-import io.github.lunaiskey.lunixprison.pickaxe.inventories.PickaxeEnchantToggleGUI;
-import io.github.lunaiskey.lunixprison.player.CurrencyType;
-import io.github.lunaiskey.lunixprison.player.PlayerManager;
-import io.github.lunaiskey.lunixprison.player.LunixPlayer;
-import io.github.lunaiskey.lunixprison.player.ViewPlayerHolder;
-import io.github.lunaiskey.lunixprison.player.armor.Armor;
-import io.github.lunaiskey.lunixprison.player.armor.ArmorSlot;
-import io.github.lunaiskey.lunixprison.player.inventories.*;
-import io.github.lunaiskey.lunixprison.player.armor.ArmorLunixHolder;
+import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
+import io.github.lunaiskey.lunixprison.modules.items.lunixitems.BoosterItem;
+import io.github.lunaiskey.lunixprison.modules.items.lunixitems.Voucher;
+import io.github.lunaiskey.lunixprison.modules.leaderboards.LeaderboardGUI;
+import io.github.lunaiskey.lunixprison.modules.mines.generator.PMineWorld;
+import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.enchants.MineBomb;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeAddLevelsGUI;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchantGUI;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchantToggleGUI;
+import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
+import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.ViewPlayerHolder;
+import io.github.lunaiskey.lunixprison.modules.armor.Armor;
+import io.github.lunaiskey.lunixprison.modules.armor.ArmorSlot;
+import io.github.lunaiskey.lunixprison.modules.armor.ArmorLunixHolder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import net.minecraft.nbt.CompoundTag;
@@ -60,7 +61,7 @@ public class PlayerEvents implements Listener {
 
     public PlayerEvents(LunixPrison plugin) {
         this.plugin = plugin;
-        pMineManager = plugin.getPmineManager();
+        pMineManager = plugin.getPMineManager();
         playerManager = plugin.getPlayerManager();
         playerMap = playerManager.getPlayerMap();
     }
@@ -86,7 +87,7 @@ public class PlayerEvents implements Listener {
                     } else {
                         if (blockLoc.getWorld() == Bukkit.getWorld(PMineWorld.getWorldName())) {
                             Pair<Integer,Integer> gridLoc = pMineManager.getGridLocation(block.getLocation());
-                            PMine pMine = LunixPrison.getPlugin().getPmineManager().getPMine(gridLoc.getLeft(), gridLoc.getRight());
+                            PMine pMine = LunixPrison.getPlugin().getPMineManager().getPMine(gridLoc.getLeft(), gridLoc.getRight());
                             if (pMine != null) {
                                 if (pMine.isInMineRegion(block.getLocation())) {
                                     e.setDropItems(false);
@@ -140,9 +141,9 @@ public class PlayerEvents implements Listener {
                 lunixPlayer.setName(p.getName());
             }
         }
-        PMine mine = LunixPrison.getPlugin().getPmineManager().getPMine(p.getUniqueId());
+        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
         if (mine == null) {
-            LunixPrison.getPlugin().getPmineManager().newPMine(p.getUniqueId());
+            LunixPrison.getPlugin().getPMineManager().newPMine(p.getUniqueId());
         } else {
             mine.scheduleReset();
         }
@@ -303,7 +304,7 @@ public class PlayerEvents implements Listener {
         ItemStack item = e.getItemDrop().getItemStack();
         CompoundTag pyrexData = NBTTags.getLunixDataMap(item);
         if (pyrexData.contains("id")) {
-            if (pyrexData.getString("id").equalsIgnoreCase(PickaxeHandler.getId())) {
+            if (pyrexData.getString("id").equalsIgnoreCase(PickaxeManager.getLunixPickaxeId())) {
                 e.setCancelled(true);
                 LunixPickaxe pickaxe = plugin.getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
                 for (EnchantType enchantType : pickaxe.getEnchants().keySet()) {
@@ -393,9 +394,9 @@ public class PlayerEvents implements Listener {
             e.setCancelled(true);
             if (kickPlayer != null) {
                 if (kickPlayer.getUniqueId() != p.getUniqueId()) {
-                    PMine mine = LunixPrison.getPlugin().getPmineManager().getPMine(p.getUniqueId());
+                    PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
                     if (mine.isInMineIsland(kickPlayer)) {
-                        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()-> LunixPrison.getPlugin().getPmineManager().getPMine(kickPlayer.getUniqueId()).teleportToCenter(kickPlayer,false,true));
+                        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()-> LunixPrison.getPlugin().getPMineManager().getPMine(kickPlayer.getUniqueId()).teleportToCenter(kickPlayer,false,true));
                         kickPlayer.sendMessage(StringUtil.color("&eYou've been kicked from "+p.getName()+"'s mine. teleporting to your mine."));
                         p.sendMessage(StringUtil.color("&aSuccessfully kicked &f"+kickPlayer.getName()+" &afrom your mine."));
                     } else {
@@ -447,7 +448,7 @@ public class PlayerEvents implements Listener {
         LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(e.getPlayer().getUniqueId()).getPickaxe();
         if (oldMap.contains("id")) {
             // is custom pickaxe
-            if (oldMap.getString("id").equals(PickaxeHandler.getId())) {
+            if (oldMap.getString("id").equals(PickaxeManager.getLunixPickaxeId())) {
                 for (EnchantType type : pickaxe.getEnchants().keySet()) {
                     LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type).onUnEquip(p,oldItem,pickaxe.getEnchants().get(type));
                 }
@@ -455,7 +456,7 @@ public class PlayerEvents implements Listener {
         }
         if (newMap.contains("id")) {
             // is custom pickaxe
-            if (newMap.getString("id").equals(PickaxeHandler.getId())) {
+            if (newMap.getString("id").equals(PickaxeManager.getLunixPickaxeId())) {
                 for (EnchantType type : pickaxe.getEnchants().keySet()) {
                     if (!pickaxe.getDisabledEnchants().contains(type)) {
                         LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type).onEquip(p,newItem,pickaxe.getEnchants().get(type));
