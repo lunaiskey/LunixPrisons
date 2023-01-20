@@ -20,7 +20,7 @@ public class CommandViewPlayer implements CommandExecutor {
             }
             if (Bukkit.getPlayer(args[0]) != null) {
                 Player toView = Bukkit.getPlayer(args[0]);
-                p.openInventory(new ViewPlayerGUI(toView).getInv());
+                p.openInventory(new ViewPlayerGUI(toView).getInv(p));
                 return true;
             } else {
                 p.sendMessage(StringUtil.color("&cPlayer '"+args+"' is offline."));

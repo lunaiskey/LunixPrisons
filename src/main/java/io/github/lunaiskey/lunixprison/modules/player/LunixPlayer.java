@@ -12,8 +12,11 @@ import io.github.lunaiskey.lunixprison.modules.armor.upgrades.abilitys.SalesBoos
 import io.github.lunaiskey.lunixprison.modules.armor.upgrades.abilitys.XPBoost;
 import io.github.lunaiskey.lunixprison.modules.boosters.Booster;
 import io.github.lunaiskey.lunixprison.modules.boosters.BoosterType;
+import io.github.lunaiskey.lunixprison.util.StringUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +40,10 @@ public class LunixPlayer {
 
     private Map<BoosterType,Integer> maxBooster;
 
-    public LunixPlayer(UUID pUUID, String name, BigInteger tokens, long gems, long lunixPoints, int rank, LunixPickaxe pickaxe, boolean isArmorEquiped, Map<ArmorSlot,Armor> armor, ItemID selectedGemstone, int gemstoneCount, List<Booster> boosters) {
+    private ChatReplyType chatReplyType = null;
+    private BigInteger cashback;
+
+    public LunixPlayer(UUID pUUID, String name, BigInteger tokens, long gems, long lunixPoints, int rank, LunixPickaxe pickaxe, boolean isArmorEquiped, Map<ArmorSlot,Armor> armor, ItemID selectedGemstone, int gemstoneCount, List<Booster> boosters, BigInteger cashback) {
         this.pUUID = pUUID;
         this.name = name;
         this.tokens = tokens;
@@ -57,11 +63,12 @@ public class LunixPlayer {
         this.armor.putIfAbsent(ArmorSlot.BOOTS,new Armor(ArmorSlot.BOOTS));
         this.selectedGemstone = Objects.requireNonNullElse(selectedGemstone, ItemID.AMETHYST_GEMSTONE);
         this.boosters = Objects.requireNonNullElseGet(boosters, ArrayList::new);
+        this.cashback = cashback;
         save();
     }
 
     public LunixPlayer(UUID pUUID, String name) {
-        this(pUUID,name,BigInteger.ZERO,0,0,0,new LunixPickaxe(pUUID),false,null,ItemID.AMETHYST_GEMSTONE,0,null);
+        this(pUUID,name,BigInteger.ZERO,0,0,0,new LunixPickaxe(pUUID),false,null,ItemID.AMETHYST_GEMSTONE,0,null,BigInteger.ZERO);
     }
 
     public String getName() {
@@ -126,6 +133,14 @@ public class LunixPlayer {
         return boosters;
     }
 
+    public ChatReplyType getChatReplyType() {
+        return chatReplyType;
+    }
+
+    public BigInteger getCashback() {
+        return cashback;
+    }
+
     public boolean isArmorEquiped() {
         return isArmorEquiped;
     }
@@ -164,6 +179,14 @@ public class LunixPlayer {
         this.pickaxe = pickaxe;
     }
 
+    public void setChatReplyType(ChatReplyType chatReplyType) {
+        this.chatReplyType = chatReplyType;
+    }
+
+    public void setCashback(BigInteger cashback) {
+        this.cashback = cashback;
+    }
+
     public void giveTokens(BigInteger tokens) {this.tokens = this.tokens.add(tokens);}
     public void giveTokens(long tokens) {this.tokens = this.tokens.add(BigInteger.valueOf(tokens));}
     public void giveGems(long gems) {
@@ -185,7 +208,14 @@ public class LunixPlayer {
         }
     }
 
-    public void takeTokens(BigInteger tokens) {
+    public void takeTokens(BigInteger tokens, boolean giveCashBack) {
+        if (giveCashBack) {
+            cashback = cashback.add(tokens.divide(new BigInteger("20")));
+            Player player = Bukkit.getPlayer(pUUID);
+            if (player != null) {
+                player.sendMessage(StringUtil.color("&aYou gained some cashback, check /cashback"));
+            }
+        }
         this.tokens = this.tokens.subtract(tokens);
     }
     public void takeGems(long gems) {
@@ -195,11 +225,11 @@ public class LunixPlayer {
         this.lunixPoints -= lunixPoints;
     }
 
-    public void takeCurrency(CurrencyType type, BigInteger amount) {
+    public void takeCurrency(CurrencyType type, BigInteger amount, boolean giveCashBack) {
         switch (type) {
             case GEMS -> takeGems(amount.longValue());
             case LUNIX_POINTS -> takeLunixPoints(amount.longValue());
-            case TOKENS -> takeTokens(amount);
+            case TOKENS -> takeTokens(amount,giveCashBack);
         }
     }
 
@@ -303,6 +333,7 @@ public class LunixPlayer {
         data.set("rank",rank);
         data.set("selectedGemstone",selectedGemstone.name());
         data.set("gemstoneCount",gemstoneCount);
+        data.set("cashback",cashback);
     }
 
     private void saveCurrencyData(FileConfiguration data) {
@@ -326,6 +357,7 @@ public class LunixPlayer {
             disabledEnchantsList.add(type.name());
         }
         pickaxeData.put("disabledEnchants",disabledEnchantsList);
+        pickaxeData.put("rename",pickaxe.getRename());
         data.createSection("pickaxe", pickaxeData);
     }
 

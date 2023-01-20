@@ -29,7 +29,7 @@ public class CommandRankup implements CommandExecutor {
                     if (player.getTokens().compareTo(cost) >= 0) {
                         int newLevel = rankup.rankup(p);
                         int nextLevel = newLevel+1;
-                        player.takeTokens(cost);
+                        player.takeTokens(cost,false);
                         p.sendMessage(
                                 StringUtil.color("&b&lYou have ranked up to &f&l"+newLevel+"&b&l!"),
                                 StringUtil.color(" &3&l- &bNext Rankup: &f"+nextLevel),
@@ -57,7 +57,7 @@ public class CommandRankup implements CommandExecutor {
                         }
                     }
                     player.setRank(player.getRank()+rank);
-                    player.takeTokens(cost);
+                    player.takeTokens(cost,false);
                     if (player.getRank() < Rankup.getMaxRankup()) {
                         p.sendMessage(
                                 StringUtil.color("&b&lYou have ranked up to &f&l"+player.getRank()+"&b&l!"),

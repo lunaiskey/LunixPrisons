@@ -3,9 +3,9 @@ package io.github.lunaiskey.lunixprison.modules.mines.inventories;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInventory;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -14,6 +14,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -22,19 +23,20 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 
 public class PMinePublicGUI implements LunixInventory {
-
-    private final String title = "Public P-Mines";
-    private final int size = 54;
     private final List<UUID> sortedList = LunixPrison.getPlugin().getPMineManager().getPublicSortedByRankList();
     private final int totalPages = (((sortedList.size() - sortedList.size()%28)/28)+1);
 
     private static final Map<UUID,Integer> pageMap = new HashMap<>();
 
-    private Inventory inv = new LunixHolder(title,size, LunixInvType.PMINE_PUBLIC_MINES).getInventory();
-
     @Override
-    public void init() {
-        for(int i = 0;i<size;i++) {
+    public Inventory getInv(Player player) {
+        Inventory inv = new LunixHolder("Public P-Mines",54, LunixInvType.PMINE_PUBLIC_MINES).getInventory();
+        init(inv,player);
+        return inv;
+    }
+
+    public void init(Inventory inv, Player p) {
+        for(int i = 0;i<inv.getSize();i++) {
             switch (i) {
                 case 1,2,3,4,5,6,7,45,46,47,48,49,50,51,52,53,9,18,27,36,17,26,35,44 -> inv.setItem(i, ItemBuilder.createItem(" ", Material.BLACK_STAINED_GLASS_PANE,null));
                 case 0 -> inv.setItem(i,getPreviousPage(0));
@@ -58,9 +60,8 @@ public class PMinePublicGUI implements LunixInventory {
     }
 
     @Override
-    public Inventory getInv() {
-        init();
-        return inv;
+    public void updateInventory(Player player) {
+
     }
 
     @Override
@@ -87,7 +88,7 @@ public class PMinePublicGUI implements LunixInventory {
                     inv.setItem(0,getPreviousPage(page));
                     inv.setItem(8,getNextPage(page+2));
                 } else {
-                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new PMineGUI(p).getInv()));
+                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new PMineGUI().getInv(p)));
                 }
             }
             case 8 -> {
@@ -99,6 +100,11 @@ public class PMinePublicGUI implements LunixInventory {
                 }
             }
         }
+    }
+
+    @Override
+    public void onDrag(InventoryDragEvent e) {
+
     }
 
     public void onOpen(InventoryOpenEvent e) {

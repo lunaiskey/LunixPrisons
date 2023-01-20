@@ -4,7 +4,7 @@ import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.armor.upgrades.Ability;
 import io.github.lunaiskey.lunixprison.modules.armor.upgrades.AbilityType;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
-import io.github.lunaiskey.lunixprison.modules.items.lunixitems.GemStone;
+import io.github.lunaiskey.lunixprison.modules.items.items.GemStone;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import net.md_5.bungee.api.ChatColor;

@@ -47,4 +47,25 @@ public enum EnchantType {
     public static Map<EnchantType,Integer> getDefaultEnchants() {
         return DEFAULT_ENCHANTS;
     }
+
+    public static EnchantType getEnchantFromSlot(int slot) {
+        return switch (slot) {
+            case 11 -> EFFICIENCY;
+            case 12 -> HASTE;
+            case 13 -> SPEED;
+            case 14 -> JUMP_BOOST;
+            case 15 -> NIGHT_VISION;
+            case 20 -> FORTUNE;
+            case 21 -> JACK_HAMMER;
+            case 22 -> STRIKE;
+            case 23 -> EXPLOSIVE;
+            case 24 -> MINE_BOMB;
+            case 29 -> NUKE;
+            case 30 -> GEM_FINDER;
+            case 31 -> KEY_FINDER;
+            case 32 -> LOOT_FINDER;
+            //case 33 -> XP_BOOST;
+            default -> null;
+        };
+    }
 }

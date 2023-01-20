@@ -3,8 +3,8 @@ package io.github.lunaiskey.lunixprison.modules.boosters;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.modules.player.inventories.PersonalBoosterGUI;
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -38,7 +38,7 @@ public class Boosters {
                     if (inv.getHolder() instanceof LunixHolder) {
                         LunixHolder holder = (LunixHolder) inv.getHolder();
                         if (holder.getInvType() == LunixInvType.PERSONAL_BOOSTER) {
-                            new PersonalBoosterGUI(p).updateGUI(p);
+                            new PersonalBoosterGUI().updateGUI(p);
                         }
                     }
                 }

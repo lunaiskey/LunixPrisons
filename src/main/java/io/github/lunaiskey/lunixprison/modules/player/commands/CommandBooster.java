@@ -1,7 +1,7 @@
 package io.github.lunaiskey.lunixprison.modules.player.commands;
 
 import io.github.lunaiskey.lunixprison.Messages;
-import io.github.lunaiskey.lunixprison.modules.items.lunixitems.BoosterItem;
+import io.github.lunaiskey.lunixprison.modules.items.items.BoosterItem;
 import io.github.lunaiskey.lunixprison.modules.boosters.BoosterType;
 import io.github.lunaiskey.lunixprison.modules.player.inventories.PersonalBoosterGUI;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
@@ -18,7 +18,7 @@ public class CommandBooster implements CommandExecutor {
         if (args.length == 0) {
             if (sender instanceof Player) {
                 Player p = (Player) sender;
-                p.openInventory(new PersonalBoosterGUI(p).getInv());
+                p.openInventory(new PersonalBoosterGUI().getInv(p));
             }
             return true;
         }

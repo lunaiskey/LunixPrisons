@@ -21,7 +21,7 @@ public class CommandArmor implements CommandExecutor {
         if (sender instanceof Player) {
             Player p = (Player) sender;
             if (args.length == 0) {
-                p.openInventory(new ArmorGUI(p).getInv());
+                p.openInventory(new ArmorGUI().getInv(p));
                 return true;
             }
             Player other = Bukkit.getPlayer(args[0]);

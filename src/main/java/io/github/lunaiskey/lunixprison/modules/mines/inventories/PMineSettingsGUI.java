@@ -3,9 +3,9 @@ package io.github.lunaiskey.lunixprison.modules.mines.inventories;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInventory;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -24,30 +25,20 @@ public class PMineSettingsGUI implements LunixInventory {
     private static Set<UUID> taxEditSet = new HashSet<>();
     private static Set<UUID> kickPlayerSet = new HashSet<>();
 
-    private final String name = "Settings";
-    private final int size = 27;
-    private Player player;
-    private LunixPlayer lunixPlayer;
-    private PMine mine;
-    private Inventory inv = new LunixHolder(name,size, LunixInvType.PMINE_SETTINGS).getInventory();
-
-    public PMineSettingsGUI(Player player) {
-        this.player = player;
-        this.lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId());
-        this.mine = LunixPrison.getPlugin().getPMineManager().getPMine(player.getUniqueId());
+    @Override
+    public Inventory getInv(Player player) {
+        Inventory inv = new LunixHolder("Settings",27, LunixInvType.PMINE_SETTINGS).getInventory();
+        init(inv,player);
+        return inv;
     }
 
-    public PMineSettingsGUI() {}
-
-
-    @Override
-    public void init() {
-        for (int i = 0;i<size;i++) {
+    public void init(Inventory inv, Player p) {
+        for (int i = 0;i<inv.getSize();i++) {
             switch (i) {
                 case 0,9,18,8,17,26 -> inv.setItem(i, ItemBuilder.createItem(" ", Material.PURPLE_STAINED_GLASS_PANE,null));
                 case 11 -> inv.setItem(i,getManagePlayers());
-                case 12 -> inv.setItem(i,getTogglePublic());
-                case 13 -> inv.setItem(i,getMineTax());
+                case 12 -> inv.setItem(i,getTogglePublic(p));
+                case 13 -> inv.setItem(i,getMineTax(p));
                 case 14 -> inv.setItem(i,getKickPlayer());
                 case 15 -> inv.setItem(i,getKickAllPlayer());
                 default -> inv.setItem(i,ItemBuilder.createItem(" ", Material.BLACK_STAINED_GLASS_PANE,null));
@@ -56,17 +47,16 @@ public class PMineSettingsGUI implements LunixInventory {
     }
 
     @Override
-    public Inventory getInv() {
-        init();
-        return inv;
+    public void updateInventory(Player player) {
+
     }
 
     @Override
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
-        player = (Player) e.getWhoClicked();
-        lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId());
-        mine = LunixPrison.getPlugin().getPMineManager().getPMine(player.getUniqueId());
+        Player player = (Player) e.getWhoClicked();
+        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId());
+        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(player.getUniqueId());
         int slot = e.getRawSlot();
         switch (slot) {
             case 11 -> {
@@ -74,7 +64,7 @@ public class PMineSettingsGUI implements LunixInventory {
             }
             case 12 -> {
                 mine.setPublic(!mine.isPublic());
-                e.getClickedInventory().setItem(slot,getTogglePublic());
+                e.getClickedInventory().setItem(slot,getTogglePublic(player));
             }
             case 13 -> {
                 getTaxEditSet().add(player.getUniqueId());
@@ -104,6 +94,11 @@ public class PMineSettingsGUI implements LunixInventory {
     }
 
     @Override
+    public void onDrag(InventoryDragEvent e) {
+
+    }
+
+    @Override
     public void onOpen(InventoryOpenEvent e) {
 
     }
@@ -123,7 +118,8 @@ public class PMineSettingsGUI implements LunixInventory {
         return ItemBuilder.createItem(name,Material.IRON_DOOR,lore);
     }
 
-    private ItemStack getTogglePublic() {
+    private ItemStack getTogglePublic(Player p) {
+        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
         String name = StringUtil.color("&aToggle Public");
         String isPublic = mine.isPublic() ? StringUtil.color("&aPublic") : StringUtil.color("&cPrivate");
         Material mat = mine.isPublic() ? Material.LIME_DYE : Material.RED_DYE;
@@ -137,7 +133,8 @@ public class PMineSettingsGUI implements LunixInventory {
         return ItemBuilder.createItem(name,mat,lore);
     }
 
-    private ItemStack getMineTax() {
+    private ItemStack getMineTax(Player p) {
+        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
         String name = StringUtil.color("&aMine Tax");
         List<String> lore = new ArrayList<>();
         lore.add(StringUtil.color("&7Modify the tax that's placed"));

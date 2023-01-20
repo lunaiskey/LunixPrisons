@@ -1,7 +1,4 @@
-package io.github.lunaiskey.lunixprison.util.gui;
-
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
+package io.github.lunaiskey.lunixprison.inventory;
 
 public class LunixPagedHolder extends LunixHolder {
 

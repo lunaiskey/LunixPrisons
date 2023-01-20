@@ -1,31 +1,26 @@
 package io.github.lunaiskey.lunixprison.listeners;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.modules.items.gui.RenameTagConfirmGUI;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.modules.mines.commands.CommandPMine;
 import io.github.lunaiskey.lunixprison.modules.mines.inventories.*;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.*;
 import io.github.lunaiskey.lunixprison.modules.player.inventories.*;
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
-import io.github.lunaiskey.lunixprison.modules.items.lunixitems.BoosterItem;
-import io.github.lunaiskey.lunixprison.modules.items.lunixitems.Voucher;
-import io.github.lunaiskey.lunixprison.modules.leaderboards.LeaderboardGUI;
+import io.github.lunaiskey.lunixprison.modules.items.items.BoosterItem;
+import io.github.lunaiskey.lunixprison.modules.items.items.Voucher;
 import io.github.lunaiskey.lunixprison.modules.mines.generator.PMineWorld;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.enchants.MineBomb;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeAddLevelsGUI;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchantGUI;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchantToggleGUI;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
-import io.github.lunaiskey.lunixprison.modules.player.ViewPlayerHolder;
 import io.github.lunaiskey.lunixprison.modules.armor.Armor;
 import io.github.lunaiskey.lunixprison.modules.armor.ArmorSlot;
-import io.github.lunaiskey.lunixprison.modules.armor.ArmorLunixHolder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import net.minecraft.nbt.CompoundTag;
@@ -40,10 +35,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -181,58 +173,23 @@ public class PlayerEvents implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getClickedInventory() != null) {
-            Inventory inv = e.getInventory();
-            Player p = (Player) e.getWhoClicked();
-            if (inv.getHolder() instanceof LunixHolder) {
-                LunixHolder holder = (LunixHolder) inv.getHolder();
-                switch(holder.getInvType()) {
-                    case PMINE_MAIN -> new PMineGUI(p).onClick(e);
-                    case PMINE_BLOCKS -> new PMineBlocksGUI(p).onClick(e);
-                    case PICKAXE_ENCHANTS -> new PickaxeEnchantGUI(p).onClick(e);
-                    case PICKAXE_ENCHANTS_ADD_LEVELS -> {
-                        if (holder instanceof EnchantLunixHolder) {
-                            EnchantLunixHolder enchantHolder = (EnchantLunixHolder) holder;
-                            new PickaxeAddLevelsGUI(p,enchantHolder.getType()).onClick(e);
-                        } else {
-                            e.setCancelled(true);
-                        }
-                    }
-                    case PICKAXE_ENCHANTS_TOGGLE -> new PickaxeEnchantToggleGUI(p).onClick(e);
-                    case ARMOR -> new ArmorGUI(p).onClick(e);
-                    case ARMOR_UPGRADES -> {
-                        if (holder instanceof ArmorLunixHolder) {
-                            ArmorLunixHolder armorPyrexHolder = (ArmorLunixHolder) holder;
-                            new ArmorUpgradeGUI(p,armorPyrexHolder.getType()).onClick(e);
-                        } else {
-                            e.setCancelled(true);
-                        }
-                    }
-                    case GEMSTONES -> new GemStoneGUI(p).onClick(e);
-                    case VIEW_PLAYER -> {
-                        if (holder instanceof ViewPlayerHolder) {
-                            ViewPlayerHolder viewPlayerHolder = (ViewPlayerHolder) holder;
-                            new ViewPlayerGUI(viewPlayerHolder.getPlayer()).onClick(e);
-                        } else {
-                            e.setCancelled(true);
-                        }
-                    }
-                    case PERSONAL_BOOSTER -> new PersonalBoosterGUI(p).onClick(e);
-                    case PMINE_UPGRADES -> new PMineUpgradesGUI(p).onClick(e);
-                    case PMINE_PUBLIC_MINES -> new PMinePublicGUI().onClick(e);
-                    case PMINE_SETTINGS -> new PMineSettingsGUI(p).onClick(e);
-                    case PLAYER_MENU -> new PlayerMenuGUI().onClick(e);
-                    case LEADERBOARDS -> new LeaderboardGUI().onClick(e);
-                }
-            }
-            if (e.getView().getType() == InventoryType.CRAFTING) {
-                switch (e.getRawSlot()) {
-                    case 5,6,7,8 -> {
-                        CompoundTag tag = NBTTags.getLunixDataMap(e.getCurrentItem());
-                        if (tag.getString("id").toUpperCase().contains("PYREX_ARMOR_")) {
-                            e.setCancelled(true);
-                            p.sendMessage(StringUtil.color("&cTo unequip this armor please do so from /armor."));
-                        }
+        if (e.getClickedInventory() == null) {
+            return;
+        }
+        Inventory inv = e.getInventory();
+        Player p = (Player) e.getWhoClicked();
+        if (inv.getHolder() instanceof LunixHolder) {
+            LunixHolder holder = (LunixHolder) inv.getHolder();
+            holder.getInvType().getInventory().onClick(e);
+            return;
+        }
+        if (e.getView().getType() == InventoryType.CRAFTING) {
+            switch (e.getRawSlot()) {
+                case 5,6,7,8 -> {
+                    CompoundTag tag = NBTTags.getLunixDataMap(e.getCurrentItem());
+                    if (tag.getString("id").toUpperCase().contains("PYREX_ARMOR_")) {
+                        e.setCancelled(true);
+                        p.sendMessage(StringUtil.color("&cTo unequip this armor please do so from /armor."));
                     }
                 }
             }
@@ -240,17 +197,11 @@ public class PlayerEvents implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onClose(InventoryCloseEvent e) {
-        Player p = (Player) e.getPlayer();
+    public void onDrag(InventoryDragEvent e) {
         Inventory inv = e.getInventory();
         if (inv.getHolder() instanceof LunixHolder) {
             LunixHolder holder = (LunixHolder) inv.getHolder();
-            switch(holder.getInvType()) {
-                case PMINE_PUBLIC_MINES -> new PMinePublicGUI().onClose(e);
-                case PMINE_UPGRADES -> new PMineUpgradesGUI(p).onClose(e);
-                case PMINE_BLOCKS -> new PMineBlocksGUI(p).onClose(e);
-                case PERSONAL_BOOSTER -> new PersonalBoosterGUI(p).onClose(e);
-            }
+            holder.getInvType().getInventory().onDrag(e);
         }
     }
 
@@ -260,11 +211,17 @@ public class PlayerEvents implements Listener {
         Inventory inv = e.getInventory();
         if (inv.getHolder() instanceof LunixHolder) {
             LunixHolder holder = (LunixHolder) inv.getHolder();
-            switch(holder.getInvType()) {
-                case PMINE_PUBLIC_MINES -> new PMinePublicGUI().onOpen(e);
-                case PMINE_BLOCKS -> new PMineBlocksGUI(p).onOpen(e);
-                case PERSONAL_BOOSTER -> new PersonalBoosterGUI(p).onOpen(e);
-            }
+            holder.getInvType().getInventory().onOpen(e);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onClose(InventoryCloseEvent e) {
+        Player p = (Player) e.getPlayer();
+        Inventory inv = e.getInventory();
+        if (inv.getHolder() instanceof LunixHolder) {
+            LunixHolder holder = (LunixHolder) inv.getHolder();
+            holder.getInvType().getInventory().onClose(e);
         }
     }
 
@@ -338,7 +295,7 @@ public class PlayerEvents implements Listener {
                 mine.getComposition().put(PMineBlocksGUI.getEditMap().get(p.getUniqueId()),newValue);
             } catch (NumberFormatException ignored) {}
             e.setCancelled(true);
-            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineBlocksGUI(p).getInv()));
+            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineBlocksGUI().getInv(p)));
             PMineBlocksGUI.getEditMap().remove(p.getUniqueId());
         } else if (ArmorUpgradeGUI.getCustomColorMap().containsKey(p.getUniqueId())) {
             Map<UUID, ArmorSlot> map = ArmorUpgradeGUI.getCustomColorMap();
@@ -359,7 +316,7 @@ public class PlayerEvents implements Listener {
                 p.sendMessage(StringUtil.color("&cInvalid Color Code."));
             }
             e.setCancelled(true);
-            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new ArmorUpgradeGUI(p,type).getInv()));
+            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new ArmorUpgradeGUI(type).getInv(p)));
             ArmorUpgradeGUI.getCustomColorMap().remove(p.getUniqueId());
         } else if (PMineSettingsGUI.getTaxEditSet().contains(p.getUniqueId())) {
             e.setCancelled(true);
@@ -383,7 +340,7 @@ public class PlayerEvents implements Listener {
                     }
                 }
                 mine.setMineTax(tax);
-                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI(p).getInv()));
+                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI().getInv(p)));
             } catch (NumberFormatException ignored) {
                 p.sendMessage(StringUtil.color("&cInvalid Number."));
 
@@ -409,7 +366,30 @@ public class PlayerEvents implements Listener {
                 p.sendMessage(StringUtil.color("&cPlayer "+strippedMessage+" isn't online."));
             }
             PMineSettingsGUI.getKickPlayerSet().remove(p.getUniqueId());
-            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI(p).getInv()));
+            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI().getInv(p)));
+        }
+        if (lunixPlayer.getChatReplyType() != null) {
+            switch (lunixPlayer.getChatReplyType()) {
+                case RENAME_TAG -> {
+                    e.setCancelled(true);
+                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->{
+                        boolean hasRenameTagInInv = false;
+                        for (ItemStack item : p.getInventory().getStorageContents()) {
+                            if (NBTTags.getItemID(item) == ItemID.RENAME_TAG) {
+                                hasRenameTagInInv = true;
+                                break;
+                            }
+                        }
+                        if (hasRenameTagInInv) {
+                            p.openInventory(new RenameTagConfirmGUI(ChatColor.stripColor(e.getMessage()),p.getUniqueId()).getInv(p));
+                        } else {
+                            p.sendMessage(StringUtil.color("&cNo Rename Tag Found!"));
+                        }
+                        lunixPlayer.setChatReplyType(null);
+
+                    });
+                }
+            }
         }
     }
 

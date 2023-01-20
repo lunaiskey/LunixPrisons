@@ -1,11 +1,12 @@
 package io.github.lunaiskey.lunixprison.modules.player.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
-import io.github.lunaiskey.lunixprison.util.gui.LunixPagedHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixPagedHolder;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.modules.boosters.Booster;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInventory;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import io.github.lunaiskey.lunixprison.util.TimeUtil;
@@ -13,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -21,21 +23,18 @@ import java.util.*;
 
 public class PersonalBoosterGUI implements LunixInventory {
 
-    private final String name = "Personal Boosters";
-    private final int size = 36;
-    private Inventory inv = new LunixPagedHolder(name,size, LunixInvType.PERSONAL_BOOSTER).getInventory();
-    private Player player;
-
-    public PersonalBoosterGUI(Player player) {
-        this.player = player;
+    @Override
+    public Inventory getInv(Player player) {
+        Inventory inv = new LunixPagedHolder("Personal Boosters",36, LunixInvType.PERSONAL_BOOSTER).getInventory();
+        init(inv,player);
+        return inv;
     }
 
-    @Override
-    public void init() {
-        for (int i = 0;i<size;i++) {
+    public void init(Inventory inv, Player p) {
+        for (int i = 0;i<inv.getSize();i++) {
             switch (i) {
                 case 10,11,12,13,14,15,16,19,20,21,22,23,24,25 -> {
-                    inv.setItem(i,getBoosterItem(getIndex(i)));
+                    inv.setItem(i,getBoosterItem(getIndex(i),p));
                 }
                 default -> inv.setItem(i, ItemBuilder.getDefaultFiller());
             }
@@ -43,14 +42,18 @@ public class PersonalBoosterGUI implements LunixInventory {
     }
 
     @Override
-    public Inventory getInv() {
-        init();
-        return inv;
+    public void updateInventory(Player player) {
+
     }
 
     @Override
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
+    }
+
+    @Override
+    public void onDrag(InventoryDragEvent e) {
+
     }
 
     public void onOpen(InventoryOpenEvent e) {
@@ -61,8 +64,8 @@ public class PersonalBoosterGUI implements LunixInventory {
 
     }
 
-    private ItemStack getBoosterItem(int index) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId());
+    private ItemStack getBoosterItem(int index, Player p) {
+        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
         List<Booster> boosters = lunixPlayer.getBoosters();
         if (index < boosters.size()) {
             Booster booster = boosters.get(index);
@@ -86,7 +89,7 @@ public class PersonalBoosterGUI implements LunixInventory {
                 for (int i = 0;i<14;i++) {
                     int slot = getSlot(i);
                     int index = (page*18)+i;
-                    inv.setItem(slot,getBoosterItem(index));
+                    inv.setItem(slot,getBoosterItem(index,p));
                 }
             }
         }

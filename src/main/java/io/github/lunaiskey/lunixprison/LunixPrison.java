@@ -1,13 +1,14 @@
 package io.github.lunaiskey.lunixprison;
 
+import io.github.lunaiskey.lunixprison.inventory.InventoryManager;
 import io.github.lunaiskey.lunixprison.modules.gangs.Gang;
 import io.github.lunaiskey.lunixprison.modules.gangs.GangManager;
 import io.github.lunaiskey.lunixprison.hooks.PlaceholderHook;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
-import io.github.lunaiskey.lunixprison.modules.leaderboards.LeaderboardStorage;
+import io.github.lunaiskey.lunixprison.modules.leaderboards.LeaderboardManager;
 import io.github.lunaiskey.lunixprison.listeners.PlayerEvents;
 import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.modules.mines.generator.PMineWorld;
@@ -30,7 +31,8 @@ public final class LunixPrison extends JavaPlugin {
     private PickaxeManager pickaxeManager;
     private ItemManager itemManager;
     private GangManager gangManager;
-    private LeaderboardStorage leaderboardStorage;
+    private LeaderboardManager leaderboardManager;
+    private InventoryManager inventoryManager;
 
     private Boosters boosters;
     private Random rand = new Random();
@@ -57,15 +59,11 @@ public final class LunixPrison extends JavaPlugin {
         new CommandManager(plugin);
         boosters = new Boosters();
 
-        checkPlayerData();
-        leaderboardStorage.startTasks();
+        playerManager.checkPlayerData();
+        leaderboardManager.startTasks();
         bufferSaveTask();
 
         boolean isPlaceholderHookRegistered = new PlaceholderHook(this).registerHook();
-        if (!isPlaceholderHookRegistered) {
-            getLogger().warning("PlaceholderAPI hooking failed, perhaps its missing?");
-        }
-
 
         Bukkit.getPluginManager().registerEvents(new PlayerEvents(this),this);
         getLogger().info("version " + getDescription().getVersion() + " enabled!");
@@ -85,8 +83,9 @@ public final class LunixPrison extends JavaPlugin {
         playerManager = new PlayerManager();
         pickaxeManager = new PickaxeManager();
         itemManager = new ItemManager();
-        leaderboardStorage = new LeaderboardStorage();
+        leaderboardManager = new LeaderboardManager();
         gangManager = new GangManager();
+        inventoryManager = new InventoryManager();
     }
 
     public static LunixPrison getPlugin() {
@@ -159,20 +158,6 @@ public final class LunixPrison extends JavaPlugin {
         return true;
     }
 
-    private void checkPlayerData() {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (!playerManager.getPlayerMap().containsKey(p.getUniqueId())) {
-                playerManager.createLunixPlayer(p.getUniqueId());
-            } else {
-                playerManager.getPlayerMap().get(p.getUniqueId()).setName(p.getName());
-            }
-            if (LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId()) == null) {
-                playerMineManager.newPMine(p.getUniqueId());
-            }
-            savePending.add(p.getUniqueId());
-        }
-    }
-
 
     public PMineManager getPMineManager() {
         return playerMineManager;
@@ -192,6 +177,10 @@ public final class LunixPrison extends JavaPlugin {
         return itemManager;
     }
 
+    public InventoryManager getInventoryManager() {
+        return inventoryManager;
+    }
+
     public Random getRand() {
         return rand;
     }
@@ -200,7 +189,7 @@ public final class LunixPrison extends JavaPlugin {
         return savePending;
     }
 
-    public LeaderboardStorage getLeaderboardStorage() {
-        return leaderboardStorage;
+    public LeaderboardManager getLeaderboardManager() {
+        return leaderboardManager;
     }
 }

@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.util.gui;
+package io.github.lunaiskey.lunixprison.inventory;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
@@ -7,20 +7,21 @@ import org.jetbrains.annotations.NotNull;
 
 public class LunixHolder implements InventoryHolder {
 
-    private final Inventory inventory;
+    private String name;
+    private int size;
     private final LunixInvType invType;
 
     public LunixHolder(String name, int size, LunixInvType invType) {
-        this.inventory = Bukkit.createInventory(this,size,name);
+        this.name = name;
+        this.size = size;
         this.invType = invType;
     }
 
     @Override
     public @NotNull Inventory getInventory() {
-        return inventory;
+        return Bukkit.createInventory(this,size,name);
     }
 
     public LunixInvType getInvType() { return invType; }
-
 
 }

@@ -24,8 +24,9 @@ public class LunixPickaxe {
     private Map<EnchantType,Integer> enchants;
     private Set<EnchantType> disabledEnchants;
     private long blocksBroken;
+    private String rename;
 
-    public LunixPickaxe(UUID player, Map<EnchantType,Integer> enchants, Set<EnchantType> disabledEnchants, long blocksBroken) {
+    public LunixPickaxe(UUID player, Map<EnchantType,Integer> enchants, Set<EnchantType> disabledEnchants, long blocksBroken, String rename) {
         this.player = player;
         if (enchants == null) {
             enchants = new HashMap<>();
@@ -40,16 +41,13 @@ public class LunixPickaxe {
             }
         }
         this.enchants = enchants;
-        if (disabledEnchants == null) {
-            this.disabledEnchants = new HashSet<>();
-        } else {
-            this.disabledEnchants = disabledEnchants;
-        }
+        this.disabledEnchants = Objects.requireNonNullElseGet(disabledEnchants, HashSet::new);
         this.blocksBroken = blocksBroken;
+        this.rename = rename;
     }
 
     public LunixPickaxe(UUID player) {
-        this(player,null,null,0);
+        this(player,null,null,0,null);
     }
 
     public ItemStack getItemStack() {
@@ -94,7 +92,7 @@ public class LunixPickaxe {
     public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
         if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            p.openInventory(new PickaxeEnchantGUI(p).getInv());
+            p.openInventory(new PickaxeEnchantGUI().getInv(p));
         }
     }
 
@@ -110,7 +108,15 @@ public class LunixPickaxe {
         return disabledEnchants;
     }
 
+    public String getRename() {
+        return rename;
+    }
+
     public void setBlocksBroken(long blocksBroken) {
         this.blocksBroken = blocksBroken;
+    }
+
+    public void setRename(String rename) {
+        this.rename = rename;
     }
 }

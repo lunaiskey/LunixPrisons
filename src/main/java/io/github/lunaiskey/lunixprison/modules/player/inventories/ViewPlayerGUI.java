@@ -1,10 +1,11 @@
 package io.github.lunaiskey.lunixprison.modules.player.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.modules.player.ViewPlayerHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInventory;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
@@ -12,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -22,22 +24,26 @@ import java.util.List;
 
 public class ViewPlayerGUI implements LunixInventory {
 
-    private String name;
-    private int size = 45;
-    private Inventory inv;
-    private Player viewing;
-    private LunixPlayer lunixPlayer;
+    private Player otherPlayer;
 
-    public ViewPlayerGUI(Player toView) {
-        this.viewing = toView;
-        this.name = viewing.getName()+"'s Profile";
-        this.inv = new ViewPlayerHolder(name,size, LunixInvType.VIEW_PLAYER,viewing).getInventory();
-        this.lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(viewing.getUniqueId());
+    public ViewPlayerGUI(Player otherPlayer) {
+        this.otherPlayer = otherPlayer;
+    }
+
+    public ViewPlayerGUI() {
+
     }
 
     @Override
-    public void init() {
-        for(int i = 0;i<size;i++) {
+    public Inventory getInv(Player player) {
+        Inventory inv = new ViewPlayerHolder(otherPlayer.getName()+"'s Profile",45, LunixInvType.VIEW_PLAYER,otherPlayer).getInventory();
+        init(inv,player);
+        return inv;
+    }
+
+    public void init(Inventory inv, Player p) {
+        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(otherPlayer.getUniqueId());
+        for(int i = 0;i<inv.getSize();i++) {
             switch(i) {
                 case 10 -> inv.setItem(i, lunixPlayer.getHelmet().getItemStack());
                 case 12 -> inv.setItem(i, lunixPlayer.getChestplate().getItemStack());
@@ -51,14 +57,18 @@ public class ViewPlayerGUI implements LunixInventory {
     }
 
     @Override
-    public Inventory getInv() {
-        init();
-        return inv;
+    public void updateInventory(Player player) {
+
     }
 
     @Override
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
+    }
+
+    @Override
+    public void onDrag(InventoryDragEvent e) {
+
     }
 
     @Override
@@ -72,6 +82,7 @@ public class ViewPlayerGUI implements LunixInventory {
     }
 
     private ItemStack getPlayerStats() {
+        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(otherPlayer.getUniqueId());
         ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(StringUtil.color("&ePlayer Stats"));

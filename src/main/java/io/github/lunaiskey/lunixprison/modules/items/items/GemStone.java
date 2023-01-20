@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.modules.items.lunixitems;
+package io.github.lunaiskey.lunixprison.modules.items.items;
 
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixPlayerHeadItem;
@@ -55,7 +55,7 @@ public class GemStone extends LunixPlayerHeadItem {
     @Override
     public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        p.openInventory(new GemStoneGUI(p).getInv());
+        p.openInventory(new GemStoneGUI().getInv(p));
     }
 
     @Override

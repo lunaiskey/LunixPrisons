@@ -47,6 +47,7 @@ public class CommandManager {
         registerCommand("leaderboard",new CommandLeaderboard());
 
         registerCommand("gang",new CommandGang(plug));
+        registerCommand("cashback",new CommandCashback());
     }
 
     private static void registerCommand(String command, CommandExecutor executor) {

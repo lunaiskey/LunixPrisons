@@ -12,7 +12,7 @@ public class CommandGemstones implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (sender instanceof Player) {
             Player p = (Player) sender;
-            p.openInventory(new GemStoneGUI(p).getInv());
+            p.openInventory(new GemStoneGUI().getInv(p));
         } else {
             sender.sendMessage("This is a player only command.");
         }

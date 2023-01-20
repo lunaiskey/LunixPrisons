@@ -51,6 +51,10 @@ commands:
     aliases:
       - leaderboards
       - lb
+  cashback:
+    usage: /<command>
+    aliases:
+      - cb
 permissions:
   lunix.*:
     description: Gives access to every command.

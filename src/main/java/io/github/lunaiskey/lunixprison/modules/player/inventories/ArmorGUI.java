@@ -3,9 +3,9 @@ package io.github.lunaiskey.lunixprison.modules.player.inventories;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.modules.armor.ArmorSlot;
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInventory;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -25,11 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ArmorGUI implements LunixInventory {
-
-    private final String name = "Armor";
-    private final int size = 27;
-    private final Inventory inv = new LunixHolder(name,size, LunixInvType.ARMOR).getInventory();
-    private final Player p;
     private static final Map<Integer, ArmorSlot> armorSlots = new HashMap<>();
 
     static {
@@ -39,26 +35,27 @@ public class ArmorGUI implements LunixInventory {
         armorSlots.put(13, ArmorSlot.BOOTS);
     }
 
-    public ArmorGUI(Player p) {
-        this.p = p;
-    }
-
     @Override
-    public Inventory getInv() {
-        init();
+    public Inventory getInv(Player player) {
+        Inventory inv = new LunixHolder("Armor",27, LunixInvType.ARMOR).getInventory();
+        init(inv,player);
         return inv;
     }
 
-    @Override
-    public void init() {
-        for(int i = 0;i<size;i++) {
+    public void init(Inventory inv, Player p) {
+        for(int i = 0;i<inv.getSize();i++) {
             switch(i) {
                 case 0,9,18,8,17,26 -> inv.setItem(i, ItemBuilder.createItem(" ", Material.PURPLE_STAINED_GLASS_PANE,null));
-                case 10,11,12,13 -> inv.setItem(i, getArmor(i));
+                case 10,11,12,13 -> inv.setItem(i, getArmor(p,i));
                 case 16 -> inv.setItem(i,getToggleButton(LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).isArmorEquiped()));
                 default -> inv.setItem(i, ItemBuilder.createItem(" ", Material.BLACK_STAINED_GLASS_PANE,null));
             }
         }
+    }
+
+    @Override
+    public void updateInventory(Player player) {
+
     }
 
     @Override
@@ -68,7 +65,7 @@ public class ArmorGUI implements LunixInventory {
         LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
         boolean armorEquiped = lunixPlayer.isArmorEquiped();
         switch (e.getRawSlot()) {
-            case 10,11,12,13 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new ArmorUpgradeGUI(p,armorSlots.get(e.getRawSlot())).getInv()));
+            case 10,11,12,13 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new ArmorUpgradeGUI(armorSlots.get(e.getRawSlot())).getInv(p)));
             case 16 -> {
                 if (armorEquiped) {
                     p.getInventory().setHelmet(null);
@@ -107,6 +104,11 @@ public class ArmorGUI implements LunixInventory {
     }
 
     @Override
+    public void onDrag(InventoryDragEvent e) {
+
+    }
+
+    @Override
     public void onOpen(InventoryOpenEvent e) {
 
     }
@@ -134,7 +136,7 @@ public class ArmorGUI implements LunixInventory {
         return item;
     }
 
-    private ItemStack getArmor(int slot) {
+    private ItemStack getArmor(Player p,int slot) {
         ItemStack item = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getArmor().get(armorSlots.get(slot)).getItemStack();
         ItemMeta meta = item.getItemMeta();
         List<String> lore = meta.getLore();

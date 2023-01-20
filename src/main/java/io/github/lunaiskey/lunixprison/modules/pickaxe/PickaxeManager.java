@@ -36,10 +36,12 @@ public class PickaxeManager {
         enchantments.put(EnchantType.STRIKE,new Strike());
         enchantments.put(EnchantType.EXPLOSIVE,new Explosive());
         enchantments.put(EnchantType.NUKE,new Nuke());
-        enchantments.put(EnchantType.XP_BOOST,new XPBoost());
+        //enchantments.put(EnchantType.XP_BOOST,new XPBoost());
         enchantments.put(EnchantType.NIGHT_VISION,new NightVision());
         enchantments.put(EnchantType.MINE_BOMB,new MineBomb());
     }
+
+
 
 
 
@@ -48,12 +50,18 @@ public class PickaxeManager {
         if (id != ItemID.LUNIX_PICKAXE) return item;
         ItemMeta meta = item.getItemMeta();
         LunixPlayer player = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p);
-        meta.setDisplayName(StringUtil.color("&a"+player.getName()+"'s &fPickaxe"));
+        LunixPickaxe pickaxe = player.getPickaxe();
+        if (pickaxe.getRename() == null) {
+            meta.setDisplayName(StringUtil.color("&a"+player.getName()+"'s &fPickaxe"));
+        } else {
+            meta.setDisplayName(pickaxe.getRename());
+        }
         List<String> lore = new ArrayList<>();
-        LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p).getPickaxe();
         Map<EnchantType, Integer> enchants = pickaxe.getEnchants();
         lore.add(" ");
         lore.add(StringUtil.color("&e&lPickaxe Stats:"));
+        lore.add(StringUtil.color("&e&l| &fLevel: 1"));
+        lore.add(StringUtil.color("&e&l| &fExp: &7&l|||||||||| &b0/250"));
         lore.add(StringUtil.color("&e&l| &fBlocks: "+pickaxe.getBlocksBroken()));
         lore.add(" ");
         lore.add(StringUtil.color("&b&lEnchants"));

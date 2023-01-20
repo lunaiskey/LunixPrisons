@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 
 import java.util.*;
 
-public class LeaderboardStorage {
+public class LeaderboardManager {
 
     private Map<UUID, LunixPlayer> playerMap = LunixPrison.getPlugin().getPlayerManager().getPlayerMap();
     private LinkedHashMap<UUID,BigIntegerEntry> tokenTopCache = new LinkedHashMap<>();

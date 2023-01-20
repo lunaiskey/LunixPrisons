@@ -1,7 +1,7 @@
 package io.github.lunaiskey.lunixprison.modules.pickaxe;
 
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 
 public class EnchantLunixHolder extends LunixHolder {
 

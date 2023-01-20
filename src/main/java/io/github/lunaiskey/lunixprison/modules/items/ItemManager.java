@@ -1,6 +1,6 @@
 package io.github.lunaiskey.lunixprison.modules.items;
 
-import io.github.lunaiskey.lunixprison.modules.items.lunixitems.*;
+import io.github.lunaiskey.lunixprison.modules.items.items.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -40,6 +40,7 @@ public class ItemManager {
         addLunixItem(new GemPouch(PouchRarity.LEGENDARY));
 
         addLunixItem(new PlayerMenu());
+        addLunixItem(new RenameTag());
 
         //itemMap.put(ItemID.SEX_ITEM,new SexItem());
     }

@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.modules.items.lunixitems;
+package io.github.lunaiskey.lunixprison.modules.items.items;
 
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
@@ -42,7 +42,7 @@ public class PlayerMenu extends LunixItem {
     @Override
     public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        p.openInventory(new PlayerMenuGUI().getInv());
+        p.openInventory(new PlayerMenuGUI().getInv(p));
     }
 
     @Override

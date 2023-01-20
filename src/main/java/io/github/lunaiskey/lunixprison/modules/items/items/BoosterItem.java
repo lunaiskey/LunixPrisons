@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.modules.items.lunixitems;
+package io.github.lunaiskey.lunixprison.modules.items.items;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;

@@ -32,6 +32,7 @@ public class PlaceholderHook extends PlaceholderExpansion implements LunixHook {
             this.register();
             return true;
         }
+        plugin.getLogger().warning("PlaceholderAPI hooking failed, perhaps its missing?");
         return false;
     }
 

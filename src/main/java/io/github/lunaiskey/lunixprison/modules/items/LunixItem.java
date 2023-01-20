@@ -50,14 +50,15 @@ public abstract class LunixItem {
                 lore.add(StringUtil.color(str));
             }
             meta.setLore(lore);
-        } else {
         }
+        /*
         if (rarity != null) {
             if (lore.size() > 0) {
                 lore.add("");
             }
             lore.add(StringUtil.color(rarity.getColorCode()+"&l"+rarity.name()));
         }
+         */
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;

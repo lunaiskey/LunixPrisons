@@ -1,7 +1,7 @@
 package io.github.lunaiskey.lunixprison.modules.player;
 
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import org.bukkit.entity.Player;
 
 public class ViewPlayerHolder extends LunixHolder {

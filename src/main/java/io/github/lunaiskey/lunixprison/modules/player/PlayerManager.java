@@ -99,9 +99,12 @@ public class PlayerManager {
         int rank = ((Number) playerData.getOrDefault("rank",0)).intValue();
         ItemID selectedGemstone = ItemID.valueOf((String) playerData.getOrDefault("selectedGemstone",ItemID.AMETHYST_GEMSTONE.name()));
         int gemstoneCount = ((Number) playerData.getOrDefault("gemstoneCount",0)).intValue();
+        BigInteger cashback = new BigInteger(playerData.getOrDefault("cashback", BigInteger.ZERO).toString());
+
         lunixPlayer.setRank(rank);
         lunixPlayer.setSelectedGemstone(selectedGemstone);
         lunixPlayer.setGemstoneCount(gemstoneCount);
+        lunixPlayer.setCashback(cashback);
     }
 
     private void loadCurrencyData(LunixPlayer lunixPlayer,Map<String,Object> playerData) {
@@ -130,7 +133,8 @@ public class PlayerManager {
             } catch (Exception ignored) {}
         }
         long blocksBroken = ((Number) pickaxeMap.getOrDefault("blocksBroken",0L)).longValue();
-        LunixPickaxe pickaxe = new LunixPickaxe(lunixPlayer.getpUUID(),pickaxeEnchantMap,pickaxeDisabledEnchants,blocksBroken);
+        String rename = (String) pickaxeMap.getOrDefault("rename",null);
+        LunixPickaxe pickaxe = new LunixPickaxe(lunixPlayer.getpUUID(),pickaxeEnchantMap,pickaxeDisabledEnchants,blocksBroken,rename);
         lunixPlayer.setPickaxe(pickaxe);
     }
 
@@ -267,6 +271,21 @@ public class PlayerManager {
             lunixPlayer.giveTokens(new BigDecimal(tokens).multiply(BigDecimal.valueOf(mineOwnerAmount)).toBigInteger());
             mineOwner.giveTokens(new BigDecimal(tokens).multiply(BigDecimal.valueOf(tax)).toBigInteger());
             LunixPrison.getPlugin().getSavePending().add(mineOwner.getpUUID());
+        }
+    }
+
+    public void checkPlayerData() {
+        PMineManager pMineManager = LunixPrison.getPlugin().getPMineManager();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (getPlayerMap().containsKey(p.getUniqueId())) {
+                createLunixPlayer(p.getUniqueId());
+            } else {
+                getPlayerMap().get(p.getUniqueId()).setName(p.getName());
+            }
+            if (pMineManager.getPMine(p.getUniqueId()) == null) {
+                pMineManager.newPMine(p.getUniqueId());
+            }
+            LunixPrison.getPlugin().getSavePending().add(p.getUniqueId());
         }
     }
 

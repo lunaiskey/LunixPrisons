@@ -1,12 +1,13 @@
 package io.github.lunaiskey.lunixprison.modules.pickaxe.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixPickaxe;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
@@ -14,47 +15,33 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class PickaxeEnchantGUI {
+public class PickaxeEnchantGUI implements LunixInventory {
 
-    private String name = "Enchantments";
-    private int size = 54;
-    private Player p;
-    private Inventory inv = new LunixHolder(name,size, LunixInvType.PICKAXE_ENCHANTS).getInventory();
-    private LunixPickaxe pickaxe;
-    private static Map<Integer, EnchantType> enchantLocation = new HashMap<>();
-
-    static {
-        enchantLocation.put(20,EnchantType.FORTUNE);
-        enchantLocation.put(21,EnchantType.JACK_HAMMER);
-        enchantLocation.put(22,EnchantType.STRIKE);
-        enchantLocation.put(23,EnchantType.EXPLOSIVE);
-        enchantLocation.put(24,EnchantType.MINE_BOMB);
-        enchantLocation.put(29,EnchantType.NUKE);
-        enchantLocation.put(30,EnchantType.GEM_FINDER);
-        enchantLocation.put(31,EnchantType.KEY_FINDER);
-        enchantLocation.put(32,EnchantType.LOOT_FINDER);
-        enchantLocation.put(33,EnchantType.XP_BOOST);
-    }
-    public PickaxeEnchantGUI(Player p) {
-        this.p = p;
-        pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
+    @Override
+    public Inventory getInv(Player player) {
+        Inventory inv = new LunixHolder("Enchantments",54, LunixInvType.PICKAXE_ENCHANTS).getInventory();
+        init(inv,player);
+        return inv;
     }
 
-    private void init() {
-        for(int i = 0; i < size;i++) {
+    private void init(Inventory inv, Player p) {
+        LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
+        for(int i = 0; i < inv.getSize();i++) {
             switch(i) {
                 case 20,21,22,23,24,29,30,31,32,33,38,39,40,41,42 -> {
-                    if (enchantLocation.containsKey(i)) {
-                        inv.setItem(i,getEnchantPlaceholder(enchantLocation.get(i)));
+                    EnchantType type = EnchantType.getEnchantFromSlot(i);
+                    if (type != null && LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().containsKey(type)) {
+                        inv.setItem(i,getEnchantPlaceholder(type,p));
                     } else {
                         inv.setItem(i, ItemBuilder.createItem("&c&lCOMING SOON", Material.BEDROCK,null));
                     }
@@ -66,11 +53,6 @@ public class PickaxeEnchantGUI {
         }
     }
 
-    public Inventory getInv() {
-        init();
-        return inv;
-    }
-
     private ItemStack getEnchantToggleIcon() {
         String name = "&aToggle Enchants";
         Material mat = Material.GREEN_DYE;
@@ -79,7 +61,7 @@ public class PickaxeEnchantGUI {
         return ItemBuilder.createItem(name,mat,lore);
     }
 
-    private ItemStack getEnchantPlaceholder(EnchantType type) {
+    private ItemStack getEnchantPlaceholder(EnchantType type, Player p) {
         LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
         Material mat = Material.ENCHANTED_BOOK;
         if (!enchant.isEnabled()) {
@@ -88,6 +70,7 @@ public class PickaxeEnchantGUI {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         CurrencyType currencyType = enchant.getCurrencyType();
+        LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
         int level = pickaxe.getEnchants().getOrDefault(type, 0);
         meta.setDisplayName(StringUtil.color("&b"+enchant.getName()+" &8[&7"+level+" -> "+(level+1)+"&8]"));
         List<String> lore = new ArrayList<>();
@@ -116,26 +99,49 @@ public class PickaxeEnchantGUI {
         return item;
     }
 
+    @Override
+    public void updateInventory(Player player) {
+
+    }
+
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
         Player p = (Player) e.getWhoClicked();
         int slot = e.getRawSlot();
-        if (slot == 11) {
-            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new PickaxeEnchantToggleGUI(p).getInv()));
-            return;
-        }
-        if (enchantLocation.containsKey(slot)) {
-            LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(enchantLocation.get(slot));
-            int level = pickaxe.getEnchants().getOrDefault(enchantLocation.get(slot), 0);
-            if (enchant.isEnabled()) {
-                if (level < enchant.getMaxLevel()) {
-                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new PickaxeAddLevelsGUI(p,enchantLocation.get(slot)).getInv()));
-                } else {
-                    p.sendMessage(StringUtil.color("&cYou have maxed out this enchantment."));
+        switch (slot) {
+            case 11 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new PickaxeEnchantToggleGUI().getInv(p)));
+            case 20,21,22,23,24,29,30,31,32,33,38,39,40,41,42 -> {
+                EnchantType type = EnchantType.getEnchantFromSlot(slot);
+                if (type != null && LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().containsKey(type)) {
+                    LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
+                    LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
+                    int level = pickaxe.getEnchants().getOrDefault(type, 0);
+                    if (enchant.isEnabled()) {
+                        if (level < enchant.getMaxLevel()) {
+                            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new PickaxeAddLevelsGUI(type).getInv(p)));
+                        } else {
+                            p.sendMessage(StringUtil.color("&cYou have maxed out this enchantment."));
+                        }
+                    } else {
+                        p.sendMessage(StringUtil.color("&cThis enchantment is currently unavailable."));
+                    }
                 }
-            } else {
-                p.sendMessage(StringUtil.color("&cThis enchantment is currently unavailable."));
             }
         }
+    }
+
+    @Override
+    public void onDrag(InventoryDragEvent e) {
+
+    }
+
+    @Override
+    public void onOpen(InventoryOpenEvent e) {
+
+    }
+
+    @Override
+    public void onClose(InventoryCloseEvent e) {
+
     }
 }

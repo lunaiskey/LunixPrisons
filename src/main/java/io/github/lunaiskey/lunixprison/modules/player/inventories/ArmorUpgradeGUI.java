@@ -5,11 +5,11 @@ import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.modules.armor.ArmorSlot;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInventory;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.armor.Armor;
 import io.github.lunaiskey.lunixprison.modules.armor.ArmorLunixHolder;
-import io.github.lunaiskey.lunixprison.modules.items.lunixitems.GemStone;
+import io.github.lunaiskey.lunixprison.modules.items.items.GemStone;
 import io.github.lunaiskey.lunixprison.modules.armor.upgrades.Ability;
 import io.github.lunaiskey.lunixprison.modules.armor.upgrades.AbilityType;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -31,14 +32,10 @@ import java.util.List;
 
 public class ArmorUpgradeGUI implements LunixInventory {
 
-    private String name;
-    private int size = 36;
-    private final Player player;
-    private final LunixPlayer lunixPlayer;
-    private final Inventory inv;
-    private ArmorSlot type;
-    private static Map<Integer,AbilityType> abilitySlots = new HashMap<>();
-    private static Map<UUID, ArmorSlot> customColorMap = new HashMap<>();
+    private static final Map<Integer,AbilityType> abilitySlots = new HashMap<>();
+    private static final Map<UUID, ArmorSlot> customColorMap = new HashMap<>();
+
+    private ArmorSlot armorSlot;
 
     static {
         abilitySlots.put(21,AbilityType.SALES_BOOST);
@@ -46,29 +43,35 @@ public class ArmorUpgradeGUI implements LunixInventory {
         //abilitySlots.put(23,AbilityType.XP_BOOST);
     }
 
-    public ArmorUpgradeGUI(Player player, ArmorSlot type) {
-        this.player = player;
-        this.lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId());
-        this.type = type;
-        this.name = type.getName() + " Upgrades";
-        this.inv = new ArmorLunixHolder(name,size, LunixInvType.ARMOR_UPGRADES,type).getInventory();
+    public ArmorUpgradeGUI(ArmorSlot armorSlot) {
+        this.armorSlot = armorSlot;
+    }
 
+    public ArmorUpgradeGUI() {
+        this.armorSlot = null;
     }
 
     @Override
-    public void init() {
-        for (int i = 0;i<size;i++) {
+    public Inventory getInv(Player player) {
+        Inventory inv = new ArmorLunixHolder(armorSlot.getName()+" Upgrades",36, LunixInvType.ARMOR_UPGRADES,armorSlot).getInventory();
+        init(inv,player);
+        return null;
+    }
+
+    public void init(Inventory inv, Player p) {
+        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        for (int i = 0;i<inv.getSize();i++) {
             switch (i) {
-                case 13 -> inv.setItem(i, lunixPlayer.getArmor().get(type).getItemStack());
+                case 13 -> inv.setItem(i, lunixPlayer.getArmor().get(armorSlot).getItemStack());
                 case 21,22,23 -> {
                     if (abilitySlots.containsKey(i)) {
-                        inv.setItem(i,getUpgradeButton(abilitySlots.get(i)));
+                        inv.setItem(i,getUpgradeButton(abilitySlots.get(i),p));
                     } else {
                         inv.setItem(i,ItemBuilder.getComingSoon());
                     }
                 }
-                case 11 -> inv.setItem(i, getTierUpButton());
-                case 15 -> inv.setItem(i, getColorButton());
+                case 11 -> inv.setItem(i, getTierUpButton(p));
+                case 15 -> inv.setItem(i, getColorButton(p));
                 case 0,9,18,27,8,17,26,35 -> inv.setItem(i, ItemBuilder.createItem(" ", Material.PURPLE_STAINED_GLASS_PANE,null));
                 default -> inv.setItem(i, ItemBuilder.createItem(" ", Material.BLACK_STAINED_GLASS_PANE,null));
             }
@@ -76,17 +79,17 @@ public class ArmorUpgradeGUI implements LunixInventory {
     }
 
     @Override
-    public Inventory getInv() {
-        init();
-        return inv;
+    public void updateInventory(Player player) {
+
     }
 
     @Override
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
         Player p = (Player) e.getWhoClicked();
+        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
         Inventory inv = e.getClickedInventory();
-        Armor armor = lunixPlayer.getArmor().get(type);
+        Armor armor = lunixPlayer.getArmor().get(armorSlot);
         int slot = e.getRawSlot();
         boolean isEquiped = lunixPlayer.isArmorEquiped();
         switch (slot) {
@@ -99,14 +102,14 @@ public class ArmorUpgradeGUI implements LunixInventory {
                         if (lunixPlayer.getGems() >= ability.getCost(level)) {
                             lunixPlayer.takeGems(ability.getCost(level));
                             armor.getAbilties().put(abilityType,level+1);
-                            player.sendMessage(StringUtil.color("&aUpgraded " + abilitySlots.get(slot).name() + " to level " + armor.getAbilties().get(abilityType) + "."));
+                            p.sendMessage(StringUtil.color("&aUpgraded " + abilitySlots.get(slot).name() + " to level " + armor.getAbilties().get(abilityType) + "."));
                             if (isEquiped) {
-                                p.getInventory().setItem(type.getSlot(), armor.getItemStack());
+                                p.getInventory().setItem(armorSlot.getSlot(), armor.getItemStack());
                             }
 
-                            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), () -> player.openInventory(new ArmorUpgradeGUI(player, type).getInv()));
+                            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), () -> p.openInventory(new ArmorUpgradeGUI(armorSlot).getInv(p)));
                         } else {
-                            player.sendMessage(StringUtil.color("&cYou cannot afford this upgrade."));
+                            p.sendMessage(StringUtil.color("&cYou cannot afford this upgrade."));
                         }
                     }
                 }
@@ -115,16 +118,16 @@ public class ArmorUpgradeGUI implements LunixInventory {
                 if (armor.getTier() < armor.getTierMax()) {
                     int cost = armor.getCostAmount(armor.getTier()+1);
                     ItemID gemStoneType = armor.getGemstone(armor.getTier()+1);
-                    if (LunixPrison.getPlugin().getPlayerManager().getLunixItemCount(player,gemStoneType) >= cost) {
-                        LunixPrison.getPlugin().getPlayerManager().removeLunixItem(player,gemStoneType,cost);
+                    if (LunixPrison.getPlugin().getPlayerManager().getLunixItemCount(p,gemStoneType) >= cost) {
+                        LunixPrison.getPlugin().getPlayerManager().removeLunixItem(p,gemStoneType,cost);
                         armor.setTier(armor.getTier()+1);
-                        player.sendMessage(StringUtil.color("&aSuccessfully upgraded armor to Tier "+armor.getTier()+"."));
+                        p.sendMessage(StringUtil.color("&aSuccessfully upgraded armor to Tier "+armor.getTier()+"."));
                         if (isEquiped) {
-                            p.getInventory().setItem(type.getSlot(),armor.getItemStack());
+                            p.getInventory().setItem(armorSlot.getSlot(),armor.getItemStack());
                         }
-                        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->player.openInventory(new ArmorUpgradeGUI(player,type).getInv()));
+                        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new ArmorUpgradeGUI(armorSlot).getInv(p)));
                     } else {
-                        player.sendMessage(StringUtil.color("&cYou don't have enough of this type of Gemstone."));
+                        p.sendMessage(StringUtil.color("&cYou don't have enough of this type of Gemstone."));
                     }
                 }
             }
@@ -133,21 +136,26 @@ public class ArmorUpgradeGUI implements LunixInventory {
                     case LEFT,SHIFT_LEFT -> {
                         Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), p::closeInventory);
                         p.sendMessage("Type in the hex code you want for your piece.");
-                        customColorMap.put(p.getUniqueId(),type);
+                        customColorMap.put(p.getUniqueId(),this.armorSlot);
                     }
                     case RIGHT,SHIFT_RIGHT -> {
                         if (armor.getCustomColor() != null) {
                             armor.setCustomColor(null);
                             if (isEquiped) {
-                                p.getInventory().setItem(type.getSlot(),armor.getItemStack());
+                                p.getInventory().setItem(armorSlot.getSlot(),armor.getItemStack());
                             }
-                            inv.setItem(slot,getColorButton());
+                            inv.setItem(slot,getColorButton(p));
                             inv.setItem(13,armor.getItemStack());
                         }
                     }
                 }
             }
         }
+    }
+
+    @Override
+    public void onDrag(InventoryDragEvent e) {
+
     }
 
     @Override
@@ -160,10 +168,11 @@ public class ArmorUpgradeGUI implements LunixInventory {
 
     }
 
-    private ItemStack getUpgradeButton(AbilityType abilityType) {
+    private ItemStack getUpgradeButton(AbilityType abilityType,Player p) {
         Material mat = abilityType.getMaterial();
         String name = abilityType.getFormattedName();
-        Armor armor = lunixPlayer.getArmor().get(type);
+        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        Armor armor = lunixPlayer.getArmor().get(armorSlot);
         int level = armor.getAbilties().get(abilityType);
         Ability ability = LunixPrison.getPlugin().getPlayerManager().getArmorAbilityMap().get(abilityType);
         int maxLevel = ability.getMaxLevel();
@@ -187,8 +196,9 @@ public class ArmorUpgradeGUI implements LunixInventory {
         return ItemBuilder.createItem(formattedName,mat,lore);
     }
 
-    private ItemStack getTierUpButton() {
-        Armor armor = lunixPlayer.getArmor().get(type);
+    private ItemStack getTierUpButton(Player p) {
+        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        Armor armor = lunixPlayer.getArmor().get(armorSlot);
         ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(StringUtil.color("&aTier Up Piece"));
@@ -211,11 +221,12 @@ public class ArmorUpgradeGUI implements LunixInventory {
         return item;
     }
 
-    private ItemStack getColorButton() {
+    private ItemStack getColorButton(Player p) {
+        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
         ItemStack item = new ItemStack(Material.YELLOW_DYE);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(StringUtil.color("&aChange "+type.getName()+" Color"));
-        Color color = lunixPlayer.getArmor().get(type).getAWTCustomColor();
+        meta.setDisplayName(StringUtil.color("&aChange "+armorSlot.getName()+" Color"));
+        Color color = lunixPlayer.getArmor().get(armorSlot).getAWTCustomColor();
         List<String> lore = new ArrayList<>();
         lore.add(StringUtil.color("&7Use this to update your"));
         lore.add(StringUtil.color("&7Armor Piece's color."));

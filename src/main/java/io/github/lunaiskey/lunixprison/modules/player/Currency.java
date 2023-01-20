@@ -69,7 +69,7 @@ public class Currency {
                     pPlayer.setTokens(BigInteger.ZERO);
                     break;
                 }
-                pPlayer.takeTokens(amount);}
+                pPlayer.takeTokens(amount,false);}
             case GEMS -> {
                 if (amount.longValue() >= pPlayer.getGems()) {
                     pPlayer.setGems(0);

@@ -1,33 +1,41 @@
 package io.github.lunaiskey.lunixprison.modules.player.inventories;
 
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInventory;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 
 public class PlayerMenuGUI implements LunixInventory {
 
-    private final String name = "Player Menu [WIP]";
-    private final int size = 54;
-    private final Inventory inv = new LunixHolder(name,size, LunixInvType.PLAYER_MENU).getInventory();
-
     @Override
-    public void init() {
+    public Inventory getInv(Player player) {
+        Inventory inv = new LunixHolder("Player Menu [WIP]",54, LunixInvType.PLAYER_MENU).getInventory();
+        init(inv,player);
+        return inv;
+    }
+
+    public void init(Inventory inv, Player p) {
 
     }
 
     @Override
-    public Inventory getInv() {
-        init();
-        return inv;
+    public void updateInventory(Player player) {
+
     }
 
     @Override
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
+    }
+
+    @Override
+    public void onDrag(InventoryDragEvent e) {
+
     }
 
     @Override

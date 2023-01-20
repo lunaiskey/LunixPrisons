@@ -2,7 +2,7 @@ package io.github.lunaiskey.lunixprison.modules.player.commands;
 
 import io.github.lunaiskey.lunixprison.Messages;
 import io.github.lunaiskey.lunixprison.LunixPrison;
-import io.github.lunaiskey.lunixprison.modules.items.lunixitems.Voucher;
+import io.github.lunaiskey.lunixprison.modules.items.items.Voucher;
 import io.github.lunaiskey.lunixprison.modules.player.Currency;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;

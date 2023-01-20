@@ -40,7 +40,7 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
             Player p = (Player) sender;
             PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
             if (args.length == 0) {
-                p.openInventory(new PMineGUI(p).getInv());
+                p.openInventory(new PMineGUI().getInv(p));
                 return true;
             }
             if (args[0].equalsIgnoreCase("reset")) {

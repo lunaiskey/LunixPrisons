@@ -1,15 +1,17 @@
 package io.github.lunaiskey.lunixprison.modules.leaderboards;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInventory;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -20,13 +22,16 @@ import java.util.List;
 
 public class LeaderboardGUI implements LunixInventory {
 
-    private final String name = "Leaderboard";
-    private final int size = 27;
-    private Inventory inv = new LunixHolder(name,size, LunixInvType.LEADERBOARDS).getInventory();
-
     @Override
-    public void init() {
-        for (int i = 0;i<size;i++) {
+    public Inventory getInv(Player player) {
+        Inventory inv = new LunixHolder("Leaderboards",27, LunixInvType.LEADERBOARDS).getInventory();
+        init(inv,player);
+        return inv;
+    }
+
+
+    public void init(Inventory inv, Player p) {
+        for (int i = 0;i< inv.getSize();i++) {
             switch (i) {
                 case 12 -> inv.setItem(i,getTokenTop());
                 case 13 -> inv.setItem(i,getGemsTop());
@@ -37,14 +42,18 @@ public class LeaderboardGUI implements LunixInventory {
     }
 
     @Override
-    public Inventory getInv() {
-        init();
-        return inv;
+    public void updateInventory(Player player) {
+
     }
 
     @Override
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
+    }
+
+    @Override
+    public void onDrag(InventoryDragEvent e) {
+
     }
 
     @Override
@@ -58,7 +67,7 @@ public class LeaderboardGUI implements LunixInventory {
     }
 
     public ItemStack getTokenTop() {
-        ArrayList<BigIntegerEntry> tokenTop = new ArrayList<>(LunixPrison.getPlugin().getLeaderboardStorage().getTokenTopCache().values());
+        ArrayList<BigIntegerEntry> tokenTop = new ArrayList<>(LunixPrison.getPlugin().getLeaderboardManager().getTokenTopCache().values());
         List<String> lore = new ArrayList<>();
         for (int i = 0;i<5;i++) {
             BigIntegerEntry entry;
@@ -73,7 +82,7 @@ public class LeaderboardGUI implements LunixInventory {
     }
 
     public ItemStack getGemsTop() {
-        ArrayList<LongEntry> gemsTop = new ArrayList<>(LunixPrison.getPlugin().getLeaderboardStorage().getGemsTopCache().values());
+        ArrayList<LongEntry> gemsTop = new ArrayList<>(LunixPrison.getPlugin().getLeaderboardManager().getGemsTopCache().values());
         List<String> lore = new ArrayList<>();
         for (int i = 0;i<5;i++) {
             LongEntry entry;
@@ -88,7 +97,7 @@ public class LeaderboardGUI implements LunixInventory {
     }
 
     public ItemStack getRankTop() {
-        ArrayList<LongEntry> rankTop = new ArrayList<>(LunixPrison.getPlugin().getLeaderboardStorage().getRankTopCache().values());
+        ArrayList<LongEntry> rankTop = new ArrayList<>(LunixPrison.getPlugin().getLeaderboardManager().getRankTopCache().values());
         List<String> lore = new ArrayList<>();
         for (int i = 0;i<5;i++) {
             LongEntry entry;

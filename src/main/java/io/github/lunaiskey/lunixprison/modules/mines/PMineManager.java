@@ -5,8 +5,8 @@ import java.io.FilenameFilter;
 import java.util.*;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
-import io.github.lunaiskey.lunixprison.util.gui.LunixHolder;
-import io.github.lunaiskey.lunixprison.util.gui.LunixInvType;
+import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
+import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.modules.mines.generator.PMineWorld;
 import io.github.lunaiskey.lunixprison.modules.mines.inventories.PMinePublicGUI;
 import io.github.lunaiskey.lunixprison.modules.mines.upgrades.PMineUpgradeType;
@@ -25,9 +25,9 @@ public class PMineManager {
 
     private static Map<Pair<Integer,Integer>, PMine> pMines = new HashMap<>();
     private static Map<UUID, Pair<Integer,Integer>> ownerPMines = new HashMap<>();
-    private final int gridIslandSize = 225;
+    private final int GRID_ISLAND_SIZE = 225;
     private static ImmutablePair<Integer,Integer> last = null;
-    private int defaultRadius = 12;
+    public static final int DEFAULT_RADIUS = 12;
     private static Map<UUID, Set<UUID>> mineAuthorizedPlayers = new HashMap<>();
     private static Map<UUID, Set<UUID>> playerAuthorizedMines = new HashMap<>();
     private static Set<UUID> publicMines = new HashSet<>();
@@ -120,11 +120,11 @@ public class PMineManager {
     }
 
     public Location getMinCorner(int chunkX,int chunkZ) {
-        return new Location(Bukkit.getWorld(PMineWorld.getWorldName()),-112+(gridIslandSize *chunkX),0,-112+(gridIslandSize *chunkZ));
+        return new Location(Bukkit.getWorld(PMineWorld.getWorldName()),-112+(GRID_ISLAND_SIZE *chunkX),0,-112+(GRID_ISLAND_SIZE *chunkZ));
     }
 
     public Location getMaxCorner(int chunkX,int chunkZ) {
-        return new Location(Bukkit.getWorld(PMineWorld.getWorldName()),112+(gridIslandSize *chunkX),256,112+(gridIslandSize *chunkZ));
+        return new Location(Bukkit.getWorld(PMineWorld.getWorldName()),112+(GRID_ISLAND_SIZE *chunkX),256,112+(GRID_ISLAND_SIZE *chunkZ));
     }
 
     /**
@@ -134,8 +134,8 @@ public class PMineManager {
      */
 
     public Pair<Integer,Integer> getGridLocation(Location loc) {
-        double x = Math.floor((112D + loc.getBlockX()) / gridIslandSize);
-        double z = Math.floor((112D + loc.getBlockZ()) / gridIslandSize);
+        double x = Math.floor((112D + loc.getBlockX()) / GRID_ISLAND_SIZE);
+        double z = Math.floor((112D + loc.getBlockZ()) / GRID_ISLAND_SIZE);
         return new ImmutablePair<>((int) x,(int) z);
     }
 
