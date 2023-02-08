@@ -1,13 +1,13 @@
 package io.github.lunaiskey.lunixprison.listeners;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.modules.armor.inventories.ArmorUpgradeGUI;
 import io.github.lunaiskey.lunixprison.modules.items.gui.RenameTagConfirmGUI;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.modules.mines.commands.CommandPMine;
 import io.github.lunaiskey.lunixprison.modules.mines.inventories.*;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.*;
-import io.github.lunaiskey.lunixprison.modules.player.inventories.*;
 import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
@@ -297,6 +297,7 @@ public class PlayerEvents implements Listener {
             e.setCancelled(true);
             Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineBlocksGUI().getInv(p)));
             PMineBlocksGUI.getEditMap().remove(p.getUniqueId());
+            return;
         } else if (ArmorUpgradeGUI.getCustomColorMap().containsKey(p.getUniqueId())) {
             Map<UUID, ArmorSlot> map = ArmorUpgradeGUI.getCustomColorMap();
             ArmorSlot type = map.get(p.getUniqueId());
@@ -307,7 +308,7 @@ public class PlayerEvents implements Listener {
                 if (color <= 0xFFFFFF && color >= 0) {
                     armor.setCustomColor(Color.fromRGB(color));
                     if (equipped) {
-                        p.getInventory().setItem(type.getSlot(),armor.getItemStack());
+                        p.getInventory().setItem(type.getEquipmentSlot(),armor.getItemStack());
                     }
                 } else {
                     p.sendMessage(StringUtil.color("&cInvalid Color Code."));
@@ -318,6 +319,7 @@ public class PlayerEvents implements Listener {
             e.setCancelled(true);
             Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new ArmorUpgradeGUI(type).getInv(p)));
             ArmorUpgradeGUI.getCustomColorMap().remove(p.getUniqueId());
+            return;
         } else if (PMineSettingsGUI.getTaxEditSet().contains(p.getUniqueId())) {
             e.setCancelled(true);
             try {
@@ -346,6 +348,7 @@ public class PlayerEvents implements Listener {
 
             }
             PMineSettingsGUI.getTaxEditSet().remove(p.getUniqueId());
+            return;
         } else if (PMineSettingsGUI.getKickPlayerSet().contains(p.getUniqueId())) {
             Player kickPlayer = Bukkit.getPlayer(strippedMessage);
             e.setCancelled(true);
@@ -367,6 +370,7 @@ public class PlayerEvents implements Listener {
             }
             PMineSettingsGUI.getKickPlayerSet().remove(p.getUniqueId());
             Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI().getInv(p)));
+            return;
         }
         if (lunixPlayer.getChatReplyType() != null) {
             switch (lunixPlayer.getChatReplyType()) {
@@ -386,7 +390,6 @@ public class PlayerEvents implements Listener {
                             p.sendMessage(StringUtil.color("&cNo Rename Tag Found!"));
                         }
                         lunixPlayer.setChatReplyType(null);
-
                     });
                 }
             }

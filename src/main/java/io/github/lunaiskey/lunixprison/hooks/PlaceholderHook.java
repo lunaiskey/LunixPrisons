@@ -64,9 +64,15 @@ public class PlaceholderHook extends PlaceholderExpansion implements LunixHook {
                 case "tokens" -> Numbers.formattedNumber(lunixPlayer.getTokens());
                 case "gems" -> Numbers.formattedNumber(lunixPlayer.getGems());
                 case "points" -> Numbers.formattedNumber(lunixPlayer.getLunixPoints());
-                case "unicode_tokens" -> CurrencyType.TOKENS.getUnicode();
-                case "unicode_gems" -> CurrencyType.GEMS.getUnicode();
-                case "unicode_points" -> CurrencyType.LUNIX_POINTS.getUnicode();
+                case "tokens_raw" -> lunixPlayer.getTokens().toString();
+                case "gems_raw" -> String.valueOf(lunixPlayer.getGems());
+                case "points_raw" -> String.valueOf(lunixPlayer.getLunixPoints());
+                case "tokens_unicode" -> CurrencyType.TOKENS.getUnicode();
+                case "gems_unicode" -> CurrencyType.GEMS.getUnicode();
+                case "points_unicode" -> CurrencyType.LUNIX_POINTS.getUnicode();
+                case "tokens_color" -> CurrencyType.TOKENS.getColorCode()+"";
+                case "gems_color" -> CurrencyType.GEMS.getColorCode()+"";
+                case "points_color" -> CurrencyType.LUNIX_POINTS.getColorCode()+"";
                 case "rank" -> String.valueOf(lunixPlayer.getRank());
                 case "rank_next" -> String.valueOf(Math.min(lunixPlayer.getRank() + 1, Rankup.getMaxRankup()));
                 case "rank_percentage" -> Numbers.formatDouble(Rankup.getRankUpPercentage(Objects.requireNonNull(player.getPlayer())));

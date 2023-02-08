@@ -43,7 +43,6 @@ public final class LunixPrison extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
-
         if (!setupConfig()) {
             this.getLogger().severe("Directories failed to setup correctly, exiting...");
             return;

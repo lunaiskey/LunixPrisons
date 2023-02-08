@@ -43,7 +43,7 @@ public class GemStoneGUI implements LunixInventory {
     public Inventory getInv(Player player) {
         Inventory inv = new LunixHolder("Gemstones",36, LunixInvType.GEMSTONES).getInventory();
         init(inv,player);
-        return null;
+        return inv;
     }
 
     public void init(Inventory inv, Player p) {
@@ -126,7 +126,7 @@ public class GemStoneGUI implements LunixInventory {
         lore.add(" ");
         if (lunixPlayer.getRank() >= getRankRequirement(gemstone)) {
             if (gemstone.equals(lunixPlayer.getSelectedGemstone())) {
-                lore.add(StringUtil.color("&cAlready selected."));
+                lore.add(StringUtil.color("&aAlready selected."));
                 meta.setDisplayName(StringUtil.color(meta.getDisplayName()+" &a✓"));
             } else {
                 lore.add(StringUtil.color("&eClick to select!"));

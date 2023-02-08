@@ -43,7 +43,7 @@ public class PickaxeEnchantGUI implements LunixInventory {
                     if (type != null && LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().containsKey(type)) {
                         inv.setItem(i,getEnchantPlaceholder(type,p));
                     } else {
-                        inv.setItem(i, ItemBuilder.createItem("&c&lCOMING SOON", Material.BEDROCK,null));
+                        inv.setItem(i, ItemBuilder.getComingSoon());
                     }
                 }
                 case 11 -> inv.setItem(i,getEnchantToggleIcon());
@@ -86,7 +86,7 @@ public class PickaxeEnchantGUI implements LunixInventory {
                 lore.add(" ");
                 lore.add(StringUtil.color("&7Enchant is max level!"));
             } else {
-                lore.add(StringUtil.color("&7Cost: "+currencyType.getColorCode()+currencyType.getUnicode()+"&f"+ Numbers.formattedNumber(enchant.getCostBetweenLevels(level,level+1))));
+                lore.add(StringUtil.color("&7Cost: "+currencyType.getColorCode()+currencyType.getUnicode()+"&f"+ Numbers.formattedNumber(enchant.getCost(level))));
                 lore.add(StringUtil.color("&7Max Level: &f"+enchant.getMaxLevel()));
                 lore.add(" ");
                 lore.add(StringUtil.color("&eL-Click to purchase levels."));
@@ -118,7 +118,7 @@ public class PickaxeEnchantGUI implements LunixInventory {
                     int level = pickaxe.getEnchants().getOrDefault(type, 0);
                     if (enchant.isEnabled()) {
                         if (level < enchant.getMaxLevel()) {
-                            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new PickaxeAddLevelsGUI(type).getInv(p)));
+                            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new PickaxeEnchantAddLevelsGUI(type).getInv(p)));
                         } else {
                             p.sendMessage(StringUtil.color("&cYou have maxed out this enchantment."));
                         }

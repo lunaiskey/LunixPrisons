@@ -1,18 +1,20 @@
 package io.github.lunaiskey.lunixprison.modules.gangs;
 
+import java.util.Map;
+
 public enum GangRankType {
     MEMBER(0),
     MOD(1),
     OWNER(2),
     ;
 
-    GangRankType(int value) {
-        this.value = value;
+    GangRankType(int weight) {
+        this.weight = weight;
     }
 
-    private final int value;
+    private final int weight;
 
-    public int getValue() {
-        return value;
+    public int getWeight() {
+        return weight;
     }
 }

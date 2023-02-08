@@ -10,6 +10,7 @@ import io.github.lunaiskey.lunixprison.util.StringUtil;
 import io.github.lunaiskey.lunixprison.util.TimeUtil;
 import org.bukkit.Bukkit;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -43,99 +44,148 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
                 p.openInventory(new PMineGUI().getInv(p));
                 return true;
             }
-            if (args[0].equalsIgnoreCase("reset")) {
-                if (p.hasPermission("lunix.resetcooldown.bypass") || !resetCooldown.containsKey(p.getUniqueId()) || System.currentTimeMillis() >= resetCooldown.get(p.getUniqueId())+300000) {
-                    if (mine != null) {
-                        p.sendMessage("PMine resetting...");
-                        mine.reset();
-                        resetCooldown.put(p.getUniqueId(),System.currentTimeMillis());
-                    } else {
-                        p.sendMessage("PMine not found. Please report this to an admin.");
-                    }
-                } else {
-                    p.sendMessage("Reset is on Cooldown: "+ TimeUtil.countdown(resetCooldown.get(p.getUniqueId())+300000));
-                }
-                return true;
+            String arg0 = args[0].toLowerCase();
+            switch(arg0) {
+                case "reset" -> resetCommand(sender, label, args);
+                case "fly" -> flyCommand(sender, label, args);
+                case "tp" -> teleportCommand(sender, label, args);
+                case "help" -> helpCommand(sender, label, args);
+                case "checkmineblocks" -> checkMineBlocksCommand(sender, label, args);
+                case "debug" -> debugCommand(sender, label, args);
+                default -> p.sendMessage(ChatColor.RED+"Invalid Arguments.");
             }
-            if (args[0].equalsIgnoreCase("fly")) {
-                if (p.getLocation().getWorld().getName().equalsIgnoreCase(PMineWorld.getWorldName())) {
-                    if (p.getAllowFlight()) {
-                        p.setAllowFlight(false);
-                        p.setFlying(false);
-                        p.sendMessage("[MINE] Flight Disabled");
-                    } else {
-                        p.setAllowFlight(true);
-                        p.setFlying(true);
-                        p.sendMessage("[MINE] Flight Enabled");
-                    }
-
-                }
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("tp")) {
-                p.teleport(LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId()).getCenter().add(0.5,1,0.5));
-                p.sendMessage("Teleporting to mine...");
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("help")) {
-                p.sendMessage("PMine Commands:",
-                        "| /pmine reset",
-                        "| /pmine tp",
-                        "| /pmine fly",
-                        "| /pmine checkmineblocks");
-                if (p.hasPermission("lunix.debug")) {
-                    p.sendMessage("| /pmine debug getposition",
-                            "| /pmine debug getgridposition"
-                            //"| /pmine debug genbedrock (DOESNT NEED TO RUN.)"
-                    );
-                }
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("checkmineblocks")) {
-                mine.checkMineBlocks();
-                p.sendMessage(StringUtil.color("&aChecked your blocks. You have "+mine.getComposition().size()+" Available blocks."));
-                return true;
-            }
-            if (p.hasPermission("lunix.debug")) {
-                if (args[0].equalsIgnoreCase("debug")) {
-                    if (args.length >= 2) {
-                        if (args[1].equalsIgnoreCase("getposition")) {
-                            Location l = p.getLocation().clone();
-                            p.sendMessage("you are in " + l.getWorld().getName() + " at " + l.getBlockX() + "," + l.getBlockY() + "," + l.getBlockZ());
-                            return true;
-                        }
-                        if (args[1].equalsIgnoreCase("getgridposition")) {
-                            Location l = p.getLocation().clone();
-                            Pair<Integer, Integer> loc = new PMineManager().getGridLocation(l);
-                            PMine pMine = LunixPrison.getPlugin().getPMineManager().getPMine(loc.getLeft(), loc.getRight());
-                            if (pMine != null && l.getWorld().getName().equalsIgnoreCase("mines")) {
-                                p.sendMessage("Owner: " + Bukkit.getOfflinePlayer(pMine.getOwner()).getName());
-                            } else {
-                                p.sendMessage("Owner: No-One");
-                            }
-                            p.sendMessage(loc.getLeft() + "," + loc.getRight());
-                            return true;
-                        }
-                        if (args[1].equalsIgnoreCase("genbedrock")) {
-                            if (debug) {
-                                Location l = p.getLocation().clone();
-                                Pair<Integer, Integer> loc = new PMineManager().getGridLocation(l);
-                                PMine pMine = LunixPrison.getPlugin().getPMineManager().getPMine(loc.getLeft(), loc.getRight());
-                                pMine.genBedrock();
-                            }
-                            return true;
-                        }
-                    }
-                }
-            } else {
-                p.sendMessage(Messages.NO_PERMISSION.getText());
-                return true;
-            }
-            p.sendMessage(StringUtil.color("Invalid Arguments."));
             return true;
-
         }
         return true;
+    }
+
+    public void resetCommand(CommandSender sender, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+        Player p = (Player) sender;
+        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        if (mine == null) {
+            p.sendMessage(ChatColor.RED+"PMine not found. Please report this to an admin.");
+            return;
+        }
+        boolean canReset =
+                p.hasPermission("lunix.resetcooldown.bypass") ||
+                !resetCooldown.containsKey(p.getUniqueId()) ||
+                System.currentTimeMillis() >= resetCooldown.get(p.getUniqueId())+(5 * 60 * 1000);
+        if (!canReset) {
+            p.sendMessage("Reset is on Cooldown: "+ TimeUtil.countdown(resetCooldown.get(p.getUniqueId())+300000));
+            return;
+        }
+        p.sendMessage("PMine resetting...");
+        mine.reset();
+        resetCooldown.put(p.getUniqueId(),System.currentTimeMillis());
+    }
+    public void flyCommand(CommandSender sender, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+        Player p = (Player) sender;
+        //PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        if (!p.getLocation().getWorld().getName().equalsIgnoreCase(PMineWorld.getWorldName())) {
+            p.sendMessage(ChatColor.RED+"You have to be in the Mine world to use this command.");
+            return;
+        }
+        boolean isFlying = p.getAllowFlight();
+        String status = isFlying ? ChatColor.RED+"Disabled" : ChatColor.GREEN+"Enabled";
+        p.setAllowFlight(!isFlying);
+        p.setFlying(!isFlying);
+        p.sendMessage("[PMine] Flight "+status+".");
+    }
+    public void teleportCommand(CommandSender sender, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+        Player p = (Player) sender;
+        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        p.teleport(mine.getCenter().add(0.5,1,0.5));
+        p.sendMessage(ChatColor.GREEN+"Teleporting to mine...");
+    }
+    public void helpCommand(CommandSender sender, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+        Player p = (Player) sender;
+        p.sendMessage(
+                ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"PMine Commands:",
+                ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine reset",
+                ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine tp",
+                ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine fly",
+                ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine checkmineblocks"
+        );
+        if (!(p.hasPermission("lunix.debug"))) {
+            return;
+        }
+        p.sendMessage(
+
+        );
+    }
+    public void checkMineBlocksCommand(CommandSender sender, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+        Player p = (Player) sender;
+        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        mine.checkMineBlocks();
+        p.sendMessage("&aChecked your blocks, You have "+mine.getComposition().size()+" Available blocks.");
+    }
+
+    public void debugCommand(CommandSender sender, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            return;
+        }
+        Player p = (Player) sender;
+        //PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        if (!(p.hasPermission("lunix.debug"))) {
+            p.sendMessage(Messages.NO_PERMISSION.getText());
+            return;
+        }
+        if (args.length < 2) {
+            return;
+        }
+        String arg1 = args[1].toLowerCase();
+        switch (arg1) {
+            case "getposition" -> {
+                Location l = p.getLocation().clone();
+                p.sendMessage("you are in " + l.getWorld().getName() + " at " + l.getBlockX() + "," + l.getBlockY() + "," + l.getBlockZ());
+            }
+            case "getgridposition" -> {
+                Location l = p.getLocation().clone();
+                Pair<Integer, Integer> loc = new PMineManager().getGridLocation(l);
+                PMine pMine = LunixPrison.getPlugin().getPMineManager().getPMine(loc.getLeft(), loc.getRight());
+                if (pMine != null && l.getWorld().getName().equalsIgnoreCase("mines")) {
+                    p.sendMessage("Owner: " + Bukkit.getOfflinePlayer(pMine.getOwner()).getName());
+                } else {
+                    p.sendMessage("Owner: No-One");
+                }
+                p.sendMessage(loc.getLeft() + "," + loc.getRight());
+            }
+            case "genbedrock" -> {
+                if (debug) {
+                    Location l = p.getLocation().clone();
+                    Pair<Integer, Integer> loc = new PMineManager().getGridLocation(l);
+                    PMine pMine = LunixPrison.getPlugin().getPMineManager().getPMine(loc.getLeft(), loc.getRight());
+                    pMine.genBedrock();
+                }
+            }
+            default -> {
+                if (args.length != 2) {
+                    p.sendMessage(ChatColor.RED+"Invalid Arguments.");
+                    return;
+                }
+                p.sendMessage(
+                        ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"PMine Debug Commands:",
+                        ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine debug getposition",
+                        ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine debug getgridposition",
+                        ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine debug genbedrock"
+                );
+            }
+        }
     }
 
 

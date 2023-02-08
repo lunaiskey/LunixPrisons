@@ -167,22 +167,28 @@ public class PMine {
         }
     }
 
+    public void setComposition(Map<Material, Double> composition) {
+        this.composition = composition;
+    }
+
+    public void setDisabledBlocks(Set<Material> disabledBlocks) {
+        this.disabledBlocks = disabledBlocks;
+    }
+
     public void save() {
         File file = new File(LunixPrison.getPlugin().getDataFolder() + "/pmines/" + owner + ".yml");
         FileConfiguration data = YamlConfiguration.loadConfiguration(file);
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("chunkX", chunkX);
-        map.put("chunkZ", chunkZ);
-        map.put("isPublic",isPublic);
-        map.put("tax",mineTax);
-        data.createSection("mine", map);
+        data.set("chunkX", chunkX);
+        data.set("chunkZ", chunkZ);
+        data.set("isPublic",isPublic);
+        data.set("tax",mineTax);
         Map<String,Object> upgradeMap = new LinkedHashMap<>();
         for (PMineUpgradeType upgradeType : this.upgradeMap.keySet()) {
             upgradeMap.put(upgradeType.name(),this.upgradeMap.get(upgradeType));
         }
         data.createSection("upgrades",upgradeMap);
         if (composition != null) {
-            data.createSection("blocks", this.composition);
+            data.createSection("blocks",composition);
         }
         List<String> disabledBlocksList = new ArrayList<>();
         for (Material mat : disabledBlocks) {
@@ -295,8 +301,11 @@ public class PMine {
 
 
     public boolean isInMineIsland(Location loc) {
+        if (!(loc.getWorld().getName().equals(PMineWorld.getWorldName()))) {
+            return false;
+        }
         Pair<Integer,Integer> pair = LunixPrison.getPlugin().getPMineManager().getGridLocation(loc);
-        return pair.getLeft() == chunkX && pair.getRight() == chunkZ && loc.getWorld().getName().equals(PMineWorld.getWorldName());
+        return pair.getLeft() == chunkX && pair.getRight() == chunkZ;
     }
 
     public void increaseRadius(int amount) {

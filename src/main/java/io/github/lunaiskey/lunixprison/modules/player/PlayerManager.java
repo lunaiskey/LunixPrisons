@@ -82,9 +82,10 @@ public class PlayerManager {
         loadCurrencyData(lunixPlayer,playerData);
         loadPickaxeData(lunixPlayer,playerData);
         loadArmorData(lunixPlayer,playerData);
-
         //Finished Loading
-        getPlayerMap().put(pUUID,lunixPlayer);
+        playerMap.put(pUUID,lunixPlayer);
+        //LunixPlayer testPlayer = playerMap.get(pUUID);
+        //LunixPrison.getPlugin().getLogger().info(testPlayer.getName()+": "+testPlayer.getTokens());
         playerNameMap.put(cachedName.toUpperCase(),pUUID);
     }
 
@@ -277,11 +278,10 @@ public class PlayerManager {
     public void checkPlayerData() {
         PMineManager pMineManager = LunixPrison.getPlugin().getPMineManager();
         for (Player p : Bukkit.getOnlinePlayers()) {
-            if (getPlayerMap().containsKey(p.getUniqueId())) {
+            if (!(getPlayerMap().containsKey(p.getUniqueId()))) {
                 createLunixPlayer(p.getUniqueId());
-            } else {
-                getPlayerMap().get(p.getUniqueId()).setName(p.getName());
             }
+            getPlayerMap().get(p.getUniqueId()).setName(p.getName());
             if (pMineManager.getPMine(p.getUniqueId()) == null) {
                 pMineManager.newPMine(p.getUniqueId());
             }

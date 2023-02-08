@@ -14,8 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 
-public class CommandRankup implements CommandExecutor {
-
+public class CommandRankupMax implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player)) {
@@ -23,34 +22,38 @@ public class CommandRankup implements CommandExecutor {
         }
         Player p = (Player) sender;
         LunixPlayer player = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
-        Rankup rankup = new Rankup();
         CurrencyType type = CurrencyType.TOKENS;
-        BigInteger cost = Rankup.getLevelCost(player.getRank()+1);
         if (player.getRank() >= Rankup.getMaxRankup()) {
-            p.sendMessage(StringUtil.color("&cYou've already maxed your rank."));
+            p.sendMessage(StringUtil.color("&cYou've already maxed out your rank."));
             return true;
         }
-        if (player.getTokens().compareTo(cost) < 0) {
-            p.sendMessage(StringUtil.color("&7You still need "+Numbers.formattedNumber(cost.subtract(player.getTokens()))+" to rankup."));
-            return true;
+        BigInteger cost = BigInteger.ZERO;
+        int rank = player.getRank();
+        for (int i = player.getRank()+1;i<Rankup.getMaxRankup();i++) {
+            cost = cost.add(Rankup.getLevelCost(i));
+            if (player.getTokens().compareTo(cost) < 0) {
+                cost = cost.subtract(Rankup.getLevelCost(i));
+                break;
+            }
+            rank++;
         }
-        int newLevel = rankup.rankup(p);
-        int nextLevel = newLevel+1;
+        player.setRank(rank);
         player.takeTokens(cost,false);
         p.sendMessage(
-                StringUtil.color("&b&lYou have ranked up to &f&l"+newLevel+"&b&l!")
+                StringUtil.color("&b&lYou have ranked up to &f&l"+rank+"&b&l!")
         );
-        if (newLevel < Rankup.getMaxRankup()) {
+        if (rank < Rankup.getMaxRankup()) {
             p.sendMessage(
-                    StringUtil.color(" &3&l- &bNext Rankup: &f"+nextLevel),
-                    StringUtil.color(" &3&l- &bCost: "+type.getColorCode()+type.getUnicode()+"&f"+ Numbers.formattedNumber(Rankup.getLevelCost(nextLevel)))
+                    StringUtil.color(" &3&l- &bNext Rankup: &f"+(rank+1)),
+                    StringUtil.color(" &3&l- &bCost: "+type.getColorCode()+type.getUnicode()+"&f"+ Numbers.formattedNumber(Rankup.getLevelCost((rank+1))))
             );
             return true;
         }
         p.sendMessage(
                 StringUtil.color("&aYou have maxed out your rank, congratulation!")
         );
+
+
         return true;
     }
-
 }

@@ -1,7 +1,7 @@
 name: LunixPrisons
 version: '${project.version}'
 main: io.github.lunaiskey.lunixprison.LunixPrison
-api-version: 1.18
+api-version: 1.19
 authors: [ Lunaiskey ]
 softdepend:
   - PlaceholderAPI
@@ -26,6 +26,10 @@ commands:
     aliases: [enchant]
   rankup:
     usage: /<command>
+  rankupmax:
+    usage: /<command>
+    aliases:
+      - maxrankup
   armor:
     usage: /<command>
   getpickaxe:
@@ -35,7 +39,6 @@ commands:
     aliases: [multi]
   litem:
     usage: /<command>
-    permission: lunix.admin.litem
   viewplayer:
     usage: /<command>
   rank:

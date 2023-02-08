@@ -1,9 +1,11 @@
-package io.github.lunaiskey.lunixprison.modules.leaderboards;
+package io.github.lunaiskey.lunixprison.modules.leaderboards.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
+import io.github.lunaiskey.lunixprison.modules.leaderboards.BigIntegerEntry;
+import io.github.lunaiskey.lunixprison.modules.leaderboards.LongEntry;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;

@@ -1,9 +1,11 @@
 package io.github.lunaiskey.lunixprison.inventory;
 
+import io.github.lunaiskey.lunixprison.modules.armor.inventories.ArmorGUI;
+import io.github.lunaiskey.lunixprison.modules.armor.inventories.ArmorUpgradeGUI;
 import io.github.lunaiskey.lunixprison.modules.items.gui.RenameTagConfirmGUI;
-import io.github.lunaiskey.lunixprison.modules.leaderboards.LeaderboardGUI;
+import io.github.lunaiskey.lunixprison.modules.leaderboards.inventories.LeaderboardGUI;
 import io.github.lunaiskey.lunixprison.modules.mines.inventories.*;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeAddLevelsGUI;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchantAddLevelsGUI;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchantGUI;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchantToggleGUI;
 import io.github.lunaiskey.lunixprison.modules.player.inventories.*;
@@ -15,7 +17,7 @@ public enum LunixInvType {
     PMINE_PUBLIC_MINES(new PMinePublicGUI()),
     PMINE_SETTINGS(new PMineSettingsGUI()),
     PICKAXE_ENCHANTS(new PickaxeEnchantGUI()),
-    PICKAXE_ENCHANTS_ADD_LEVELS(new PickaxeAddLevelsGUI()),
+    PICKAXE_ENCHANTS_ADD_LEVELS(new PickaxeEnchantAddLevelsGUI()),
     PICKAXE_ENCHANTS_TOGGLE(new PickaxeEnchantToggleGUI()),
     PERSONAL_BOOSTER(new PersonalBoosterGUI()),
     ARMOR(new ArmorGUI()),

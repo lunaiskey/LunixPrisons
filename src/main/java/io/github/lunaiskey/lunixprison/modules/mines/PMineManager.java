@@ -12,6 +12,7 @@ import io.github.lunaiskey.lunixprison.modules.mines.inventories.PMinePublicGUI;
 import io.github.lunaiskey.lunixprison.modules.mines.upgrades.PMineUpgradeType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import org.bukkit.Material;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -23,55 +24,78 @@ import org.bukkit.entity.Player;
 
 public class PMineManager {
 
-    private static Map<Pair<Integer,Integer>, PMine> pMines = new HashMap<>();
-    private static Map<UUID, Pair<Integer,Integer>> ownerPMines = new HashMap<>();
-    private final int GRID_ISLAND_SIZE = 225;
-    private static ImmutablePair<Integer,Integer> last = null;
     public static final int DEFAULT_RADIUS = 12;
-    private static Map<UUID, Set<UUID>> mineAuthorizedPlayers = new HashMap<>();
-    private static Map<UUID, Set<UUID>> playerAuthorizedMines = new HashMap<>();
-    private static Set<UUID> publicMines = new HashSet<>();
+    private final int GRID_ISLAND_DIAMETER;
+    private final int GRID_ISLAND_RADIUS;
+
+
+    private final Map<UUID, PMine> pMines = new HashMap<>();
+    private final Map<Pair<Integer,Integer>, UUID> gridPosUUIDMap = new HashMap<>();
+    private ImmutablePair<Integer,Integer> lastChunkChecked = new ImmutablePair<>(0,0);
+    private Set<UUID> publicMines = new HashSet<>();
     private List<UUID> sortedList = new ArrayList<>();
+
+    public PMineManager() {
+        GRID_ISLAND_DIAMETER = 225; //ALWAYS BE ODD
+        GRID_ISLAND_RADIUS = (GRID_ISLAND_DIAMETER - (GRID_ISLAND_DIAMETER % 2))/2;
+    }
 
     public void loadPMines() {
         File[] pmineFiles = new File(LunixPrison.getPlugin().getDataFolder(), "pmines").listFiles(new IsPMineFile());
         assert pmineFiles != null;
         for (File file : pmineFiles) {
-            FileConfiguration fileConf = YamlConfiguration.loadConfiguration(file);
-            Map<String,Object> map = fileConf.getConfigurationSection("mine").getValues(false);
-            UUID owner = UUID.fromString(file.getName().replace(".yml",""));
-            int chunkX = (int) map.get("chunkX");
-            int chunkZ = (int) map.get("chunkZ");
-            boolean isPublic = (boolean) map.getOrDefault("isPublic",false);
-            double tax = (double) map.getOrDefault("tax",10D);
-            Map<Material,Double> blocksMap = new LinkedHashMap<>();
-            if (fileConf.getConfigurationSection("blocks") != null) {
-                Map<String,Object> blocksMapRaw = fileConf.getConfigurationSection("blocks").getValues(false);
-                for (String str : blocksMapRaw.keySet()) {
-                    blocksMap.put(Material.getMaterial(str),(double) blocksMapRaw.get(str));
-                }
-            }
-            Map<PMineUpgradeType,Integer> upgradesMap = new HashMap<>();
-            if (fileConf.getConfigurationSection("upgrades") != null) {
-                Map<String,Object> upgradesMapRaw = fileConf.getConfigurationSection("upgrades").getValues(false);
-                for (String str : upgradesMapRaw.keySet()) {
-                    upgradesMap.put(PMineUpgradeType.valueOf(str), (Integer) upgradesMapRaw.get(str));
-                }
-            }
-            Set<Material> disabledBlocks = new HashSet<>();
-            List<String> disabledBlocksRaw = fileConf.getStringList("disabledBlocks");
-            for (String str : disabledBlocksRaw) {
-                try {
-                    disabledBlocks.add(Material.valueOf(str)); //works
-                } catch (Exception ignored) {}
-            }
-            newPMine(owner,chunkX,chunkZ,isPublic,tax,disabledBlocks,blocksMap,upgradesMap);
-            if (Bukkit.getPlayer(owner) != null) {
-                getPMine(owner).reset();
-            }
+            loadPMine(file);
         }
         sortedList = getSortedPublicByRank();
         ScheduleSortPublic();
+    }
+
+    public void loadPMine(File file) {
+        FileConfiguration fileConf = YamlConfiguration.loadConfiguration(file);
+        Map<String,Object> map = fileConf.getValues(true);
+        UUID owner = UUID.fromString(file.getName().replace(".yml",""));
+        int chunkX = ((Number) map.get("chunkX")).intValue();
+        int chunkZ = ((Number) map.get("chunkZ")).intValue();
+        PMine mine = new PMine(owner,chunkX,chunkZ);
+        loadRootData(mine,map);
+        loadUpgradeData(mine,map);
+        loadBlocksData(mine,map);
+        newPMine(mine);
+        if (Bukkit.getPlayer(owner) != null) {
+            getPMine(owner).reset();
+        }
+    }
+
+    private void loadRootData(PMine mine, Map<String, Object> map) {
+        boolean isPublic = (boolean) map.getOrDefault("isPublic",false);
+        double tax = ((Number) map.getOrDefault("tax",10D)).doubleValue();
+        mine.setPublic(isPublic);
+        mine.setMineTax(tax);
+    }
+
+    private void loadUpgradeData(PMine mine, Map<String, Object> map) {
+        Map<String,Object> section = ((MemorySection) map.get("upgrades")).getValues(true);
+        Map<PMineUpgradeType,Integer> upgradesMap = new HashMap<>();
+        for (String str : section.keySet()) {
+            upgradesMap.put(PMineUpgradeType.valueOf(str), ((Number) section.get(str)).intValue());
+        }
+    }
+
+    private void loadBlocksData(PMine mine, Map<String, Object> map) {
+        Map<String,Object> section = ((MemorySection) map.get("blocks")).getValues(true);
+        Map<Material,Double> blocksMap = new LinkedHashMap<>();
+        for (String str : section.keySet()) {
+            blocksMap.put(Material.getMaterial(str),((Number) section.get(str)).doubleValue());
+        }
+        Set<Material> disabledBlocks = new HashSet<>();
+        List<String> disabledBlocksRaw = (List<String>) map.get("disabledBlocks");
+        for (String str : disabledBlocksRaw) {
+            try {
+                disabledBlocks.add(Material.valueOf(str)); //material is valid
+            } catch (Exception ignored) {}
+        }
+        mine.setComposition(blocksMap);
+        mine.setDisabledBlocks(disabledBlocks);
     }
 
     public void ScheduleSortPublic() {
@@ -120,34 +144,22 @@ public class PMineManager {
     }
 
     public Location getMinCorner(int chunkX,int chunkZ) {
-        return new Location(Bukkit.getWorld(PMineWorld.getWorldName()),-112+(GRID_ISLAND_SIZE *chunkX),0,-112+(GRID_ISLAND_SIZE *chunkZ));
+        return new Location(Bukkit.getWorld(PMineWorld.getWorldName()),-GRID_ISLAND_RADIUS+(GRID_ISLAND_DIAMETER *chunkX),0,-GRID_ISLAND_RADIUS+(GRID_ISLAND_DIAMETER *chunkZ));
     }
 
     public Location getMaxCorner(int chunkX,int chunkZ) {
-        return new Location(Bukkit.getWorld(PMineWorld.getWorldName()),112+(GRID_ISLAND_SIZE *chunkX),256,112+(GRID_ISLAND_SIZE *chunkZ));
+        return new Location(Bukkit.getWorld(PMineWorld.getWorldName()),GRID_ISLAND_RADIUS+(GRID_ISLAND_DIAMETER *chunkX),256,GRID_ISLAND_RADIUS+(GRID_ISLAND_DIAMETER *chunkZ));
     }
 
-    /**
-     *
-     * @param loc
-     * @return <x,z> grid locations.
-     */
-
     public Pair<Integer,Integer> getGridLocation(Location loc) {
-        double x = Math.floor((112D + loc.getBlockX()) / GRID_ISLAND_SIZE);
-        double z = Math.floor((112D + loc.getBlockZ()) / GRID_ISLAND_SIZE);
+        double x = Math.floor((((double)GRID_ISLAND_RADIUS) + loc.getBlockX()) / GRID_ISLAND_DIAMETER);
+        double z = Math.floor((((double)GRID_ISLAND_RADIUS) + loc.getBlockZ()) / GRID_ISLAND_DIAMETER);
         return new ImmutablePair<>((int) x,(int) z);
     }
 
     public void newPMine(UUID owner, int chunkX, int chunkZ,boolean isPublic,double tax,Set<Material> disabledBlocks,Map<Material,Double> composition,Map<PMineUpgradeType,Integer> upgradeMap) {
         PMine mine = new PMine(owner, chunkX, chunkZ,12,isPublic,tax,disabledBlocks,composition,null,upgradeMap);
-        Pair<Integer,Integer> pair = new ImmutablePair<>(chunkX,chunkZ);
-        pMines.put(pair,mine);
-        ownerPMines.put(owner,pair);
-        pMines.get(pair).save();
-        if (isPublic) {
-            publicMines.add(owner);
-        }
+        newPMine(mine);
     }
 
     public void newPMine(UUID owner, int chunkX, int chunkZ) {
@@ -161,42 +173,45 @@ public class PMineManager {
         }
     }
 
+    public void newPMine(PMine mine) {
+        Pair<Integer,Integer> pair = new ImmutablePair<>(mine.getChunkX(),mine.getChunkZ());
+        pMines.put(mine.getOwner(),mine);
+        gridPosUUIDMap.put(pair,mine.getOwner());
+        mine.save();
+        if (mine.isPublic()) {
+            publicMines.add(mine.getOwner());
+        }
+    }
+
     public PMine getPMine(int chunkX,int chunkZ) {
-        return pMines.get(new ImmutablePair<>(chunkX,chunkZ));
+        return getPMine(gridPosUUIDMap.get(new ImmutablePair<>(chunkX,chunkZ)));
     }
 
     public PMine getPMine(UUID owner) {
-        Pair<Integer,Integer> pair = ownerPMines.get(owner);
-        if (pair != null) {
-            return getPMine(pair.getLeft(),pair.getRight());
-        }
-        return null;
+        return pMines.get(owner);
     }
 
-    public Map<Pair<Integer, Integer>, PMine> getPMinesMap() {
-        return pMines;
+    public Map<Pair<Integer, Integer>, UUID> getGridPosToUUIDMap() {
+        return gridPosUUIDMap;
     }
 
     public boolean isChunkOccupied(int chunkX,int chunkZ) {
-        return getPMinesMap().containsKey(new ImmutablePair<>(chunkX,chunkZ));
+        return getGridPosToUUIDMap().containsKey(new ImmutablePair<>(chunkX,chunkZ));
     }
 
-    public Map<UUID, Pair<Integer, Integer>> getOwnerPMines() {
-        return ownerPMines;
+    public Map<UUID, PMine> getPMineMap() {
+        return pMines;
     }
 
     private Pair<Integer,Integer> getNextIsland() {
         // Find the next free spot
-        if (last == null) {
-            last = new ImmutablePair<>(0,0);
-        }
-        Pair<Integer,Integer> next = new ImmutablePair<>(last.getLeft(),last.getRight());
+        Pair<Integer,Integer> next = new ImmutablePair<>(lastChunkChecked.getLeft(), lastChunkChecked.getRight());
 
-        while (getPMinesMap().containsKey(next)) {
+        while (getGridPosToUUIDMap().containsKey(next)) {
             next = nextGridLocation(next);
         }
         // Make the last next, last
-        last = new ImmutablePair<>(next.getLeft(),next.getRight());
+        lastChunkChecked = new ImmutablePair<>(next.getLeft(),next.getRight());
         return next;
     }
 

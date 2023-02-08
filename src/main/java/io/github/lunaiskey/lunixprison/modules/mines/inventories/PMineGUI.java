@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -26,7 +27,7 @@ public class PMineGUI implements LunixInventory {
 
     @Override
     public Inventory getInv(Player p) {
-        Inventory inv = new LunixHolder("Personal Mine",27, LunixInvType.PMINE_MAIN).getInventory();
+        Inventory inv = new LunixHolder("Personal Mine",45, LunixInvType.PMINE_MAIN).getInventory();
         init(inv,p);
         return inv;
     }
@@ -34,14 +35,16 @@ public class PMineGUI implements LunixInventory {
     private void init(Inventory inv, Player p) {
         for (int i = 0; i < inv.getSize();i++) {
             switch(i) {
-                case 0,9,18,8,17,26 -> inv.setItem(i, ItemBuilder.createItem(" ", Material.PURPLE_STAINED_GLASS_PANE,null));
-                case 10 -> inv.setItem(i,ItemBuilder.createItem(StringUtil.color("&aTeleport to Mine"),Material.COMPASS, List.of(ChatColor.YELLOW+"Click to teleport!")));
-                case 11 -> inv.setItem(i,ItemBuilder.createItem(StringUtil.color("&aReset Mine"),Material.CLOCK, List.of(ChatColor.YELLOW+"Click to reset!")));
-                case 14 -> inv.setItem(i,ItemBuilder.createItem(StringUtil.color("&aMine Settings"),Material.WHITE_WOOL,List.of(ChatColor.YELLOW+"Click to manage!")));
-                case 15 -> inv.setItem(i,ItemBuilder.createItem(StringUtil.color("&aChange Mine Blocks"),Material.GRASS_BLOCK, List.of(ChatColor.YELLOW+"Click to view menu!")));
-                case 16 -> inv.setItem(i,ItemBuilder.createItem(StringUtil.color("&aMine Upgrades"),Material.COMMAND_BLOCK,List.of(StringUtil.color("&eClick to view!"))));
-                case 12 -> inv.setItem(i,viewPublic());
-                default -> inv.setItem(i, ItemBuilder.createItem(" ", Material.BLACK_STAINED_GLASS_PANE,null));
+                case 0,9,18,27,36,45,8,17,26,35,44,53 -> inv.setItem(i, ItemBuilder.getDefaultEdgeFilder());
+                case 11 -> inv.setItem(i, getPublicMines());
+                case 13 -> inv.setItem(i, getInvitedMines());
+                case 15 -> inv.setItem(i,getGangMines());
+                case 29 -> inv.setItem(i,getPersonalMineTeleport());
+                case 30 -> inv.setItem(i,getPersonalMineReset());
+                case 31 -> inv.setItem(i,getPersonalMineUpgrades());
+                case 32 -> inv.setItem(i,getPersonalMineBlocks());
+                case 33 -> inv.setItem(i,getPersonalMineSettings());
+                default -> inv.setItem(i, ItemBuilder.getDefaultFiller());
             }
         }
     }
@@ -56,21 +59,19 @@ public class PMineGUI implements LunixInventory {
         int slot = e.getRawSlot();
         Player p = (Player) e.getWhoClicked();
         PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
-        if (mine != null) {
-            switch (slot) {
-                case 10 -> {mine.teleportToCenter(p,false,false);Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), p::closeInventory);}
-                case 11 -> {mine.reset();Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), p::closeInventory);}
-                case 14 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI().getInv(p)));
-                case 15 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineBlocksGUI().getInv(p)));
-                case 16 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineUpgradesGUI().getInv(p)));
-                case 12 -> {
-                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMinePublicGUI().getInv(p)));
-                }
-            }
-        } else {
+        if (mine == null) {
             p.sendMessage(ChatColor.RED+"Your Mine hasn't loaded correctly, Please contact an administrator.");
+            return;
         }
-        //p.sendMessage(ChatColor.LIGHT_PURPLE + "This feature is currently a work in progress, Please try again later.");
+        switch (slot) {
+            case 11 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMinePublicGUI().getInv(p)));
+            case 13,15 -> p.sendMessage(ChatColor.RED + "This feature is currently a work in progress, Please try again later.");
+            case 29 -> {mine.teleportToCenter(p,false,false);Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), p::closeInventory);}
+            case 30 -> {mine.reset();Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), p::closeInventory);}
+            case 31 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineUpgradesGUI().getInv(p)));
+            case 32 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineBlocksGUI().getInv(p)));
+            case 33 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI().getInv(p)));
+        }
     }
 
     @Override
@@ -88,14 +89,57 @@ public class PMineGUI implements LunixInventory {
 
     }
 
-    private ItemStack viewPublic() {
-        ItemStack item = new ItemStack(Material.PAPER);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(StringUtil.color("&aView Public"));
+    private ItemStack getPublicMines() {
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.YELLOW+"Click to view mines!");
+        return ItemBuilder.createItem("&aPublic Mines",Material.PAPER,lore);
+    }
+
+    private ItemStack getInvitedMines() {
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.GRAY+"All mines that you've been added to.");
+        lore.add("");
+        lore.add(ChatColor.YELLOW+"Click to view invited mines!");
+        return ItemBuilder.createItem("&aInvited Mines &c[WIP]", Material.ITEM_FRAME, lore);
+    }
+
+    private ItemStack getGangMines() {
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.YELLOW+"Click to teleport!");
+        return ItemBuilder.createItem("&aGang Mine &c[WIP]", Material.IRON_BLOCK, lore);
+    }
+
+    private ItemStack getPersonalMineTeleport() {
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.YELLOW+"Click to teleport!");
+        return ItemBuilder.createItem("&aTeleport to Mine",Material.COMPASS, lore);
+    }
+
+    private ItemStack getPersonalMineReset() {
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.YELLOW+"Click to reset!");
+        return ItemBuilder.createItem("&aReset Mine",Material.CLOCK, lore);
+    }
+
+    private ItemStack getPersonalMineSettings() {
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.YELLOW+"Click to manage!");
+        return ItemBuilder.createItem("&aMine Settings",Material.COMMAND_BLOCK,lore);
+    }
+
+    private ItemStack getPersonalMineBlocks() {
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.YELLOW+"Click to view menu!");
+        return ItemBuilder.createItem("&aChange Mine Blocks",Material.GRASS_BLOCK, lore);
+    }
+
+    private ItemStack getPersonalMineUpgrades() {
         List<String> lore = new ArrayList<>();
         lore.add(StringUtil.color("&eClick to view!"));
-        meta.setLore(lore);
-        item.setItemMeta(meta);
+        ItemStack item = ItemBuilder.createItem("&aMine Upgrades",Material.IRON_PICKAXE,lore);
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        item.setItemMeta(itemMeta);
         return item;
     }
 }

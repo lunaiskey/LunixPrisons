@@ -20,7 +20,15 @@ public enum CurrencyType {
         return switch (this) {
             case TOKENS -> ChatColor.YELLOW;
             case GEMS -> ChatColor.GREEN;
-            case LUNIX_POINTS -> ChatColor.DARK_AQUA;
+            case LUNIX_POINTS -> ChatColor.AQUA;
+        };
+    }
+
+    public String getName() {
+        return switch (this) {
+            case TOKENS -> "Tokens";
+            case GEMS -> "Gems";
+            case LUNIX_POINTS -> "Lunix Points";
         };
     }
 }

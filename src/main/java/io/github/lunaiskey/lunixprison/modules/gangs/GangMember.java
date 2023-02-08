@@ -11,6 +11,9 @@ public class GangMember {
     public GangMember(UUID playerUUID, String name, GangRankType gangRankType) {
         this.playerUUID = playerUUID;
         this.name = name;
+        if (gangRankType == null) {
+            gangRankType = GangRankType.MEMBER;
+        }
         this.type = gangRankType;
     }
 
@@ -27,6 +30,9 @@ public class GangMember {
     }
 
     public void setType(GangRankType type) {
+        if (type == null) {
+            return;
+        }
         this.type = type;
     }
 

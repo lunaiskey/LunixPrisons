@@ -4,38 +4,34 @@ import org.bukkit.generator.ChunkGenerator;
 
 public class MineWorldGenerator extends ChunkGenerator {
 
-    @Override
-    public boolean shouldGenerateBedrock() {
-        return super.shouldGenerateBedrock();
-    }
 
     @Override
     public boolean shouldGenerateCaves() {
-        return super.shouldGenerateCaves();
+        return false;
     }
 
     @Override
     public boolean shouldGenerateDecorations() {
-        return super.shouldGenerateDecorations();
+        return false;
     }
 
     @Override
     public boolean shouldGenerateMobs() {
-        return super.shouldGenerateMobs();
+        return false;
     }
 
     @Override
     public boolean shouldGenerateNoise() {
-        return super.shouldGenerateNoise();
+        return false;
     }
 
     @Override
     public boolean shouldGenerateStructures() {
-        return super.shouldGenerateStructures();
+        return false;
     }
 
     @Override
     public boolean shouldGenerateSurface() {
-        return super.shouldGenerateSurface();
+        return false;
     }
 }

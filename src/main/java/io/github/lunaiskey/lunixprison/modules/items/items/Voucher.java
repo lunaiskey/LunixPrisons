@@ -8,6 +8,7 @@ import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -26,7 +27,7 @@ public class Voucher extends LunixItem {
     private String playerName;
 
     public Voucher(BigInteger amount, CurrencyType type, String playerName) {
-        super(ItemID.VOUCHER, "   &7- &6&lBank Note &7-", null, Material.PAPER);
+        super(ItemID.VOUCHER, "   &7- &6&lBank Note &7-   ", null, Material.PAPER);
         this.amount = amount;
         this.type = type;
     }
@@ -41,23 +42,9 @@ public class Voucher extends LunixItem {
 
     @Override
     public ItemStack getItemStack() {
-        String name = StringUtil.color(getDisplayName());
-        String strType = "INVALID";
-        String strAmount = "INVALID";
-        switch (type) {
-            case TOKENS -> {
-                strType = "&eTokens";
-                strAmount = "&e"+type.getUnicode()+"&f"+Numbers.formattedNumber(amount);
-            }
-            case GEMS -> {
-                strType = "&aGems";
-                strAmount = "&a"+type.getUnicode()+"&f"+Numbers.formattedNumber(amount);
-            }
-            case LUNIX_POINTS -> {
-                strType = "&3Lunix Points";
-                strAmount = "&3"+type.getUnicode()+"&f"+Numbers.formattedNumber(amount);
-            }
-        }
+        String name = getDisplayName();
+        String strType = type.getColorCode()+type.getName();
+        String strAmount = type.getColorCode()+type.getUnicode()+"&f"+Numbers.formattedNumber(amount);
         List<String> lore = new ArrayList<>();
         lore.add(" ");
         lore.add(StringUtil.color("&7• Type: "+strType));
@@ -84,17 +71,16 @@ public class Voucher extends LunixItem {
     @Override
     public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        if (type != null && amount != null) {
-            ItemStack item = e.getItem();
-            Currency.giveCurrency(e.getPlayer().getUniqueId(), type,amount);
-            item.setAmount(e.getItem().getAmount()-1);
-            switch(type) {
-                case TOKENS -> p.sendMessage(StringUtil.color("&eRedeemed "+type.getUnicode()+"&f"+ Numbers.formattedNumber(amount)+" &eTokens."));
-                case GEMS -> p.sendMessage(StringUtil.color("&aRedeemed "+type.getUnicode()+"&f"+Numbers.formattedNumber(amount)+" &aGems."));
-                case LUNIX_POINTS -> p.sendMessage(StringUtil.color("&dRedeemed "+type.getUnicode()+"&f"+Numbers.formattedNumber(amount)+" &3Lunix Points."));
-            }
-        } else {
+        if (type == null || amount == null) {
             p.sendMessage(StringUtil.color("&cInvalid Voucher..."));
+            return;
         }
+        ItemStack item = e.getItem();
+        Currency.giveCurrency(e.getPlayer().getUniqueId(), type,amount);
+        item.setAmount(e.getItem().getAmount()-1);
+        ChatColor color = type.getColorCode();
+        String unicode = type.getUnicode();
+        String text = type.getName();
+        p.sendMessage(color+"Redeemed "+unicode+ChatColor.WHITE+Numbers.formattedNumber(amount)+" "+color+text+".");
     }
 }

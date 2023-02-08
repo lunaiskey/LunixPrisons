@@ -109,4 +109,8 @@ public class ItemBuilder {
         return ItemBuilder.createItem(" ",Material.BLACK_STAINED_GLASS_PANE,null);
     }
 
+    public static ItemStack getDefaultEdgeFilder() {
+        return ItemBuilder.createItem(" ",Material.PURPLE_STAINED_GLASS_PANE,null);
+    }
+
 }

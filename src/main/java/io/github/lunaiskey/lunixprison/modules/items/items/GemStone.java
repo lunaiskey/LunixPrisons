@@ -30,17 +30,11 @@ public class GemStone extends LunixPlayerHeadItem {
             case DIAMOND -> setRarity(Rarity.EPIC);
         }
         setDisplayName(StringUtil.color("&f" + getName() + " Gemstone"));
-    }
-
-    @Override
-    public List<String> getDescription() {
         List<String> desc = new ArrayList<>();
         desc.add(StringUtil.color("&7This Gemstone is used to upgrade"));
         desc.add(StringUtil.color("&7your Armor to Tier "+type.getTier()));
-        return desc;
+        setDescription(desc);
     }
-
-
 
     @Override
     public void onBlockBreak(BlockBreakEvent e) {

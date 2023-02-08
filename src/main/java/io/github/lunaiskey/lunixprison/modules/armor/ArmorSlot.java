@@ -42,7 +42,7 @@ public enum ArmorSlot {
         return list;
     }
 
-    public EquipmentSlot getSlot() {
+    public EquipmentSlot getEquipmentSlot() {
         return equipmentSlot;
     }
 }

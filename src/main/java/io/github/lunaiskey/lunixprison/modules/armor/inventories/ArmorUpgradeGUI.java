@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.modules.player.inventories;
+package io.github.lunaiskey.lunixprison.modules.armor.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
@@ -55,7 +55,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
     public Inventory getInv(Player player) {
         Inventory inv = new ArmorLunixHolder(armorSlot.getName()+" Upgrades",36, LunixInvType.ARMOR_UPGRADES,armorSlot).getInventory();
         init(inv,player);
-        return null;
+        return inv;
     }
 
     public void init(Inventory inv, Player p) {
@@ -63,17 +63,11 @@ public class ArmorUpgradeGUI implements LunixInventory {
         for (int i = 0;i<inv.getSize();i++) {
             switch (i) {
                 case 13 -> inv.setItem(i, lunixPlayer.getArmor().get(armorSlot).getItemStack());
-                case 21,22,23 -> {
-                    if (abilitySlots.containsKey(i)) {
-                        inv.setItem(i,getUpgradeButton(abilitySlots.get(i),p));
-                    } else {
-                        inv.setItem(i,ItemBuilder.getComingSoon());
-                    }
-                }
+                case 21,22,23 -> inv.setItem(i,abilitySlots.containsKey(i) ? getUpgradeButton(abilitySlots.get(i),p) : ItemBuilder.getComingSoon() );
                 case 11 -> inv.setItem(i, getTierUpButton(p));
                 case 15 -> inv.setItem(i, getColorButton(p));
-                case 0,9,18,27,8,17,26,35 -> inv.setItem(i, ItemBuilder.createItem(" ", Material.PURPLE_STAINED_GLASS_PANE,null));
-                default -> inv.setItem(i, ItemBuilder.createItem(" ", Material.BLACK_STAINED_GLASS_PANE,null));
+                case 0,9,18,27,8,17,26,35 -> inv.setItem(i, ItemBuilder.getDefaultEdgeFilder());
+                default -> inv.setItem(i, ItemBuilder.getDefaultFiller());
             }
         }
     }
@@ -104,7 +98,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
                             armor.getAbilties().put(abilityType,level+1);
                             p.sendMessage(StringUtil.color("&aUpgraded " + abilitySlots.get(slot).name() + " to level " + armor.getAbilties().get(abilityType) + "."));
                             if (isEquiped) {
-                                p.getInventory().setItem(armorSlot.getSlot(), armor.getItemStack());
+                                p.getInventory().setItem(armorSlot.getEquipmentSlot(), armor.getItemStack());
                             }
 
                             Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), () -> p.openInventory(new ArmorUpgradeGUI(armorSlot).getInv(p)));
@@ -123,7 +117,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
                         armor.setTier(armor.getTier()+1);
                         p.sendMessage(StringUtil.color("&aSuccessfully upgraded armor to Tier "+armor.getTier()+"."));
                         if (isEquiped) {
-                            p.getInventory().setItem(armorSlot.getSlot(),armor.getItemStack());
+                            p.getInventory().setItem(armorSlot.getEquipmentSlot(),armor.getItemStack());
                         }
                         Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new ArmorUpgradeGUI(armorSlot).getInv(p)));
                     } else {
@@ -142,7 +136,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
                         if (armor.getCustomColor() != null) {
                             armor.setCustomColor(null);
                             if (isEquiped) {
-                                p.getInventory().setItem(armorSlot.getSlot(),armor.getItemStack());
+                                p.getInventory().setItem(armorSlot.getEquipmentSlot(),armor.getItemStack());
                             }
                             inv.setItem(slot,getColorButton(p));
                             inv.setItem(13,armor.getItemStack());

@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigInteger;
-import java.util.List;
+import java.util.*;
 
 public abstract class LunixEnchant {
 
@@ -78,6 +78,28 @@ public abstract class LunixEnchant {
             }
         }
         return new ImmutablePair<>(getMaxLevel(),sum);
+    }
+
+    public Map<Integer,BigInteger> getCostAmountFromLevelArray(int start, int[] amountArray) {
+        Map<Integer,BigInteger> amountMap = new HashMap<>();
+        BigInteger sum = BigInteger.ZERO;
+        int currentArrayIndex = 0;
+        int endAmount = Math.min(start+amountArray[amountArray.length - 1], getMaxLevel());
+        for (int i = start;i<endAmount;i++) {
+            //if (sum+getEquation(n) < amount) {
+            sum = sum.add(getCost(i));
+            if (i-start+1 == amountArray[currentArrayIndex]) {
+                amountMap.put(i-start+1,sum);
+                currentArrayIndex++;
+            }
+        }
+        for (int i = currentArrayIndex;i<amountArray.length;i++) {
+            int amount = amountArray[i];
+            if (!amountMap.containsKey(amount)) {
+                amountMap.put(amount,sum);
+            }
+        }
+        return amountMap;
     }
 
     public BigInteger getCostBetweenLevels(int start, int end) {

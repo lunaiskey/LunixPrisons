@@ -64,7 +64,6 @@ public class LunixPlayer {
         this.selectedGemstone = Objects.requireNonNullElse(selectedGemstone, ItemID.AMETHYST_GEMSTONE);
         this.boosters = Objects.requireNonNullElseGet(boosters, ArrayList::new);
         this.cashback = cashback;
-        save();
     }
 
     public LunixPlayer(UUID pUUID, String name) {

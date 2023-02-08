@@ -13,8 +13,8 @@ import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -26,36 +26,28 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PickaxeAddLevelsGUI implements LunixInventory {
+public class PickaxeEnchantAddLevelsGUI implements LunixInventory {
 
     private EnchantType type;
 
-    private static final Map<Integer,Integer> amountLoc = new HashMap<>();
+    private static final int[] amountLoc = {1,2,10,25,50,100,200,500,1000};
 
-    static {
-        amountLoc.put(0,1);
-        amountLoc.put(1,10);
-        amountLoc.put(2,100);
-        amountLoc.put(3,1000);
-        amountLoc.put(4,10000);
-        amountLoc.put(5,Integer.MAX_VALUE);
-    }
-    public PickaxeAddLevelsGUI(EnchantType type) {
+    public PickaxeEnchantAddLevelsGUI(EnchantType type) {
         this.type = type;
     }
 
-    public PickaxeAddLevelsGUI() {
-
+    public PickaxeEnchantAddLevelsGUI() {
+        this(null);
     }
 
     @Override
     public Inventory getInv(Player player) {
         LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
-        Inventory inv = new EnchantLunixHolder("Add "+enchant.getName()+" Levels",9, LunixInvType.PICKAXE_ENCHANTS_ADD_LEVELS, type).getInventory();
+        LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId()).getPickaxe();
+        Inventory inv = new EnchantLunixHolder("Add "+enchant.getName()+" Levels",27, LunixInvType.PICKAXE_ENCHANTS_ADD_LEVELS, type,enchant.getCostAmountFromLevelArray(pickaxe.getEnchants().getOrDefault(type,0),amountLoc)).getInventory();
         init(inv,player);
         return inv;
     }
@@ -63,16 +55,16 @@ public class PickaxeAddLevelsGUI implements LunixInventory {
     private void init(Inventory inv, Player p) {
         LunixPlayer lunixPlayer =  LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
         LunixPickaxe pickaxe = lunixPlayer.getPickaxe();
+        EnchantLunixHolder holder = (EnchantLunixHolder) inv.getHolder();
         for (int i = 0; i<inv.getSize();i++) {
             switch(i) {
-                case 0,1,2,3,4,5 -> inv.setItem(i,getAddLevelButton(amountLoc.get(i),p));
-                case 6,8 -> inv.setItem(i,ItemBuilder.createItem(" ",Material.BLACK_STAINED_GLASS_PANE,null));
-                case 7 -> inv.setItem(i,pickaxe.getItemStack());
+                case 0 -> inv.setItem(i,ItemBuilder.getGoBack());
+                case 4 -> inv.setItem(i,pickaxe.getItemStack());
+                case 9,10,11,12,13,14,15,16,17 -> inv.setItem(i,getAddLevelButton(p,getAmount(i),holder.getCostMap()));
+                default -> inv.setItem(i,ItemBuilder.getDefaultFiller());
             }
         }
     }
-
-
 
     @Override
     public void updateInventory(Player player) {
@@ -82,15 +74,19 @@ public class PickaxeAddLevelsGUI implements LunixInventory {
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
         Player p = (Player) e.getWhoClicked();
+        EnchantLunixHolder holder = (EnchantLunixHolder) e.getInventory().getHolder();
         LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
         LunixPickaxe pickaxe = lunixPlayer.getPickaxe();
-        LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
+        EnchantType enchantType = holder.getType();
+        LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(enchantType);
         CurrencyType currencyType = enchant.getCurrencyType();
         switch (e.getRawSlot()) {
-            case 0, 1, 2, 3, 4, 5 -> {
-                int level = amountLoc.get(e.getRawSlot());
-                int start = pickaxe.getEnchants().getOrDefault(type, 0);
+            case 0 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new PickaxeEnchantGUI().getInv(p)));
+            case 9,10,11,12,13,14,15,16,17 -> {
+                int level = getAmount(e.getRawSlot());
+                int start = pickaxe.getEnchants().getOrDefault(enchantType, 0);
                 int end = Math.min(start + level, enchant.getMaxLevel());
+                /*
                 if (level == Integer.MAX_VALUE) {
                     Pair<Integer, BigInteger> pair = enchant.getMaxLevelFromAmount(start, lunixPlayer.getTokens());
                     // afford or not
@@ -99,7 +95,7 @@ public class PickaxeAddLevelsGUI implements LunixInventory {
                         if (start < enchant.getMaxLevel()) {
                             if (start != pair.getLeft()) {
                                 lunixPlayer.takeCurrency(currencyType,pair.getRight(),true);
-                                pickaxe.getEnchants().put(type, pair.getLeft());
+                                pickaxe.getEnchants().put(enchantType, pair.getLeft());
                                 LunixPrison.getPlugin().getPickaxeHandler().updateInventoryPickaxe(p);
                                 p.sendMessage("Purchased " + (pair.getLeft() - start) + " Levels of " + enchant.getName() + ".");
                                 Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), () -> p.openInventory(getInv(p)));
@@ -112,24 +108,35 @@ public class PickaxeAddLevelsGUI implements LunixInventory {
                     } else {
                         p.sendMessage(StringUtil.color("&cYou cannot afford any more levels of this enchantment."));
                     }
-                } else {
-                    BigInteger cost = enchant.getCostBetweenLevels(start, end);
-                    if (start < enchant.getMaxLevel()) {
-                        if (lunixPlayer.getCurrency(currencyType).compareTo(cost) >= 0) {
-                            lunixPlayer.takeCurrency(currencyType,cost,true);
-                            pickaxe.getEnchants().put(type, end);
-                            p.sendMessage("Purchased " + (end - start) + " Levels of " + enchant.getName() + ".");
-                            LunixPrison.getPlugin().getPickaxeHandler().updateInventoryPickaxe(p);
-                            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), () -> p.openInventory(getInv(p)));
-                        } else {
-                            p.sendMessage(StringUtil.color("&cYou cannot afford this level of enchantment."));
-                        }
-                    } else {
-                        p.sendMessage(StringUtil.color("&cYou have the max level of this enchantment."));
-                    }
-                    //enchant.getCostBetweenLevels(start,end); cost
-                    //end; level
+
+                 */
+                //p.sendMessage(holder.getCostMap().size()+"");
+                /*
+                p.sendMessage(level+"");
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int index : holder.getCostMap().keySet()) {
+                    stringBuilder.append(index).append(", ");
                 }
+                p.sendMessage(stringBuilder.toString());
+
+                 */
+                BigInteger cost = holder.getCostMap().get(level);
+                if (start < enchant.getMaxLevel()) {
+                    if (lunixPlayer.getCurrency(currencyType).compareTo(cost) >= 0) {
+                        lunixPlayer.takeCurrency(currencyType,cost,true);
+                        pickaxe.getEnchants().put(enchantType, end);
+                        p.sendMessage("Purchased " + (end - start) + " Levels of " + enchant.getName() + ".");
+                        LunixPrison.getPlugin().getPickaxeHandler().updateInventoryPickaxe(p);
+                        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), () -> p.openInventory(new PickaxeEnchantAddLevelsGUI(holder.getType()).getInv(p)));
+                    } else {
+                        p.sendMessage(StringUtil.color("&cYou cannot afford this level of enchantment."));
+                    }
+                } else {
+                    p.sendMessage(StringUtil.color("&cYou have the max level of this enchantment."));
+                }
+                //enchant.getCostBetweenLevels(start,end); cost
+                //end; level
+
             }
         }
     }
@@ -146,39 +153,46 @@ public class PickaxeAddLevelsGUI implements LunixInventory {
 
     @Override
     public void onClose(InventoryCloseEvent e) {
+        /*
+        Player player = (Player) e.getPlayer();
+        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->{
+            if (!(player.getOpenInventory().getTopInventory().getHolder() instanceof EnchantLunixHolder)) {
+                player.openInventory(new PickaxeEnchantGUI().getInv(player));
+            }
+        });
 
+         */
     }
 
-    private ItemStack getAddLevelButton(int level, Player p) {
+    private ItemStack getAddLevelButton(Player p,int level, Map<Integer,BigInteger> amountMap) {
         LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
         LunixPickaxe pickaxe = lunixPlayer.getPickaxe();
         LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
         CurrencyType currencyType = enchant.getCurrencyType();
-        Material mat;
-        if (level <= 10) {
-            mat = Material.LIME_STAINED_GLASS_PANE;
-        } else if (level <= 1000) {
-            mat = Material.YELLOW_STAINED_GLASS_PANE;
-        } else {
-            mat = Material.RED_STAINED_GLASS_PANE;
-        }
+        Material mat = Material.LIME_STAINED_GLASS_PANE;
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        String name = level == Integer.MAX_VALUE ? StringUtil.color("&a&l+MAX") : StringUtil.color("&a&l+"+level);
+        String name = StringUtil.color("&a&l+"+level);
         int start = pickaxe.getEnchants().getOrDefault(type,0);
         int end = Math.min(start + level, enchant.getMaxLevel());
         List<String> lore = new ArrayList<>();
-        if (level == Integer.MAX_VALUE) {
-            Pair<Integer,BigInteger> pair = enchant.getMaxLevelFromAmount(start, lunixPlayer.getCurrency(currencyType));
-            lore.add(StringUtil.color("&a&l| &7Cost: "+currencyType.getColorCode()+currencyType.getUnicode()+"&f"+Numbers.formattedNumber(pair.getRight())));
-            lore.add(StringUtil.color("&a&l| &7New Level: &e"+pair.getLeft()));
-        } else {
-            lore.add(StringUtil.color("&a&l| &7Cost: "+currencyType.getColorCode()+currencyType.getUnicode()+"&f"+ Numbers.formattedNumber(enchant.getCostBetweenLevels(start,end))));
-            lore.add(StringUtil.color("&a&l| &7New Level: &e"+end));
-        }
-        meta.setLore(lore);
+        lore.add(StringUtil.color("&a&l| &7Cost: "+currencyType.getColorCode()+currencyType.getUnicode()+"&f"+ Numbers.formattedNumber(amountMap.get(level))));
+        lore.add(StringUtil.color("&a&l| &7New Level: &e"+end));
+        lore.add("");
+        lore.add(ChatColor.YELLOW+"Click to Apply!");
         meta.setDisplayName(name);
         item.setItemMeta(meta);
         return item;
+    }
+
+    private int getAmount(int slot) {
+        if (slot < 0) {
+            return -1;
+        }
+        int offset = 9;
+        if (slot-offset < amountLoc.length) {
+            return amountLoc[slot-offset];
+        }
+        return -1;
     }
 }

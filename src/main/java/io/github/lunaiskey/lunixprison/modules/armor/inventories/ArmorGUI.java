@@ -1,4 +1,4 @@
-package io.github.lunaiskey.lunixprison.modules.player.inventories;
+package io.github.lunaiskey.lunixprison.modules.armor.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;

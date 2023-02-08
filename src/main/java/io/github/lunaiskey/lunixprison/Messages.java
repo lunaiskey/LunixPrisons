@@ -1,9 +1,12 @@
 package io.github.lunaiskey.lunixprison;
 
 import io.github.lunaiskey.lunixprison.util.StringUtil;
+import org.bukkit.ChatColor;
 
 public enum Messages {
-    NO_PERMISSION("&cNo Permission."),
+    NO_PERMISSION(ChatColor.RED+"No Permission."),
+    NOT_ENOUGH_ARGS(ChatColor.RED+"Not Enough Arguments."),
+    PLAYER_ONLY(ChatColor.RED+"This is a player only command!")
     ;
 
 
@@ -13,10 +16,6 @@ public enum Messages {
     }
 
     public String getText() {
-        return StringUtil.color(text);
-    }
-
-    public String getRawText() {
         return text;
     }
 }
