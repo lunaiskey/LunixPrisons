@@ -2,6 +2,7 @@ package io.github.lunaiskey.lunixprison.modules.items.items;
 
 import io.github.lunaiskey.lunixprison.modules.items.LunixPlayerHeadItem;
 import io.github.lunaiskey.lunixprison.modules.items.PouchRarity;
+import io.github.lunaiskey.lunixprison.modules.items.meta.LunixItemMeta;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -16,6 +17,12 @@ public class GemPouch extends LunixPlayerHeadItem {
 
     public GemPouch(PouchRarity rarity) {
         super(rarity.getGemItemID(), rarity.getRarityString()+" &7Gem Pouch", List.of(StringUtil.color("&eR-Click to open!")), null);
+        pouchRarity = rarity;
+    }
+
+    @Override
+    public List<String> getLore(LunixItemMeta meta) {
+        return null;
     }
 
     @Override
@@ -26,7 +33,6 @@ public class GemPouch extends LunixPlayerHeadItem {
     @Override
     public void onBlockPlace(BlockPlaceEvent e) {
         e.setCancelled(true);
-
     }
 
     @Override

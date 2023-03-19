@@ -32,7 +32,7 @@ public class GemFinder extends LunixEnchant {
             int j = getMaxLevel()/10;
             int gemNum = rand.nextInt((((level-1)-((level-1) % j))/j)+1)+1;
             //int gemNum = (int) (Math.random() * (level / 100)) + 1;
-            LunixItem gemstone =  LunixPrison.getPlugin().getItemManager().getItemMap().get(getGemstone(gemNum));
+            LunixItem gemstone =  LunixPrison.getPlugin().getItemManager().getLunixItem(getGemstone(gemNum));
             ItemStack gemstoneItem = gemstone.getItemStack();
             player.getInventory().addItem(gemstoneItem);
             //player.sendMessage("GEM_FINDER: "+gemstone.getItemID());

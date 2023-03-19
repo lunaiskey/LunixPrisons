@@ -2,28 +2,29 @@ package io.github.lunaiskey.lunixprison.modules.player;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
+import io.github.lunaiskey.lunixprison.modules.leaderboards.BigIntegerEntry;
+import io.github.lunaiskey.lunixprison.modules.leaderboards.LongEntry;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
+import io.github.lunaiskey.lunixprison.modules.player.chatcolor.LunixChatColor;
+import io.github.lunaiskey.lunixprison.modules.player.datastorages.ChatColorStorage;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixPickaxe;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeStorage;
 import io.github.lunaiskey.lunixprison.modules.armor.Armor;
 import io.github.lunaiskey.lunixprison.modules.armor.ArmorSlot;
-import io.github.lunaiskey.lunixprison.modules.armor.upgrades.Ability;
 import io.github.lunaiskey.lunixprison.modules.armor.upgrades.AbilityType;
-import io.github.lunaiskey.lunixprison.modules.armor.upgrades.abilitys.EnchantmentProc;
-import io.github.lunaiskey.lunixprison.modules.armor.upgrades.abilitys.SalesBoost;
-import io.github.lunaiskey.lunixprison.modules.armor.upgrades.abilitys.XPBoost;
 import net.minecraft.nbt.CompoundTag;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -36,20 +37,15 @@ public class PlayerManager {
     private Map<UUID, LunixPlayer> playerMap = new HashMap<>();
     private Map<String, UUID> playerNameMap = new HashMap<>();
 
-    private Map<AbilityType, Ability> armorAbilityMap = new HashMap<>();
-
-    public PlayerManager() {
-        registerArmorAbilities();
+    public LunixPlayer getLunixPlayer(UUID playerUUID) {
+        return playerMap.get(playerUUID);
     }
 
-    private void registerArmorAbilities() {
-        armorAbilityMap.put(AbilityType.SALES_BOOST,new SalesBoost());
-        armorAbilityMap.put(AbilityType.ENCHANTMENT_PROC,new EnchantmentProc());
-        armorAbilityMap.put(AbilityType.XP_BOOST,new XPBoost());
-    }
-
-    public Map<AbilityType, Ability> getArmorAbilityMap() {
-        return armorAbilityMap;
+    public LunixPlayer getLunixPlayer(String player) {
+        if (player == null) {
+            return null;
+        }
+        return getLunixPlayer(playerNameMap.get(player.toUpperCase()));
     }
 
     public void createLunixPlayer(UUID pUUID) {
@@ -61,10 +57,11 @@ public class PlayerManager {
         }
     }
 
-
     public void loadPlayers() {
         File[] playerFiles = new File(LunixPrison.getPlugin().getDataFolder(), "playerdata").listFiles(new PMineManager.IsPMineFile());
-        assert playerFiles != null;
+        if (playerFiles == null) {
+            return;
+        }
         for (File file : playerFiles) {
             loadPlayer(file);
         }
@@ -73,7 +70,6 @@ public class PlayerManager {
     private void loadPlayer(File file) {
         FileConfiguration fileConf = YamlConfiguration.loadConfiguration(file);
         UUID pUUID = UUID.fromString(file.getName().replace(".yml",""));
-
         //Load Lunix Data from map
         Map<String,Object> playerData = fileConf.getValues(true);
         String cachedName = (String) playerData.getOrDefault("name",Bukkit.getOfflinePlayer(pUUID).getName());
@@ -82,6 +78,7 @@ public class PlayerManager {
         loadCurrencyData(lunixPlayer,playerData);
         loadPickaxeData(lunixPlayer,playerData);
         loadArmorData(lunixPlayer,playerData);
+        LoadNameAndTextColorData(lunixPlayer,playerData);
         //Finished Loading
         playerMap.put(pUUID,lunixPlayer);
         //LunixPlayer testPlayer = playerMap.get(pUUID);
@@ -135,8 +132,8 @@ public class PlayerManager {
         }
         long blocksBroken = ((Number) pickaxeMap.getOrDefault("blocksBroken",0L)).longValue();
         String rename = (String) pickaxeMap.getOrDefault("rename",null);
-        LunixPickaxe pickaxe = new LunixPickaxe(lunixPlayer.getpUUID(),pickaxeEnchantMap,pickaxeDisabledEnchants,blocksBroken,rename);
-        lunixPlayer.setPickaxe(pickaxe);
+        PickaxeStorage pickaxe = new PickaxeStorage(lunixPlayer.getpUUID(),pickaxeEnchantMap,pickaxeDisabledEnchants,blocksBroken,rename);
+        lunixPlayer.setPickaxeStorage(pickaxe);
     }
 
     private void loadArmorData(LunixPlayer lunixPlayer,Map<String,Object> playerData) {
@@ -169,10 +166,63 @@ public class PlayerManager {
         lunixPlayer.setArmor(armorMap);
     }
 
+    private void LoadNameAndTextColorData(LunixPlayer lunixPlayer, Map<String,Object> playerData) {
+        ChatColorStorage storage = lunixPlayer.getChatColorStorage();
+        Object chatColorDataObject = playerData.get("chatcolor");
+        if (chatColorDataObject == null) return;
+        Map<String,Object> chatColorData = ((MemorySection) chatColorDataObject).getValues(true);
+
+        Object nameColorDataObject = chatColorData.get("name");
+        if (nameColorDataObject == null) return;
+        Map<String,Object> nameColorData = ((MemorySection) nameColorDataObject).getValues(true);
+
+        LunixChatColor selectedNameColor;
+        String nameColorDataText = (String) nameColorData.getOrDefault("selectedColor",null);
+        try {
+            selectedNameColor = nameColorDataText == null ? null : LunixChatColor.valueOf(nameColorDataText);
+        } catch (IllegalArgumentException ignored) {
+            selectedNameColor = null;
+        }
+        storage.setSelectedNameColor(selectedNameColor);
+        Set<LunixChatColor> selectedNameFormats = storage.getSelectedNameFormats();
+        List<String> selectedNameFormatsList = (List<String>) nameColorData.getOrDefault("selectedFormats",new ArrayList<String>());
+        for (String str : selectedNameFormatsList) {
+            try {
+                selectedNameFormats.add(LunixChatColor.valueOf(str));
+            } catch (IllegalArgumentException ignored) {}
+        }
+        Set<LunixChatColor> unlockedNameColorAndFormats = storage.getUnlockedNameColorAndFormats();
+        List<String> unlockedNameColorAndFormatsList = (List<String>) nameColorData.getOrDefault("unlockedColorsAndFormats",new ArrayList<String>());
+        for (String str : unlockedNameColorAndFormatsList) {
+            try {
+                unlockedNameColorAndFormats.add(LunixChatColor.valueOf(str));
+            } catch (IllegalArgumentException ignored) {}
+        }
+
+        Object textColorDataObject = chatColorData.get("text");
+        if (textColorDataObject == null ) return;
+        Map<String,Object> textColorData = ((MemorySection) textColorDataObject).getValues(true);
+        LunixChatColor selectedTextColor;
+        String textColorDataText = (String) textColorData.getOrDefault("selectedColor",null);
+        try {
+            selectedTextColor = textColorDataText == null ? null : LunixChatColor.valueOf(textColorDataText);
+        } catch (IllegalArgumentException ignored) {
+            selectedTextColor = null;
+        }
+        storage.setSelectedTextColor(selectedTextColor);
+        Set<LunixChatColor> unlockedTextColors = storage.getUnlockedTextColors();
+        List<String> unlockedTextColorsList = (List<String>) textColorData.getOrDefault("unlockedColorsAndFormats",new ArrayList<String>());
+        for (String str : unlockedTextColorsList) {
+            try {
+                unlockedTextColors.add(LunixChatColor.valueOf(str));
+            } catch (IllegalArgumentException ignored) {}
+        }
+    }
+
     public int getLunixItemCount(Player p, ItemID id) {
         int count = 0;
         for (ItemStack item : p.getInventory().getContents()) {
-            CompoundTag tag = NBTTags.getLunixDataMap(item);
+            CompoundTag tag = NBTTags.getLunixDataTag(item);
             if (tag.contains("id")) {
                 if (tag.getString("id").equals(id.name())) {
                     count += item.getAmount();
@@ -186,7 +236,7 @@ public class PlayerManager {
         ItemStack[] inv = p.getInventory().getContents();
         for (int i = 0;i<inv.length;i++) {
             ItemStack item = inv[i];
-            CompoundTag tag = NBTTags.getLunixDataMap(item);
+            CompoundTag tag = NBTTags.getLunixDataTag(item);
             if (tag.contains("id")) {
                 if (tag.getString("id").equals(id.name())) {
                     if (amount > 0) {
@@ -232,9 +282,12 @@ public class PlayerManager {
         LunixPlayer player = getPlayerMap().get(p.getUniqueId());
         int combined = amount + player.getGemstoneCount();
         int ticks = (combined - combined%(getGemstoneCountMax(p)))/(getGemstoneCountMax(p));
-        while (ticks > 0) {
-            p.getInventory().addItem(LunixPrison.getPlugin().getItemManager().getItemMap().get(player.getSelectedGemstone()).getItemStack());
-            ticks--;
+        if (ticks > 0) {
+            LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(player.getSelectedGemstone());
+            while (ticks > 0) {
+                p.getInventory().addItem(lunixItem.getItemStack());
+                ticks--;
+            }
         }
         player.setGemstoneCount(combined%getGemstoneCountMax(p));
     }
@@ -256,7 +309,7 @@ public class PlayerManager {
         Pair<Integer,Integer> pair = LunixPrison.getPlugin().getPMineManager().getGridLocation(p.getLocation());
         PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(pair.getLeft(),pair.getRight());
 
-        LunixPickaxe pickaxe = lunixPlayer.getPickaxe();
+        PickaxeStorage pickaxe = lunixPlayer.getPickaxeStorage();
         double multiplier = lunixPlayer.getTotalMultiplier();
         int fortune = Math.max(pickaxe.getEnchants().getOrDefault(EnchantType.FORTUNE,5),5);
 

@@ -1,5 +1,6 @@
 package io.github.lunaiskey.lunixprison.modules.armor;
 
+import io.github.lunaiskey.lunixprison.modules.player.ChatReplyType;
 import org.bukkit.inventory.EquipmentSlot;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ public enum ArmorSlot {
     HELMET(5,EquipmentSlot.HEAD),
     CHESTPLATE(6,EquipmentSlot.CHEST),
     LEGGINGS(7,EquipmentSlot.LEGS),
-    BOOTS(8,EquipmentSlot.FEET)
+    BOOTS(8,EquipmentSlot.FEET),
     ;
 
     private final int slot;

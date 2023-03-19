@@ -2,6 +2,8 @@ package io.github.lunaiskey.lunixprison.util;
 
 import org.bukkit.ChatColor;
 
+import java.util.List;
+
 public class StringUtil {
 
     public static String color(String string) {
@@ -13,5 +15,10 @@ public class StringUtil {
             strings[i] = ChatColor.translateAlternateColorCodes('&',strings[i]);
         }
         return strings;
+    }
+
+    public static List<String> color(List<String> stringList) {
+        stringList.replaceAll(StringUtil::color);
+        return stringList;
     }
 }

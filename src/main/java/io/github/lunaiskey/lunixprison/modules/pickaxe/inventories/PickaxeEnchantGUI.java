@@ -4,7 +4,7 @@ import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixEnchant;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixPickaxe;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeStorage;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
@@ -35,7 +35,7 @@ public class PickaxeEnchantGUI implements LunixInventory {
     }
 
     private void init(Inventory inv, Player p) {
-        LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
+        PickaxeStorage pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxeStorage();
         for(int i = 0; i < inv.getSize();i++) {
             switch(i) {
                 case 20,21,22,23,24,29,30,31,32,33,38,39,40,41,42 -> {
@@ -70,7 +70,7 @@ public class PickaxeEnchantGUI implements LunixInventory {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         CurrencyType currencyType = enchant.getCurrencyType();
-        LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
+        PickaxeStorage pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxeStorage();
         int level = pickaxe.getEnchants().getOrDefault(type, 0);
         meta.setDisplayName(StringUtil.color("&b"+enchant.getName()+" &8[&7"+level+" -> "+(level+1)+"&8]"));
         List<String> lore = new ArrayList<>();
@@ -114,7 +114,7 @@ public class PickaxeEnchantGUI implements LunixInventory {
                 EnchantType type = EnchantType.getEnchantFromSlot(slot);
                 if (type != null && LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().containsKey(type)) {
                     LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
-                    LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
+                    PickaxeStorage pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxeStorage();
                     int level = pickaxe.getEnchants().getOrDefault(type, 0);
                     if (enchant.isEnabled()) {
                         if (level < enchant.getMaxLevel()) {

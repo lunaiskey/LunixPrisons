@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.modules.items.items;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixPlayerHeadItem;
 import io.github.lunaiskey.lunixprison.modules.items.Rarity;
+import io.github.lunaiskey.lunixprison.modules.items.meta.LunixItemMeta;
 import io.github.lunaiskey.lunixprison.modules.player.inventories.GemStoneGUI;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import net.md_5.bungee.api.ChatColor;
@@ -34,6 +35,11 @@ public class GemStone extends LunixPlayerHeadItem {
         desc.add(StringUtil.color("&7This Gemstone is used to upgrade"));
         desc.add(StringUtil.color("&7your Armor to Tier "+type.getTier()));
         setDescription(desc);
+    }
+
+    @Override
+    public List<String> getLore(LunixItemMeta meta) {
+        return null;
     }
 
     @Override

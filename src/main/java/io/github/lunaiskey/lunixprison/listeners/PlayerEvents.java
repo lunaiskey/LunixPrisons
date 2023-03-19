@@ -1,19 +1,22 @@
 package io.github.lunaiskey.lunixprison.listeners;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.inventory.InventoryManager;
 import io.github.lunaiskey.lunixprison.modules.armor.inventories.ArmorUpgradeGUI;
 import io.github.lunaiskey.lunixprison.modules.items.gui.RenameTagConfirmGUI;
+import io.github.lunaiskey.lunixprison.modules.items.meta.MetaBoosterItem;
+import io.github.lunaiskey.lunixprison.modules.items.meta.MetaCurrencyVoucher;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.modules.mines.commands.CommandPMine;
 import io.github.lunaiskey.lunixprison.modules.mines.inventories.*;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.*;
-import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
 import io.github.lunaiskey.lunixprison.modules.items.items.BoosterItem;
-import io.github.lunaiskey.lunixprison.modules.items.items.Voucher;
+import io.github.lunaiskey.lunixprison.modules.items.items.CurrencyVoucher;
 import io.github.lunaiskey.lunixprison.modules.mines.generator.PMineWorld;
+import io.github.lunaiskey.lunixprison.modules.player.ChatReplyType;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.enchants.MineBomb;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
@@ -49,12 +52,14 @@ public class PlayerEvents implements Listener {
     private LunixPrison plugin;
     private PMineManager pMineManager;
     private PlayerManager playerManager;
+    private InventoryManager inventoryManager;
     private Map<UUID, LunixPlayer> playerMap;
 
     public PlayerEvents(LunixPrison plugin) {
         this.plugin = plugin;
         pMineManager = plugin.getPMineManager();
         playerManager = plugin.getPlayerManager();
+        inventoryManager = plugin.getInventoryManager();
         playerMap = playerManager.getPlayerMap();
     }
 
@@ -71,10 +76,10 @@ public class PlayerEvents implements Listener {
         ItemID itemID = NBTTags.getItemID(mainHand);
         if (itemID != null) {
             switch (itemID) {
-                case BOOSTER -> new BoosterItem(mainHand).onBlockBreak(e);
+                case BOOSTER -> new BoosterItem().onBlockBreak(e);
                 case LUNIX_PICKAXE -> {
                     if (playerMap.containsKey(p.getUniqueId())) {
-                        LunixPickaxe pickaxe = playerMap.get(p.getUniqueId()).getPickaxe();
+                        PickaxeStorage pickaxe = playerMap.get(p.getUniqueId()).getPickaxeStorage();
                         pickaxe.onBlockBreak(e);
                     } else {
                         if (blockLoc.getWorld() == Bukkit.getWorld(PMineWorld.getWorldName())) {
@@ -91,8 +96,9 @@ public class PlayerEvents implements Listener {
                     }
                 }
                 default -> {
-                    if (LunixPrison.getPlugin().getItemManager().getItemMap().containsKey(itemID)) {
-                        LunixPrison.getPlugin().getItemManager().getItemMap().get(itemID).onBlockBreak(e);
+                    LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(itemID);
+                    if (lunixItem != null) {
+                        lunixItem.onBlockBreak(e);
                     }
                 }
             }
@@ -102,28 +108,21 @@ public class PlayerEvents implements Listener {
     @EventHandler
     public void onPlace(BlockPlaceEvent e) {
         Player p = e.getPlayer();
-        CompoundTag tag = NBTTags.getLunixDataMap(e.getItemInHand());
-        if (tag.contains("id")) {
-            String id = tag.getString("id");
-            try {
-                ItemID itemID = ItemID.valueOf(id);
-                if (LunixPrison.getPlugin().getItemManager().getItemMap().containsKey(itemID)) {
-                    LunixPrison.getPlugin().getItemManager().getItemMap().get(itemID).onBlockPlace(e);
-                }
-                if (itemID == ItemID.BOOSTER) {
-                    new BoosterItem(e.getItemInHand()).onBlockPlace(e);
-                }
-            } catch (Exception ignored) {}
+        ItemID itemID = NBTTags.getItemID(e.getItemInHand());
+        if (itemID != null) {
+            LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(itemID);
+            if (lunixItem != null) {
+                lunixItem.onBlockPlace(e);
+            }
+            if (itemID == ItemID.BOOSTER) {
+                new BoosterItem().onBlockPlace(e);
+            }
         }
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        if (p.getWorld().getName().equals(PMineWorld.getWorldName())) {
-            p.setAllowFlight(true);
-            p.setFlying(true);
-        }
         Map<UUID, LunixPlayer> playerMap = LunixPrison.getPlugin().getPlayerManager().getPlayerMap();
         if (!playerMap.containsKey(p.getUniqueId())) {
             LunixPrison.getPlugin().getPlayerManager().createLunixPlayer(p.getUniqueId());
@@ -142,6 +141,14 @@ public class PlayerEvents implements Listener {
         LunixPrison.getPlugin().getPickaxeHandler().updateInventoryPickaxe(p);
         LunixPrison.getPlugin().getPickaxeHandler().hasOrGivePickaxe(p);
         LunixPrison.getPlugin().getSavePending().add(p.getUniqueId());
+        if (p.getWorld().getName().equals(PMineWorld.getWorldName())) {
+            p.setAllowFlight(true);
+            p.setFlying(true);
+            PMine currentPMine = LunixPrison.getPlugin().getPMineManager().getPMineAtPlayer(p);
+            if (currentPMine != null) {
+                Bukkit.getScheduler().runTask(plugin,()->currentPMine.sendBorder(p));
+            }
+        }
     }
 
     @EventHandler
@@ -159,14 +166,24 @@ public class PlayerEvents implements Listener {
         Location from = e.getFrom();
         Player player = e.getPlayer();
         //player.sendMessage(to.getWorld().getName() +" "+ from.getWorld().getName() + " " + e.getCause().name());
-        if (to.getWorld() != null) {
-            if (to.getWorld().getName().equals(PMineWorld.getWorldName())) {
-                if (e.getCause() == PlayerTeleportEvent.TeleportCause.PLUGIN || e.getCause() == PlayerTeleportEvent.TeleportCause.COMMAND) {
-                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()-> {
-                        player.setAllowFlight(true);
-                        player.setFlying(true);
-                    });
-                }
+        if (to == null || to.getWorld() == null) {
+            return;
+        }
+        PMine fromPMine = LunixPrison.getPlugin().getPMineManager().getPMineAtPlayer(player);
+        PMine toPMine = LunixPrison.getPlugin().getPMineManager().getPMineAtLocation(to);
+        if (to.getWorld().getName().equals(PMineWorld.getWorldName())) {
+            if (e.getCause() == PlayerTeleportEvent.TeleportCause.PLUGIN || e.getCause() == PlayerTeleportEvent.TeleportCause.COMMAND) {
+                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()-> {
+                    player.setAllowFlight(true);
+                    player.setFlying(true);
+                    if (toPMine == null) {
+                        player.setWorldBorder(null);
+                        return;
+                    }
+                    if (fromPMine == null || !toPMine.getOwner().equals(fromPMine.getOwner())) {
+                        toPMine.sendBorder(player);
+                    }
+                });
             }
         }
     }
@@ -178,15 +195,11 @@ public class PlayerEvents implements Listener {
         }
         Inventory inv = e.getInventory();
         Player p = (Player) e.getWhoClicked();
-        if (inv.getHolder() instanceof LunixHolder) {
-            LunixHolder holder = (LunixHolder) inv.getHolder();
-            holder.getInvType().getInventory().onClick(e);
-            return;
-        }
+        inventoryManager.onClick(e);
         if (e.getView().getType() == InventoryType.CRAFTING) {
             switch (e.getRawSlot()) {
                 case 5,6,7,8 -> {
-                    CompoundTag tag = NBTTags.getLunixDataMap(e.getCurrentItem());
+                    CompoundTag tag = NBTTags.getLunixDataTag(e.getCurrentItem());
                     if (tag.getString("id").toUpperCase().contains("PYREX_ARMOR_")) {
                         e.setCancelled(true);
                         p.sendMessage(StringUtil.color("&cTo unequip this armor please do so from /armor."));
@@ -198,31 +211,17 @@ public class PlayerEvents implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDrag(InventoryDragEvent e) {
-        Inventory inv = e.getInventory();
-        if (inv.getHolder() instanceof LunixHolder) {
-            LunixHolder holder = (LunixHolder) inv.getHolder();
-            holder.getInvType().getInventory().onDrag(e);
-        }
+        inventoryManager.onDrag(e);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onOpen(InventoryOpenEvent e) {
-        Player p = (Player) e.getPlayer();
-        Inventory inv = e.getInventory();
-        if (inv.getHolder() instanceof LunixHolder) {
-            LunixHolder holder = (LunixHolder) inv.getHolder();
-            holder.getInvType().getInventory().onOpen(e);
-        }
+        inventoryManager.onOpen(e);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClose(InventoryCloseEvent e) {
-        Player p = (Player) e.getPlayer();
-        Inventory inv = e.getInventory();
-        if (inv.getHolder() instanceof LunixHolder) {
-            LunixHolder holder = (LunixHolder) inv.getHolder();
-            holder.getInvType().getInventory().onClose(e);
-        }
+        inventoryManager.onClose(e);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -236,21 +235,14 @@ public class PlayerEvents implements Listener {
             case LUNIX_PICKAXE -> {
                 LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
                 if (lunixPlayer == null) return;
-                lunixPlayer.getPickaxe().onInteract(e);
+                lunixPlayer.getPickaxeStorage().onInteract(e);
             }
-            case BOOSTER -> new BoosterItem(e.getItem()).onInteract(e);
-            case VOUCHER -> {
-                Pair<CurrencyType, BigInteger> pair = NBTTags.getVoucherValue(e.getItem());
-                if (pair != null) {
-                    new Voucher(pair.getLeft(),pair.getRight()).onInteract(e);
-                } else {
-                    new Voucher(null,null).onInteract(e);
-                }
-            }
+            case BOOSTER -> new BoosterItem().onInteract(e);
+            case CURRENCY_VOUCHER -> new CurrencyVoucher().onInteract(e);
             default -> {
-                LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getItemMap().get(id);
+                LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(id);
                 if (lunixItem == null) return;
-                LunixPrison.getPlugin().getItemManager().getItemMap().get(id).onInteract(e);
+                lunixItem.onInteract(e);
             }
         }
     }
@@ -259,11 +251,11 @@ public class PlayerEvents implements Listener {
     public void onDrop(PlayerDropItemEvent e) {
         Player p = e.getPlayer();
         ItemStack item = e.getItemDrop().getItemStack();
-        CompoundTag pyrexData = NBTTags.getLunixDataMap(item);
+        CompoundTag pyrexData = NBTTags.getLunixDataTag(item);
         if (pyrexData.contains("id")) {
             if (pyrexData.getString("id").equalsIgnoreCase(PickaxeManager.getLunixPickaxeId())) {
                 e.setCancelled(true);
-                LunixPickaxe pickaxe = plugin.getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
+                PickaxeStorage pickaxe = plugin.getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxeStorage();
                 for (EnchantType enchantType : pickaxe.getEnchants().keySet()) {
                     if (!pickaxe.getDisabledEnchants().contains(enchantType)) {
                         LunixEnchant enchant = plugin.getPickaxeHandler().getEnchantments().get(enchantType);
@@ -281,101 +273,11 @@ public class PlayerEvents implements Listener {
         Player p = e.getPlayer();
         LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
         String strippedMessage = ChatColor.stripColor(e.getMessage());
-        if (PMineBlocksGUI.getEditMap().containsKey(p.getUniqueId())) {
-            try {
-                double percentage = Double.parseDouble(strippedMessage);
-                if (percentage < 0) {
-                    percentage = 0;
-                }
-                if (percentage > 100) {
-                    percentage = 100;
-                }
-                double newValue = (Math.floor(percentage)/100);
-                PMine mine = pMineManager.getPMine(p.getUniqueId());
-                mine.getComposition().put(PMineBlocksGUI.getEditMap().get(p.getUniqueId()),newValue);
-            } catch (NumberFormatException ignored) {}
-            e.setCancelled(true);
-            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineBlocksGUI().getInv(p)));
-            PMineBlocksGUI.getEditMap().remove(p.getUniqueId());
-            return;
-        } else if (ArmorUpgradeGUI.getCustomColorMap().containsKey(p.getUniqueId())) {
-            Map<UUID, ArmorSlot> map = ArmorUpgradeGUI.getCustomColorMap();
-            ArmorSlot type = map.get(p.getUniqueId());
-            boolean equipped = lunixPlayer.isArmorEquiped();
-            try {
-                Armor armor = lunixPlayer.getArmor().get(type);
-                int color = Numbers.hexToInt(strippedMessage);
-                if (color <= 0xFFFFFF && color >= 0) {
-                    armor.setCustomColor(Color.fromRGB(color));
-                    if (equipped) {
-                        p.getInventory().setItem(type.getEquipmentSlot(),armor.getItemStack());
-                    }
-                } else {
-                    p.sendMessage(StringUtil.color("&cInvalid Color Code."));
-                }
-            } catch (Exception ignored) {
-                p.sendMessage(StringUtil.color("&cInvalid Color Code."));
-            }
-            e.setCancelled(true);
-            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new ArmorUpgradeGUI(type).getInv(p)));
-            ArmorUpgradeGUI.getCustomColorMap().remove(p.getUniqueId());
-            return;
-        } else if (PMineSettingsGUI.getTaxEditSet().contains(p.getUniqueId())) {
-            e.setCancelled(true);
-            try {
-                PMine mine = pMineManager.getPMine(p.getUniqueId());
-                double tax = Double.parseDouble(strippedMessage);
-                if (tax > 100) {
-                    tax = 100;
-                } else if (tax < 0) {
-                    tax = 0;
-                } else {
-                    if (tax%1 != 0) {
-                        double mid = (Math.floor(tax)+0.5);
-                        if (tax > mid) {
-                            tax = Math.ceil(tax);
-                        } else if (tax < mid){
-                            tax = Math.floor(tax);
-                        } else {
-                            tax = mid;
-                        }
-                    }
-                }
-                mine.setMineTax(tax);
-                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI().getInv(p)));
-            } catch (NumberFormatException ignored) {
-                p.sendMessage(StringUtil.color("&cInvalid Number."));
-
-            }
-            PMineSettingsGUI.getTaxEditSet().remove(p.getUniqueId());
-            return;
-        } else if (PMineSettingsGUI.getKickPlayerSet().contains(p.getUniqueId())) {
-            Player kickPlayer = Bukkit.getPlayer(strippedMessage);
-            e.setCancelled(true);
-            if (kickPlayer != null) {
-                if (kickPlayer.getUniqueId() != p.getUniqueId()) {
-                    PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
-                    if (mine.isInMineIsland(kickPlayer)) {
-                        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()-> LunixPrison.getPlugin().getPMineManager().getPMine(kickPlayer.getUniqueId()).teleportToCenter(kickPlayer,false,true));
-                        kickPlayer.sendMessage(StringUtil.color("&eYou've been kicked from "+p.getName()+"'s mine. teleporting to your mine."));
-                        p.sendMessage(StringUtil.color("&aSuccessfully kicked &f"+kickPlayer.getName()+" &afrom your mine."));
-                    } else {
-                        p.sendMessage(StringUtil.color("Player "+kickPlayer.getName()+" isn't in your mine."));
-                    }
-                } else {
-                    p.sendMessage(StringUtil.color("&cYou can't kick yourself."));
-                }
-            } else {
-                p.sendMessage(StringUtil.color("&cPlayer "+strippedMessage+" isn't online."));
-            }
-            PMineSettingsGUI.getKickPlayerSet().remove(p.getUniqueId());
-            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI().getInv(p)));
-            return;
-        }
         if (lunixPlayer.getChatReplyType() != null) {
-            switch (lunixPlayer.getChatReplyType()) {
+            e.setCancelled(true);
+            ChatReplyType replyType = lunixPlayer.getChatReplyType();
+            switch (replyType) {
                 case RENAME_TAG -> {
-                    e.setCancelled(true);
                     Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->{
                         boolean hasRenameTagInInv = false;
                         for (ItemStack item : p.getInventory().getStorageContents()) {
@@ -389,10 +291,100 @@ public class PlayerEvents implements Listener {
                         } else {
                             p.sendMessage(StringUtil.color("&cNo Rename Tag Found!"));
                         }
-                        lunixPlayer.setChatReplyType(null);
                     });
                 }
+                case PMINE_BLOCK_CHANCE_EDIT-> {
+                    try {
+                        double percentage = Double.parseDouble(strippedMessage);
+                        if (percentage < 0) {
+                            percentage = 0;
+                        }
+                        if (percentage > 100) {
+                            percentage = 100;
+                        }
+                        percentage = (int) percentage;
+                        double newValue = (percentage/100);
+                        PMine mine = pMineManager.getPMine(p.getUniqueId());
+                        mine.getComposition().put(PMineBlocksGUI.getEditMap().get(p.getUniqueId()),newValue);
+                    } catch (NumberFormatException ignored) {}
+                    e.setCancelled(true);
+                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineBlocksGUI().getInv(p)));
+                }
+                case PMINE_TAX_EDIT -> {
+                    PMine mine = pMineManager.getPMine(p.getUniqueId());
+                    double tax;
+                    try {
+                        tax = Double.parseDouble(strippedMessage);
+                    } catch (NumberFormatException ignored) {
+                        p.sendMessage(StringUtil.color("&cInvalid Number."));
+                        return;
+                    }
+                    if (tax > 100) {
+                        tax = 100;
+                    } else if (tax < 0) {
+                        tax = 0;
+                    } else {
+                        if (tax%1 != 0) {
+                            double mid = (Math.floor(tax)+0.5);
+                            if (tax > mid) {
+                                tax = Math.ceil(tax);
+                            } else if (tax < mid){
+                                tax = Math.floor(tax);
+                            } else {
+                                tax = mid;
+                            }
+                        }
+                    }
+                    mine.setMineTax(tax);
+                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI().getInv(p)));
+                }
+                case PMINE_KICK_PLAYER -> {
+                    Player kickPlayer = Bukkit.getPlayer(strippedMessage);
+                    if (kickPlayer != null) {
+                        if (kickPlayer.getUniqueId() != p.getUniqueId()) {
+                            PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+                            if (mine.isInMineIsland(kickPlayer)) {
+                                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()-> LunixPrison.getPlugin().getPMineManager().getPMine(kickPlayer.getUniqueId()).teleportToCenter(kickPlayer,false,true));
+                                kickPlayer.sendMessage(StringUtil.color("&eYou've been kicked from "+p.getName()+"'s mine. teleporting to your mine."));
+                                p.sendMessage(StringUtil.color("&aSuccessfully kicked &f"+kickPlayer.getName()+" &afrom your mine."));
+                            } else {
+                                p.sendMessage(StringUtil.color("Player "+kickPlayer.getName()+" isn't in your mine."));
+                            }
+                        } else {
+                            p.sendMessage(StringUtil.color("&cYou can't kick yourself."));
+                        }
+                    } else {
+                        p.sendMessage(StringUtil.color("&cPlayer "+strippedMessage+" isn't online."));
+                    }
+                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI().getInv(p)));
+                }
+                case ARMOR_CUSTOM_COLOR_EDIT -> {
+                    ArmorSlot type = ArmorUpgradeGUI.getCustomColorSlotMap().get(p.getUniqueId());
+                    if (type == null) {
+                        p.sendMessage(ChatColor.RED+"Failed to find Armor Piece, please report this!");
+                        lunixPlayer.setChatReplyType(null);
+                        return;
+                    }
+                    boolean equipped = lunixPlayer.isArmorEquiped();
+                    try {
+                        Armor armor = lunixPlayer.getArmor().get(type);
+                        int color = Numbers.hexToInt(strippedMessage);
+                        if (color <= 0xFFFFFF && color >= 0) {
+                            armor.setCustomColor(Color.fromRGB(color));
+                            if (equipped) {
+                                p.getInventory().setItem(type.getEquipmentSlot(),armor.getItemStack());
+                            }
+                        } else {
+                            p.sendMessage(StringUtil.color("&cInvalid Color Code."));
+                        }
+                    } catch (Exception ignored) {
+                        p.sendMessage(StringUtil.color("&cInvalid Color Code."));
+                    }
+                    e.setCancelled(true);
+                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new ArmorUpgradeGUI(type).getInv(p)));
+                }
             }
+            lunixPlayer.setChatReplyType(null);
         }
     }
 
@@ -426,9 +418,9 @@ public class PlayerEvents implements Listener {
         Player p = e.getPlayer();
         ItemStack oldItem = p.getInventory().getItem(e.getPreviousSlot()) != null ? p.getInventory().getItem(e.getPreviousSlot()) : new ItemStack(Material.AIR);
         ItemStack newItem = p.getInventory().getItem(e.getNewSlot()) != null ? p.getInventory().getItem(e.getNewSlot()) : new ItemStack(Material.AIR);
-        CompoundTag oldMap = NBTTags.getLunixDataMap(oldItem);
-        CompoundTag newMap = NBTTags.getLunixDataMap(newItem);
-        LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(e.getPlayer().getUniqueId()).getPickaxe();
+        CompoundTag oldMap = NBTTags.getLunixDataTag(oldItem);
+        CompoundTag newMap = NBTTags.getLunixDataTag(newItem);
+        PickaxeStorage pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(e.getPlayer().getUniqueId()).getPickaxeStorage();
         if (oldMap.contains("id")) {
             // is custom pickaxe
             if (oldMap.getString("id").equals(PickaxeManager.getLunixPickaxeId())) {

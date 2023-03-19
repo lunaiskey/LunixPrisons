@@ -16,7 +16,10 @@ import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeManager;
 import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.modules.boosters.Boosters;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -66,7 +69,6 @@ public final class LunixPrison extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new PlayerEvents(this),this);
         getLogger().info("version " + getDescription().getVersion() + " enabled!");
-
     }
 
     @Override
@@ -82,9 +84,9 @@ public final class LunixPrison extends JavaPlugin {
         playerManager = new PlayerManager();
         pickaxeManager = new PickaxeManager();
         itemManager = new ItemManager();
-        leaderboardManager = new LeaderboardManager();
         gangManager = new GangManager();
         inventoryManager = new InventoryManager();
+        leaderboardManager = new LeaderboardManager();
     }
 
     public static LunixPrison getPlugin() {
@@ -108,7 +110,6 @@ public final class LunixPrison extends JavaPlugin {
         //Schedule save
         saveTaskID = scheduler.scheduleSyncRepeatingTask(LunixPrison.getPlugin(), this::saveAll, 5 * 60 * 20L,5 * 60 * 20L);
         this.getLogger().info("Buffered a save task to happen in 5 minutes.");
-
     }
 
     private void savePlayer(UUID player, boolean slient) {

@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.modules.items.items;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
+import io.github.lunaiskey.lunixprison.modules.items.meta.LunixItemMeta;
 import io.github.lunaiskey.lunixprison.modules.player.ChatReplyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
@@ -19,6 +20,11 @@ import java.util.List;
 public class RenameTag extends LunixItem {
     public RenameTag() {
         super(ItemID.RENAME_TAG, "&6Rename Tag",List.of("&7Right click to rename pickaxe!") , null, Material.NAME_TAG);
+    }
+
+    @Override
+    public List<String> getLore(LunixItemMeta meta) {
+        return null;
     }
 
     @Override

@@ -78,7 +78,7 @@ public class ArmorGUI implements LunixInventory {
                     boolean allSlotsEmpty = true;
                     for (ItemStack item : p.getInventory().getArmorContents()) {
                         if (item == null) continue;
-                        CompoundTag armorTag = NBTTags.getLunixDataMap(item);
+                        CompoundTag armorTag = NBTTags.getLunixDataTag(item);
                         if (armorTag.get("id") != null) {
                             if (!armorTag.get("id").getAsString().contains("LUNIX_ARMOR_")) {
                                 allSlotsEmpty = false;

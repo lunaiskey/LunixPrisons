@@ -2,6 +2,8 @@ package io.github.lunaiskey.lunixprison.modules.items.items;
 
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
+import io.github.lunaiskey.lunixprison.modules.items.meta.LunixItemMeta;
+import io.github.lunaiskey.lunixprison.modules.items.meta.MetaCurrencyVoucher;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.modules.player.Currency;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
@@ -20,29 +22,35 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Voucher extends LunixItem {
+public class CurrencyVoucher extends LunixItem {
 
-    private BigInteger amount;
     private CurrencyType type;
-    private String playerName;
+    private BigInteger amount;
+    //private String playerName; unused for now.
 
-    public Voucher(BigInteger amount, CurrencyType type, String playerName) {
-        super(ItemID.VOUCHER, "   &7- &6&lBank Note &7-   ", null, Material.PAPER);
-        this.amount = amount;
+    public CurrencyVoucher( CurrencyType type,BigInteger amount) {
+        super(ItemID.CURRENCY_VOUCHER, "   &7- &6&lBank Note &7-   ", null, Material.PAPER);
         this.type = type;
+        this.amount = amount;
     }
 
-    public Voucher( CurrencyType type,BigInteger amount) {
-        this(amount,type,null);
+    public CurrencyVoucher(CurrencyType type,Long amount) {
+        this(type,BigInteger.valueOf(amount));
     }
 
-    public Voucher(Long amount, CurrencyType type, String playerName) {
-        this(BigInteger.valueOf(amount),type,playerName);
+    public CurrencyVoucher(MetaCurrencyVoucher currencyVoucher) {
+        this(currencyVoucher.getType(),currencyVoucher.getAmount());
+    }
+
+    public CurrencyVoucher() {
+        this(null,BigInteger.ZERO);
     }
 
     @Override
-    public ItemStack getItemStack() {
-        String name = getDisplayName();
+    public List<String> getLore(LunixItemMeta meta) {
+        MetaCurrencyVoucher currencyMeta = (MetaCurrencyVoucher) meta;
+        CurrencyType type = currencyMeta.getType();
+        BigInteger amount = currencyMeta.getAmount();
         String strType = type.getColorCode()+type.getName();
         String strAmount = type.getColorCode()+type.getUnicode()+"&f"+Numbers.formattedNumber(amount);
         List<String> lore = new ArrayList<>();
@@ -51,9 +59,16 @@ public class Voucher extends LunixItem {
         lore.add(StringUtil.color("&7• Amount: "+strAmount));
         lore.add(" ");
         lore.add(StringUtil.color("&eRight Click to redeem!"));
-        ItemStack item = ItemBuilder.createItem(name,getMaterial(),lore);
+        return lore;
+    }
+
+    @Override
+    public ItemStack getItemStack() {
+        String name = getDisplayName();
+        MetaCurrencyVoucher voucher = new MetaCurrencyVoucher(type,amount);
+        ItemStack item = ItemBuilder.createItem(name,getMaterial(),getLore(voucher));
         item = NBTTags.addLunixData(item,"id",getItemID().name());
-        item = NBTTags.setCurrencyVoucherTags(item,amount,type);
+        voucher.applyMeta(item);
         return item;
 
     }
@@ -76,11 +91,11 @@ public class Voucher extends LunixItem {
             return;
         }
         ItemStack item = e.getItem();
-        Currency.giveCurrency(e.getPlayer().getUniqueId(), type,amount);
-        item.setAmount(e.getItem().getAmount()-1);
+        Currency.giveCurrency(e.getPlayer().getUniqueId(), type, amount);
+        item.setAmount(e.getItem().getAmount() - 1);
         ChatColor color = type.getColorCode();
         String unicode = type.getUnicode();
         String text = type.getName();
-        p.sendMessage(color+"Redeemed "+unicode+ChatColor.WHITE+Numbers.formattedNumber(amount)+" "+color+text+".");
+        p.sendMessage(color + "Redeemed " + unicode + ChatColor.WHITE + Numbers.formattedNumber(amount) + " " + color + text + ".");
     }
 }

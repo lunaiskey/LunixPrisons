@@ -5,7 +5,7 @@ import java.util.List;
 
 public enum ItemID {
 
-    VOUCHER(false),
+    CURRENCY_VOUCHER(false),
     LUNIX_PICKAXE,
     PLAYER_MENU,
 
@@ -45,8 +45,9 @@ public enum ItemID {
 
     KEY_SACK(false),
     RENAME_TAG(false),
-    SEX_ITEM,
     BOOSTER,
+    CHATCOLOR_VOUCHER,
+    BLAN_NOES,
     ;
 
     ItemID() {

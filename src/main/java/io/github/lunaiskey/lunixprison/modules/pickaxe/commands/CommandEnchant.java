@@ -4,7 +4,7 @@ import io.github.lunaiskey.lunixprison.Messages;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixEnchant;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixPickaxe;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeStorage;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -14,9 +14,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.UUID;
 
 public class CommandEnchant implements CommandExecutor {
 
@@ -77,7 +74,7 @@ public class CommandEnchant implements CommandExecutor {
             return;
         }
         LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(toEnchant.getUniqueId());
-        LunixPickaxe pickaxe = lunixPlayer.getPickaxe();
+        PickaxeStorage pickaxe = lunixPlayer.getPickaxeStorage();
         if (level > 0) {
             pickaxe.getEnchants().put(enchantType,level);
             p.sendMessage(ChatColor.GREEN+"Set "+enchant.getName()+" to level "+level+" on pickaxe.");

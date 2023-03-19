@@ -2,7 +2,7 @@ package io.github.lunaiskey.lunixprison.modules.player.commands;
 
 import io.github.lunaiskey.lunixprison.Messages;
 import io.github.lunaiskey.lunixprison.LunixPrison;
-import io.github.lunaiskey.lunixprison.modules.items.items.Voucher;
+import io.github.lunaiskey.lunixprison.modules.items.items.CurrencyVoucher;
 import io.github.lunaiskey.lunixprison.modules.player.Currency;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
@@ -254,7 +254,7 @@ public class CommandCurrency implements CommandExecutor, TabCompleter {
             p.sendMessage(StringUtil.color("&cAmount has to be more then 0."));
             return;
         }
-        if (!p.getInventory().addItem(new Voucher(type,amount).getItemStack()).isEmpty()) {
+        if (!p.getInventory().addItem(new CurrencyVoucher(type,amount).getItemStack()).isEmpty()) {
             p.sendMessage(StringUtil.color("&cNot enough inventory space."));
             return;
         }

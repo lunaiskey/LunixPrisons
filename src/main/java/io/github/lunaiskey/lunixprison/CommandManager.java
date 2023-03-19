@@ -1,5 +1,6 @@
 package io.github.lunaiskey.lunixprison;
 
+import io.github.lunaiskey.lunixprison.commands.CommandLunixDebug;
 import io.github.lunaiskey.lunixprison.modules.armor.commands.CommandArmor;
 import io.github.lunaiskey.lunixprison.modules.gangs.commands.CommandGang;
 import io.github.lunaiskey.lunixprison.modules.items.commands.CommandGemstones;
@@ -10,6 +11,7 @@ import io.github.lunaiskey.lunixprison.modules.pickaxe.commands.CommandEnchant;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.commands.CommandGetPickaxe;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.commands.CommandResetPickaxe;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
+import io.github.lunaiskey.lunixprison.modules.player.chatcolor.ChatColorSelectType;
 import io.github.lunaiskey.lunixprison.modules.player.commands.*;
 import io.github.lunaiskey.lunixprison.modules.rankup.commands.CommandRank;
 import io.github.lunaiskey.lunixprison.modules.rankup.commands.CommandRankup;
@@ -52,6 +54,13 @@ public class CommandManager {
 
         registerCommand("gang",new CommandGang(plug));
         registerCommand("cashback",new CommandCashback());
+        registerCommand("settings", new CommandSettings());
+
+        registerCommand("namecolor", new CommandChatNameTextColor(ChatColorSelectType.NAME));
+        registerCommand("chatcolor", new CommandChatNameTextColor(ChatColorSelectType.TEXT));
+
+
+        registerCommand("lunixdebug", new CommandLunixDebug());
     }
 
     private static void registerCommand(String command, CommandExecutor executor) {

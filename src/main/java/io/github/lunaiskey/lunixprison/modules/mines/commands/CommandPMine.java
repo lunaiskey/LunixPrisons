@@ -140,12 +140,19 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
             return;
         }
         Player p = (Player) sender;
-        //PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
         if (!(p.hasPermission("lunix.debug"))) {
             p.sendMessage(Messages.NO_PERMISSION.getText());
             return;
         }
         if (args.length < 2) {
+            p.sendMessage(
+                    ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"PMine Debug Commands:",
+                    ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine debug getposition",
+                    ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine debug getgridposition",
+                    ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine debug genbedrock",
+                    ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine debug sendborder"
+            );
             return;
         }
         String arg1 = args[1].toLowerCase();
@@ -173,17 +180,12 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
                     pMine.genBedrock();
                 }
             }
+            case "sendborder" -> {
+                mine.sendBorder(p);
+                p.sendMessage(ChatColor.GREEN+"Attempting to send border packets.");
+            }
             default -> {
-                if (args.length != 2) {
-                    p.sendMessage(ChatColor.RED+"Invalid Arguments.");
-                    return;
-                }
-                p.sendMessage(
-                        ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"PMine Debug Commands:",
-                        ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine debug getposition",
-                        ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine debug getgridposition",
-                        ChatColor.LIGHT_PURPLE+""+ChatColor.BOLD+"| "+ChatColor.WHITE+"/pmine debug genbedrock"
-                );
+                p.sendMessage(ChatColor.RED+"Invalid Arguments.");
             }
         }
     }

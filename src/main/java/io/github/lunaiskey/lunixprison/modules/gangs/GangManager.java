@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,8 +20,8 @@ public class GangManager {
     private Map<String, UUID> gangNameMap = new HashMap<>();
 
     private Map<UUID, UUID> playerGangMap = new HashMap<>();
-    private List<Gang> trophyTop = new ArrayList<>();
     public static String GANG_FILE_NAME = "gangdata";
+
 
     public void loadGangs(){
         File[] gangFiles = new File(LunixPrison.getPlugin().getDataFolder(), GANG_FILE_NAME).listFiles(new IsGangFile());
@@ -46,7 +47,6 @@ public class GangManager {
             long trophies = ((Number) gangMap.get("trophies")).longValue();
             addGang(gangUUID, owner, name, memberMap, trophies);
         }
-        trophyTop = getTrophyTop();
     }
 
     public Map<UUID, Gang> getGangMap() {
@@ -89,19 +89,10 @@ public class GangManager {
 
     @Nullable
     public Gang getGang(@NotNull UUID player) {
-        if (isInGang(player)) {
-            return gangMap.get(getPlayerGangMap().get(player));
-        } else {
+        if (!isInGang(player)) {
             return null;
         }
-    }
-
-    //public Gang getGang
-
-    public List<Gang> getTrophyTop(){
-        List<Gang> sortedList = new ArrayList<>(gangMap.values());
-        sortedList.sort(Collections.reverseOrder(Comparator.comparingLong(Gang::getTrophies)));
-        return sortedList;
+        return gangMap.get(getPlayerGangMap().get(player));
     }
 
     public void addGang(UUID uuid, UUID owner, String name, Map<UUID,GangMember> members, long trophies) {

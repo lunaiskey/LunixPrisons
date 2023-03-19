@@ -6,9 +6,9 @@ import org.bukkit.ChatColor;
 public enum Messages {
     NO_PERMISSION(ChatColor.RED+"No Permission."),
     NOT_ENOUGH_ARGS(ChatColor.RED+"Not Enough Arguments."),
-    PLAYER_ONLY(ChatColor.RED+"This is a player only command!")
+    PLAYER_ONLY(ChatColor.RED+"This is a player only command!"),
+    FEATURE_UNAVAILABLE(ChatColor.RED+"This feature is currently unavailable")
     ;
-
 
     private final String text;
     Messages(String text) {

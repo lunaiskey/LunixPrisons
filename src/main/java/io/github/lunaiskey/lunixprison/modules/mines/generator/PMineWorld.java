@@ -1,12 +1,10 @@
 package io.github.lunaiskey.lunixprison.modules.mines.generator;
 
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
+import org.bukkit.*;
 
 public class PMineWorld {
 
-    private final static String WORLD_NAME = "mines";
+    private static final String WORLD_NAME = "lunixmines";
 
     public void generateWorld() {
         WorldCreator wc = new WorldCreator(WORLD_NAME);
@@ -15,11 +13,14 @@ public class PMineWorld {
         wc.type(WorldType.FLAT);
         wc.generateStructures(false);
         wc.environment(World.Environment.NORMAL);
-        wc.createWorld();
+        World world = wc.createWorld();
+        if (world == null) return;
+        world.setDifficulty(Difficulty.PEACEFUL);
+        world.setSpawnFlags(false,false);
+        world.setGameRule(GameRule.DO_TRADER_SPAWNING,false);
     }
 
     public static String getWorldName() {
         return WORLD_NAME;
     }
-
 }

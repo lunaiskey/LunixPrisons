@@ -25,7 +25,7 @@ public class Reward {
         this.items = items;
         if (commands == null) return;
         commands = new ArrayList<>(commands);
-        if (commandsList.size() <= 0) return;
+        if (commandsList.size() == 0) return;
         for (int i = 0;i<commands.size();i++) {
             String command = commands.get(i);
             StringBuilder builder = new StringBuilder(command);

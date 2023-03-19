@@ -1,8 +1,20 @@
 package io.github.lunaiskey.lunixprison.modules.items;
 
 import io.github.lunaiskey.lunixprison.modules.items.items.*;
+import io.github.lunaiskey.lunixprison.modules.items.meta.MetaBoosterItem;
+import io.github.lunaiskey.lunixprison.modules.items.meta.MetaChatColorVoucher;
+import io.github.lunaiskey.lunixprison.modules.items.meta.MetaCurrencyVoucher;
+import io.github.lunaiskey.lunixprison.util.StringUtil;
+import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ItemManager {
@@ -41,15 +53,81 @@ public class ItemManager {
 
         addLunixItem(new PlayerMenu());
         addLunixItem(new RenameTag());
-
+        addLunixItem(new BlanNoes());
         //itemMap.put(ItemID.SEX_ITEM,new SexItem());
     }
 
-    public void addLunixItem(LunixItem item) {
+    private void addLunixItem(LunixItem item) {
         itemMap.putIfAbsent(item.getItemID(),item);
     }
 
-    public Map<ItemID, LunixItem> getItemMap() {
-        return itemMap;
+    public LunixItem getLunixItem(ItemID itemID) {
+        return itemMap.get(itemID);
+    }
+
+    public LunixItem getLunixItem(ItemStack itemStack) {
+        ItemID itemID = NBTTags.getItemID(itemStack);
+        LunixItem lunixItem = getLunixItem(itemID);
+        if (lunixItem != null) {
+            return lunixItem;
+        }
+        switch (itemID) {
+            case BOOSTER -> new BoosterItem(new MetaBoosterItem(itemStack));
+            case CURRENCY_VOUCHER -> new CurrencyVoucher(new MetaCurrencyVoucher(itemStack));
+            case CHATCOLOR_VOUCHER -> new ChatColorVoucher(new MetaChatColorVoucher(itemStack));
+        }
+        return null;
+    }
+
+    public void updateItemStack(ItemStack itemStack) {
+        LunixItem lunixItem = getLunixItem(itemStack);
+        if (lunixItem == null) {
+            return;
+        }
+        updateMaterial(itemStack,lunixItem);
+        ItemMeta meta = itemStack.getItemMeta();
+        updateItemName(itemStack,lunixItem,meta);
+        updateItemLore(itemStack,lunixItem,meta);
+        itemStack.setItemMeta(meta);
+    }
+
+    private void updateItemName(ItemStack itemStack,LunixItem lunixItem, ItemMeta meta) {
+        String name = StringUtil.color(lunixItem.getDisplayName());
+        if (lunixItem.getRarity() != null) {
+            name = lunixItem.getRarity().getChatColor()+name;
+        }
+        meta.setDisplayName(name);
+    }
+
+    private void updateItemLore(ItemStack itemStack, LunixItem lunixItem, ItemMeta meta) {
+        List<String> lore = new ArrayList<>();
+        lore.addAll(lunixItem.getColoredDescription());
+        if (lunixItem.getRarity() != null) {
+            if (lore.size() != 0) {
+                lore.add(" ");
+            }
+            lore.add(lunixItem.getRarity().getChatColor()+""+ChatColor.BOLD+lunixItem.getRarity().name());
+        }
+        meta.setLore(lore);
+    }
+
+    private void updateMaterial(ItemStack itemStack, LunixItem lunixItem) {
+        if (!itemStack.getType().equals(lunixItem.getMaterial())) {
+            itemStack.setType(lunixItem.getMaterial());
+        }
+    }
+
+    public void updateInventory(Player player) {
+        ItemStack[] contents = player.getInventory().getContents();
+        for (ItemStack content : contents) {
+            updateItemStack(content);
+        }
+        player.getInventory().setContents(contents);
+    }
+
+    public void updateEquipmentSlot(Player player, EquipmentSlot slot) {
+        ItemStack stack = player.getInventory().getItem(slot);
+        updateItemStack(stack);
+        player.getInventory().setItem(slot,stack);
     }
 }

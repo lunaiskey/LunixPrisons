@@ -23,4 +23,8 @@ public enum BoosterType {
             case GEMSTONE -> ChatColor.LIGHT_PURPLE;
         };
     }
+
+    public String getColoredName() {
+        return getColor()+getName();
+    }
 }

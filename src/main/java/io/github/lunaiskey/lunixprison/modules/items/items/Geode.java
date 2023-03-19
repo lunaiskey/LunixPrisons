@@ -2,6 +2,7 @@ package io.github.lunaiskey.lunixprison.modules.items.items;
 
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixPlayerHeadItem;
+import io.github.lunaiskey.lunixprison.modules.items.meta.LunixItemMeta;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import io.github.lunaiskey.lunixprison.util.reward.Reward;
 import org.bukkit.entity.Player;
@@ -27,6 +28,11 @@ public class Geode extends LunixPlayerHeadItem {
             case EPIC -> rewardList.add(new Reward("20,000 Tokens, 125 Gems",1,null,List.of("tokens give %player% 20000","gems give %player% 125")));
             case LEGENDARY -> rewardList.add(new Reward("30,000 Tokens, 150 Gems",1,null,List.of("tokens give %player% 30000","gems give %player% 150")));
         }
+    }
+
+    @Override
+    public List<String> getLore(LunixItemMeta meta) {
+        return null;
     }
 
     @Override

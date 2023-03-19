@@ -14,49 +14,6 @@ import java.util.UUID;
 
 public class NBTTags {
 
-    public static CompoundTag getBaseTagContainer(ItemStack item) {
-        net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-        return nmsStack.getOrCreateTag();
-    }
-
-    public static ItemStack addCustomTagContainer(ItemStack item, String containerName, CompoundTag tag) {
-        net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-        CompoundTag itemTag = nmsStack.getOrCreateTag();
-        itemTag.put(containerName,tag);
-        nmsStack.setTag(itemTag);
-        return CraftItemStack.asBukkitCopy(nmsStack);
-    }
-
-    public static boolean hasCustomTagContainer(ItemStack item, String containerName) {
-        net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-        if (!nmsStack.hasTag()) {
-            return false;
-        }
-        CompoundTag itemTag = nmsStack.getTag();
-        assert itemTag != null;
-        return itemTag.contains(containerName);
-    }
-
-    public static ItemStack setCurrencyVoucherTags(ItemStack item, BigInteger amount, CurrencyType type) {
-        CompoundTag voucherTag = new CompoundTag();
-        voucherTag.putString("type",type.name());
-        voucherTag.putString("amount",amount.toString());
-        return addLunixData(item,"voucherData",voucherTag);
-    }
-
-    public static Pair<CurrencyType,BigInteger> getVoucherValue(ItemStack item) {
-        CompoundTag itemTag = getLunixDataMap(item);
-        CompoundTag voucherTag = itemTag.getCompound("voucherData");
-        try {
-            CurrencyType type = CurrencyType.valueOf(voucherTag.getString("type"));
-            BigInteger amount = new BigInteger(voucherTag.getString("amount"));
-            return new ImmutablePair<>(type,amount);
-        } catch (Exception ignored) {
-
-        }
-        return null;
-    }
-
     public static ItemStack addLunixDataContainer(ItemStack item) {
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
         CompoundTag itemTag = nmsStack.getOrCreateTag();
@@ -113,7 +70,7 @@ public class NBTTags {
         return CraftItemStack.asBukkitCopy(nmsStack);
     }
 
-    public static CompoundTag getLunixDataMap(ItemStack item) {
+    public static CompoundTag getLunixDataTag(ItemStack item) {
         item = addLunixDataContainer(item);
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
         CompoundTag itemTag = nmsStack.getOrCreateTag();
@@ -124,8 +81,11 @@ public class NBTTags {
     }
 
     public static ItemID getItemID(ItemStack item) {
+        if (item == null) {
+            return null;
+        }
         try {
-            return ItemID.valueOf(getLunixDataMap(item).getString("id"));
+            return ItemID.valueOf(getLunixDataTag(item).getString("id"));
         } catch (Exception ignored) {
             return null;
         }

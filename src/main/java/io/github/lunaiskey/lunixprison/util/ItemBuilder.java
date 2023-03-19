@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.v1_19_R1.block.impl.CraftSkull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -109,7 +110,7 @@ public class ItemBuilder {
         return ItemBuilder.createItem(" ",Material.BLACK_STAINED_GLASS_PANE,null);
     }
 
-    public static ItemStack getDefaultEdgeFilder() {
+    public static ItemStack getDefaultEdgeFiller() {
         return ItemBuilder.createItem(" ",Material.PURPLE_STAINED_GLASS_PANE,null);
     }
 

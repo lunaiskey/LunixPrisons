@@ -1,15 +1,24 @@
 package io.github.lunaiskey.lunixprison.modules.armor.upgrades;
 
+import io.github.lunaiskey.lunixprison.modules.armor.upgrades.abilitys.EnchantmentProc;
+import io.github.lunaiskey.lunixprison.modules.armor.upgrades.abilitys.SalesBoost;
+import io.github.lunaiskey.lunixprison.modules.armor.upgrades.abilitys.XPBoost;
 import org.bukkit.Material;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public enum AbilityType {
-    SALES_BOOST,
-    ENCHANTMENT_PROC,
-    XP_BOOST,
+    SALES_BOOST(new SalesBoost()),
+    ENCHANTMENT_PROC(new EnchantmentProc()),
+    XP_BOOST(new XPBoost()),
     ;
+
+    private Ability ability;
+    AbilityType(Ability ability) {
+        this.ability = ability;
+    }
 
     public static List<AbilityType> getSortedList() {
         List<AbilityType> list = new ArrayList<>();
@@ -33,5 +42,9 @@ public enum AbilityType {
             case ENCHANTMENT_PROC -> "&eEnchantment Proc";
             case XP_BOOST -> "&eXP Boost";
         };
+    }
+
+    public Ability getAbility() {
+        return ability;
     }
 }

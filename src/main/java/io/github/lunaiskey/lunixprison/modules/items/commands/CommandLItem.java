@@ -47,7 +47,7 @@ public class CommandLItem implements CommandExecutor, TabCompleter {
 
     private void giveCommand(CommandSender sender, String label, String[] args, boolean isGiveSubCommand) {
         int argOffSet = isGiveSubCommand ? 2 : 0;
-        if (args.length == (1-argOffSet)) {
+        if (args.length == (1+argOffSet)) {
             sender.sendMessage(StringUtil.color("Usage: /litem give <player> <id> [amount]"));
             return;
         }
@@ -57,24 +57,22 @@ public class CommandLItem implements CommandExecutor, TabCompleter {
         }
         ItemID itemID;
         try {
-            itemID = ItemID.valueOf(args[2-argOffSet]);
+            itemID = ItemID.valueOf(args[argOffSet]);
         } catch (IllegalArgumentException ignored) {
             sender.sendMessage(StringUtil.color("&cInvalid ItemID."));
             return;
         }
-        LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getItemMap().get(itemID);
+        LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(itemID);
         if (lunixItem == null) {
             sender.sendMessage(StringUtil.color("&cItemID \""+itemID.name()+"\" doesn't have an item assigned to it."));
             return;
         }
         int amount = 1;
-        if (args.length >= (4-argOffSet)) {
-            try {
-                amount = Integer.parseInt(args[3-argOffSet]);
-            } catch (NumberFormatException ignored) {
-                sender.sendMessage(StringUtil.color("&cInvalid Amount."));
-                return;
-            }
+        try {
+            amount = Integer.parseInt(args[1+argOffSet]);
+        } catch (NumberFormatException ignored) {
+            sender.sendMessage(StringUtil.color("&cInvalid Amount."));
+            return;
         }
         if (amount <= 0) {
             sender.sendMessage(StringUtil.color("&cAmount has to be more then 0."));

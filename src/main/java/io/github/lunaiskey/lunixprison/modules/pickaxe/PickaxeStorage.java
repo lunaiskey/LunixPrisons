@@ -18,16 +18,16 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class LunixPickaxe {
+public class PickaxeStorage {
 
-    private UUID player;
+    private UUID pUUID;
     private Map<EnchantType,Integer> enchants;
     private Set<EnchantType> disabledEnchants;
     private long blocksBroken;
     private String rename;
 
-    public LunixPickaxe(UUID player, Map<EnchantType,Integer> enchants, Set<EnchantType> disabledEnchants, long blocksBroken, String rename) {
-        this.player = player;
+    public PickaxeStorage(UUID pUUID, Map<EnchantType,Integer> enchants, Set<EnchantType> disabledEnchants, long blocksBroken, String rename) {
+        this.pUUID = pUUID;
         if (enchants == null) {
             enchants = new HashMap<>();
         }
@@ -46,14 +46,14 @@ public class LunixPickaxe {
         this.rename = rename;
     }
 
-    public LunixPickaxe(UUID player) {
-        this(player,null,null,0,null);
+    public PickaxeStorage(UUID pUUID) {
+        this(pUUID,null,null,0,null);
     }
 
     public ItemStack getItemStack() {
         ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE);
         item = NBTTags.addLunixData(item,"id", PickaxeManager.getLunixPickaxeId());
-        return LunixPrison.getPlugin().getPickaxeHandler().updatePickaxe(item,player);
+        return LunixPrison.getPlugin().getPickaxeHandler().updatePickaxe(item, pUUID);
     }
 
 
@@ -63,8 +63,7 @@ public class LunixPickaxe {
         ItemStack mainHand = p.getInventory().getItemInMainHand();
         Location blockLoc = block.getLocation();
         if (blockLoc.getWorld().getName().equals(PMineWorld.getWorldName())) {
-            Pair<Integer,Integer> gridLoc = LunixPrison.getPlugin().getPMineManager().getGridLocation(blockLoc);
-            PMine pMine = LunixPrison.getPlugin().getPMineManager().getPMine(gridLoc.getLeft(), gridLoc.getRight());
+            PMine pMine = LunixPrison.getPlugin().getPMineManager().getPMineAtPlayer(p);
             if (pMine != null) {
                 if (pMine.isInMineRegion(blockLoc)) {
                     e.setDropItems(false);
@@ -82,7 +81,7 @@ public class LunixPickaxe {
                     LunixPrison.getPlugin().getPlayerManager().payForBlocks(e.getPlayer(),1);
                     //p.giveExp(1+player.getXPBoostTotal()); //Not Implemented yet...
                     LunixPrison.getPlugin().getPlayerManager().tickGemstoneCount(p);
-                    setBlocksBroken(getBlocksBroken()+1);
+                    incrementBlocksBroken();
                     LunixPrison.getPlugin().getPickaxeHandler().updateInventoryPickaxe(p);
                 }
             }
@@ -114,6 +113,10 @@ public class LunixPickaxe {
 
     public void setBlocksBroken(long blocksBroken) {
         this.blocksBroken = blocksBroken;
+    }
+
+    public void incrementBlocksBroken() {
+        this.blocksBroken += 1;
     }
 
     public void setRename(String rename) {

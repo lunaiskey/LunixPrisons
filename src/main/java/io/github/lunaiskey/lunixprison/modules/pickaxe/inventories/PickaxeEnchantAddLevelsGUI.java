@@ -8,7 +8,7 @@ import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantLunixHolder;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixEnchant;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixPickaxe;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeStorage;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
@@ -22,7 +22,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ public class PickaxeEnchantAddLevelsGUI implements LunixInventory {
 
     private EnchantType type;
 
-    private static final int[] amountLoc = {1,2,10,25,50,100,200,500,1000};
+    private static final int[] amountLoc = {1,5,10,25,50,100,200,500,1000};
 
     public PickaxeEnchantAddLevelsGUI(EnchantType type) {
         this.type = type;
@@ -46,7 +45,7 @@ public class PickaxeEnchantAddLevelsGUI implements LunixInventory {
     @Override
     public Inventory getInv(Player player) {
         LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
-        LunixPickaxe pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId()).getPickaxe();
+        PickaxeStorage pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId()).getPickaxeStorage();
         Inventory inv = new EnchantLunixHolder("Add "+enchant.getName()+" Levels",27, LunixInvType.PICKAXE_ENCHANTS_ADD_LEVELS, type,enchant.getCostAmountFromLevelArray(pickaxe.getEnchants().getOrDefault(type,0),amountLoc)).getInventory();
         init(inv,player);
         return inv;
@@ -54,7 +53,7 @@ public class PickaxeEnchantAddLevelsGUI implements LunixInventory {
 
     private void init(Inventory inv, Player p) {
         LunixPlayer lunixPlayer =  LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
-        LunixPickaxe pickaxe = lunixPlayer.getPickaxe();
+        PickaxeStorage pickaxe = lunixPlayer.getPickaxeStorage();
         EnchantLunixHolder holder = (EnchantLunixHolder) inv.getHolder();
         for (int i = 0; i<inv.getSize();i++) {
             switch(i) {
@@ -76,7 +75,7 @@ public class PickaxeEnchantAddLevelsGUI implements LunixInventory {
         Player p = (Player) e.getWhoClicked();
         EnchantLunixHolder holder = (EnchantLunixHolder) e.getInventory().getHolder();
         LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
-        LunixPickaxe pickaxe = lunixPlayer.getPickaxe();
+        PickaxeStorage pickaxe = lunixPlayer.getPickaxeStorage();
         EnchantType enchantType = holder.getType();
         LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(enchantType);
         CurrencyType currencyType = enchant.getCurrencyType();
@@ -166,12 +165,9 @@ public class PickaxeEnchantAddLevelsGUI implements LunixInventory {
 
     private ItemStack getAddLevelButton(Player p,int level, Map<Integer,BigInteger> amountMap) {
         LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
-        LunixPickaxe pickaxe = lunixPlayer.getPickaxe();
+        PickaxeStorage pickaxe = lunixPlayer.getPickaxeStorage();
         LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
         CurrencyType currencyType = enchant.getCurrencyType();
-        Material mat = Material.LIME_STAINED_GLASS_PANE;
-        ItemStack item = new ItemStack(mat);
-        ItemMeta meta = item.getItemMeta();
         String name = StringUtil.color("&a&l+"+level);
         int start = pickaxe.getEnchants().getOrDefault(type,0);
         int end = Math.min(start + level, enchant.getMaxLevel());
@@ -179,9 +175,17 @@ public class PickaxeEnchantAddLevelsGUI implements LunixInventory {
         lore.add(StringUtil.color("&a&l| &7Cost: "+currencyType.getColorCode()+currencyType.getUnicode()+"&f"+ Numbers.formattedNumber(amountMap.get(level))));
         lore.add(StringUtil.color("&a&l| &7New Level: &e"+end));
         lore.add("");
-        lore.add(ChatColor.YELLOW+"Click to Apply!");
-        meta.setDisplayName(name);
-        item.setItemMeta(meta);
+        //lore.add(ChatColor.YELLOW+"Click to Apply!");
+        Material mat;
+        if (lunixPlayer.getTokens().compareTo(amountMap.get(level)) >= 0) {
+            mat = Material.LIME_STAINED_GLASS_PANE;
+            lore.add(ChatColor.YELLOW+"Click to Apply!");
+        } else {
+            mat = Material.RED_STAINED_GLASS_PANE;
+            lore.add(ChatColor.RED+"Not Enough "+currencyType.getName()+".");
+        }
+        ItemStack item = ItemBuilder.createItem(name,mat,lore);
+        item.setAmount(level);
         return item;
     }
 

@@ -1,6 +1,8 @@
 package io.github.lunaiskey.lunixprison.modules.leaderboards;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.modules.gangs.Gang;
+import io.github.lunaiskey.lunixprison.modules.gangs.GangMember;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import org.bukkit.Bukkit;
 
@@ -9,19 +11,22 @@ import java.util.*;
 public class LeaderboardManager {
 
     private Map<UUID, LunixPlayer> playerMap = LunixPrison.getPlugin().getPlayerManager().getPlayerMap();
+    private Map<UUID, Gang> gangMap = LunixPrison.getPlugin().getGangManager().getGangMap();
     private LinkedHashMap<UUID,BigIntegerEntry> tokenTopCache = new LinkedHashMap<>();
     private LinkedHashMap<UUID,LongEntry> gemsTopCache = new LinkedHashMap<>();
     private LinkedHashMap<UUID,LongEntry> rankTopCache = new LinkedHashMap<>();
+    private LinkedHashMap<UUID,LongEntry> gangTopCache = new LinkedHashMap<>();
 
 
     public void startTasks() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(LunixPrison.getPlugin(), this::calculateTokensTop,0L,20*60*10L);
-        Bukkit.getScheduler().runTaskTimerAsynchronously(LunixPrison.getPlugin(), this::calculateGemsTop,0L,20*60*10L);
-        Bukkit.getScheduler().runTaskTimerAsynchronously(LunixPrison.getPlugin(), this::calculateRankTop,0L,20*60*10L);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(LunixPrison.getPlugin(), this::calculateTokensTop,0L,10*60*20L);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(LunixPrison.getPlugin(), this::calculateGemsTop,0L,10*60*20L);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(LunixPrison.getPlugin(), this::calculateRankTop,0L,10*60*20L);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(LunixPrison.getPlugin(), this::calculateGangTop,0L,10*60*20L);
     }
 
     public void calculateTokensTop() {
-        final List<BigIntegerEntry> entries = new LinkedList<>();
+        final List<BigIntegerEntry> entries = new ArrayList<>();
         for (UUID uuid : playerMap.keySet()) {
             LunixPlayer lunixPlayer = playerMap.get(uuid);
             entries.add(new BigIntegerEntry(uuid, lunixPlayer.getName(), lunixPlayer.getTokens()));
@@ -35,7 +40,7 @@ public class LeaderboardManager {
     }
 
     public void calculateGemsTop() {
-        final List<LongEntry> entries = new LinkedList<>();
+        final List<LongEntry> entries = new ArrayList<>();
         for (UUID uuid : playerMap.keySet()) {
             LunixPlayer lunixPlayer = playerMap.get(uuid);
             entries.add(new LongEntry(uuid, lunixPlayer.getName(), lunixPlayer.getGems()));
@@ -49,7 +54,7 @@ public class LeaderboardManager {
     }
 
     public void calculateRankTop() {
-        final List<LongEntry> entries = new LinkedList<>();
+        final List<LongEntry> entries = new ArrayList<>();
         for (UUID uuid : playerMap.keySet()) {
             LunixPlayer lunixPlayer = playerMap.get(uuid);
             entries.add(new LongEntry(uuid, lunixPlayer.getName(), lunixPlayer.getRank()));
@@ -60,6 +65,20 @@ public class LeaderboardManager {
             sortedMap.put(entry.getUUID(),entry);
         }
         rankTopCache = sortedMap;
+    }
+
+    public void calculateGangTop() {
+        final List<LongEntry> entries = new ArrayList<>();
+        for (UUID uuid : gangMap.keySet()) {
+            Gang gang = gangMap.get(uuid);
+            entries.add(new LongEntry(uuid, gang.getName(), gang.getTrophies()));
+        }
+        final LinkedHashMap<UUID,LongEntry> sortedMap = new LinkedHashMap<>();
+        entries.sort((entry1,entry2) -> Long.compare(entry2.getValue(),entry1.getValue()));
+        for (LongEntry entry : entries) {
+            sortedMap.put(entry.getUUID(),entry);
+        }
+        gangTopCache = sortedMap;
     }
 
     public LinkedHashMap<UUID, BigIntegerEntry> getTokenTopCache() {
@@ -74,6 +93,8 @@ public class LeaderboardManager {
         return rankTopCache;
     }
 
-
+    public LinkedHashMap<UUID, LongEntry> getGangTopCache() {
+        return gangTopCache;
+    }
 }
 

@@ -50,7 +50,7 @@ public class PickaxeManager {
         if (id != ItemID.LUNIX_PICKAXE) return item;
         ItemMeta meta = item.getItemMeta();
         LunixPlayer player = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p);
-        LunixPickaxe pickaxe = player.getPickaxe();
+        PickaxeStorage pickaxe = player.getPickaxeStorage();
         if (pickaxe.getRename() == null) {
             meta.setDisplayName(StringUtil.color("&a"+player.getName()+"'s &fPickaxe"));
         } else {
@@ -102,13 +102,13 @@ public class PickaxeManager {
     public boolean hasOrGivePickaxe(Player p) {
         boolean hasPickaxe = false;
         for(ItemStack item : p.getInventory().getContents()) {
-            if (NBTTags.getLunixDataMap(item).getString("id").equals(LUNIX_PICKAXE_ID)) {
+            if (NBTTags.getLunixDataTag(item).getString("id").equals(LUNIX_PICKAXE_ID)) {
                 hasPickaxe = true;
                 break;
             }
         }
         if (!hasPickaxe) {
-            p.getInventory().addItem(LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe().getItemStack());
+            p.getInventory().addItem(LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxeStorage().getItemStack());
         }
         return hasPickaxe;
     }

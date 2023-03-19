@@ -66,13 +66,12 @@ public class LootFinder extends LunixEnchant {
 
     private ItemStack getGeode(int rarity) {
         ItemManager itemManager = LunixPrison.getPlugin().getItemManager();
-        Map<ItemID, LunixItem> itemMap = itemManager.getItemMap();
         return switch(rarity) {
-            case 0 -> itemMap.get(ItemID.COMMON_GEODE).getItemStack();
-            case 1 -> itemMap.get(ItemID.UNCOMMON_GEODE).getItemStack();
-            case 2 -> itemMap.get(ItemID.RARE_GEODE).getItemStack();
-            case 3 -> itemMap.get(ItemID.EPIC_GEODE).getItemStack();
-            case 4 -> itemMap.get(ItemID.LEGENDARY_GEODE).getItemStack();
+            case 0 -> itemManager.getLunixItem(ItemID.COMMON_GEODE).getItemStack();
+            case 1 -> itemManager.getLunixItem(ItemID.UNCOMMON_GEODE).getItemStack();
+            case 2 -> itemManager.getLunixItem(ItemID.RARE_GEODE).getItemStack();
+            case 3 -> itemManager.getLunixItem(ItemID.EPIC_GEODE).getItemStack();
+            case 4 -> itemManager.getLunixItem(ItemID.LEGENDARY_GEODE).getItemStack();
             default -> throw new IllegalStateException("Unexpected value: " + rarity);
         };
     }

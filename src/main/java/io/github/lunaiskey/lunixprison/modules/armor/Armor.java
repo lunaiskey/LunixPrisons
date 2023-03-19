@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,14 +23,14 @@ import java.util.Map;
 
 public class Armor {
 
-    private final ArmorSlot type;
+    private final ArmorSlot slot;
     private Color customColor;
     private int tier;
     private Map<AbilityType, Integer> abilties;
 
 
-    public Armor(ArmorSlot type, int tier, Color customColor, Map<AbilityType,Integer> abilityMap) {
-        this.type = type;
+    public Armor(@NotNull ArmorSlot slot, int tier, Color customColor, Map<AbilityType,Integer> abilityMap) {
+        this.slot = slot;
         this.customColor = customColor;
         this.tier = tier;
         if (abilityMap == null) abilityMap = new HashMap<>();
@@ -39,29 +40,28 @@ public class Armor {
         this.abilties = abilityMap;
     }
 
-    public Armor(ArmorSlot type) {
-        this(type,0,null,null);
+    public Armor(ArmorSlot slot) {
+        this(slot,0,null,null);
     }
 
-    public Armor(ArmorSlot type, int tier) {
-        this(type,tier,null,null);
+    public Armor(ArmorSlot slot, int tier) {
+        this(slot,tier,null,null);
     }
 
     public ItemStack getItemStack() {
-        ItemStack item = new ItemStack(getMaterial(type));
+        ItemStack item = new ItemStack(getMaterial(slot));
         ItemMeta meta = item.getItemMeta();
         if (tier == 0) {
-            meta.setDisplayName(StringUtil.color("&fStarter "+type.getName()));
+            meta.setDisplayName(StringUtil.color("&fStarter "+ slot.getName()));
         } else {
-            meta.setDisplayName(((GemStone) LunixPrison.getPlugin().getItemManager().getItemMap().get(getGemstone(tier))).getName()+" "+type.getName());
+            meta.setDisplayName(((GemStone) LunixPrison.getPlugin().getItemManager().getLunixItem(getGemstone(tier))).getName()+" "+ slot.getName());
         }
         List<String> lore = new ArrayList<>();
         lore.add(" ");
         lore.add(StringUtil.color("&f&lPiece Abilities:"));
         boolean hasAbilities = false;
-        Map<AbilityType, Ability> abilityMap = LunixPrison.getPlugin().getPlayerManager().getArmorAbilityMap();
         for (AbilityType type : AbilityType.getSortedList()) {
-            Ability ability = abilityMap.get(type);
+            Ability ability = type.getAbility();
             int level = abilties.get(type);
             if (level > 0) {
                 hasAbilities = true;
@@ -73,7 +73,7 @@ public class Armor {
         }
 
         lore.add(" ");
-    lore.add(ChatColor.of(getAWTTierColor(tier))+""+ChatColor.BOLD+"TIER "+tier+" "+type.name());
+    lore.add(ChatColor.of(getAWTTierColor(tier))+""+ChatColor.BOLD+"TIER "+tier+" "+ slot.name());
         meta.setLore(lore);
         meta.setUnbreakable(true);
         meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE,ItemFlag.HIDE_ATTRIBUTES,ItemFlag.HIDE_DYE);
@@ -88,7 +88,7 @@ public class Armor {
         } else {
             item.setItemMeta(meta);
         }
-        item = NBTTags.addLunixData(item,"id","LUNIX_ARMOR_"+type.name());
+        item = NBTTags.addLunixData(item,"id","LUNIX_ARMOR_"+ slot.name());
         return item;
     }
 
@@ -151,8 +151,8 @@ public class Armor {
         return 10;
     }
 
-    public ArmorSlot getType() {
-        return type;
+    public ArmorSlot getSlot() {
+        return slot;
     }
 
     public Map<AbilityType, Integer> getAbilties() {
@@ -163,7 +163,7 @@ public class Armor {
         if (tier == 0) {
             return Color.WHITE;
         } else if (tier <= getTierMax()) {
-            return Color.fromRGB(((GemStone) LunixPrison.getPlugin().getItemManager().getItemMap().get(getGemstone(tier))).getIntFromHex());
+            return Color.fromRGB(((GemStone) LunixPrison.getPlugin().getItemManager().getLunixItem(getGemstone(tier))).getIntFromHex());
         } else {
             return Color.BLACK;
         }

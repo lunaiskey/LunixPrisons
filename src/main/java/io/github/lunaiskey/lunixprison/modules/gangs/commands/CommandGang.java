@@ -174,15 +174,16 @@ public class CommandGang implements CommandExecutor {
             }
         }
         p.sendMessage(
-                StringUtil.color(
-                        "&a&m                                                  &r",
-                        " &7» &6Gang Name: &f"+ gang.getName(),
-                        " &7» &6Trophies: &f"+gang.getTrophies(),
-                        "",
-                        " &7» &eOwner: "+strings.get(0).toString(),
-                        " &7» &eMods: "+(strings.get(1).length() > 0 ? strings.get(1).toString() : "&f[]"),
-                        " &7» &eMembers: "+(strings.get(2).length() > 0 ? strings.get(2).toString() : "&f[]"),
-                        "&a&m                                                  &r")
+            StringUtil.color(
+                "&a&m                                                  &r",
+                " &7» &6Gang Name: &f"+ gang.getName(),
+                " &7» &6Trophies: &f"+gang.getTrophies(),
+                "",
+                " &7» &eOwner: "+strings.get(0).toString(),
+                " &7» &eMods: "+(strings.get(1).length() > 0 ? strings.get(1).toString() : "&f[]"),
+                " &7» &eMembers: "+(strings.get(2).length() > 0 ? strings.get(2).toString() : "&f[]"),
+                "&a&m                                                  &r"
+            )
         );
     }
     private void joinCommand(CommandSender sender, String[] args) {

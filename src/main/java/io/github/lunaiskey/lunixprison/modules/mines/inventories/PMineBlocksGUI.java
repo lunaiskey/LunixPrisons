@@ -1,8 +1,8 @@
 package io.github.lunaiskey.lunixprison.modules.mines.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.inventory.LunixPagedHolder;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
-import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
@@ -19,44 +19,39 @@ import java.util.*;
 
 public class PMineBlocksGUI implements LunixInventory {
 
-    private static Map<UUID,Material> editMap;
-    private static Map<UUID,Integer> pageMap;
+    private static Map<UUID,Material> editMap = new HashMap<>();
 
-    static {
-        editMap = new HashMap<>();
-        pageMap = new HashMap<>();
-    }
+    private static final int blocksPerPageSize = 45;
 
     @Override
     public Inventory getInv(Player p) {
-        Inventory inv = new LunixHolder("Blocks",54, LunixInvType.PMINE_BLOCKS).getInventory();
+        Inventory inv = new LunixPagedHolder("Blocks",54, LunixInvType.PMINE_BLOCKS).getInventory();
         init(inv,p);
         return inv;
     }
 
     public void init(Inventory inv, Player p) {
         PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
-        if (mine != null) {
-            List<Material> materialList = new ArrayList<>(mine.getComposition().keySet());
-            int totalPages = (((materialList.size() - materialList.size()%45)/45)+1);
-            for (int i = 0;i<inv.getSize();i++) {
-                switch (i) {
-                    case 1,2,3,5,6,7 -> inv.setItem(i,ItemBuilder.getDefaultFiller());
-                    case 0 -> inv.setItem(i,getPreviousPage(0));
-                    case 8 -> {
-                        int page = 2;
-                        if (page > totalPages) {
-                            inv.setItem(i,ItemBuilder.getDefaultFiller());
-                        } else {
-                            inv.setItem(i,getNextPage(2, totalPages));
-                        }
+        LunixPagedHolder holder = (LunixPagedHolder) inv.getHolder();
+        if (mine == null) {
+            return;
+        }
+        List<Material> materialList = new ArrayList<>(mine.getComposition().keySet());
+        for (int i = 0;i<inv.getSize();i++) {
+            switch (i) {
+                case 1,2,3,5,6,7 -> inv.setItem(i,ItemBuilder.getDefaultFiller());
+                case 0 -> inv.setItem(i,getPreviousPage(0));
+                case 8 -> {
+                    int page = holder.getPage();
+                    int totalPages = (((materialList.size()-materialList.size()% blocksPerPageSize)/blocksPerPageSize)+1);
+                    inv.setItem(i,getNextPage(page+1, totalPages));
+                }
+                case 4 -> inv.setItem(i, getToggleAllButton());
+                default -> {
+                    if (getIndex(i) >= materialList.size()) {
+                        return;
                     }
-                    case 4 -> inv.setItem(i,getMiddleButton());
-                    default -> {
-                        if (getIndex(i) < materialList.size()) {
-                            inv.setItem(i,getBlockItem(materialList.get(getIndex(i)),p));
-                        }
-                    }
+                    inv.setItem(i,getBlockItem(materialList.get(getIndex(i)),p));
                 }
             }
         }
@@ -64,12 +59,16 @@ public class PMineBlocksGUI implements LunixInventory {
 
     private void updateGUI(Player p) {
         Inventory inv = p.getOpenInventory().getTopInventory();
+        if (!(inv.getHolder() instanceof LunixPagedHolder)) {
+            return;
+        }
+        LunixPagedHolder holder = (LunixPagedHolder) inv.getHolder();
         PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
         List<Material> materialList = new ArrayList<>(mine.getComposition().keySet());
-        int totalPages = (((materialList.size() - materialList.size()%45)/45)+1);
-        int page = pageMap.get(p.getUniqueId());
-        int pageOffset = page*45;
-        for (int i = 0;i<45;i++) {
+        int totalPages = (((materialList.size()-materialList.size()% blocksPerPageSize)/blocksPerPageSize)+1);
+        int page = holder.getPage();
+        int pageOffset = page*blocksPerPageSize;
+        for (int i = 0;i<blocksPerPageSize;i++) {
             if (pageOffset+i < materialList.size()) {
                 Material mat = materialList.get(pageOffset+i);
                 inv.setItem(getSlot(i),getBlockItem(mat,p));
@@ -77,8 +76,8 @@ public class PMineBlocksGUI implements LunixInventory {
                 inv.setItem(getSlot(i),new ItemStack(Material.AIR));
             }
         }
-        inv.setItem(0,getPreviousPage(page));
-        inv.setItem(8,getNextPage(page+2,totalPages));
+        inv.setItem(0,getPreviousPage(page-1));
+        inv.setItem(8,getNextPage(page+1,totalPages));
     }
 
 
@@ -91,6 +90,10 @@ public class PMineBlocksGUI implements LunixInventory {
     @Override
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
+        if (!(e.getInventory().getHolder() instanceof LunixPagedHolder)) {
+            return;
+        }
+        LunixPagedHolder holder = (LunixPagedHolder) e.getInventory().getHolder();
         Player p = (Player) e.getWhoClicked();
         ItemStack item = e.getCurrentItem();
         Inventory inv = e.getClickedInventory();
@@ -98,23 +101,23 @@ public class PMineBlocksGUI implements LunixInventory {
         List<Material> materialList = new ArrayList<>(mine.getComposition().keySet());
         Map<Material,Double> mineComposition = mine.getComposition();
         int slot = e.getRawSlot();
-        int page = pageMap.get(p.getUniqueId());
+        int page = holder.getPage();
         int totalPages = ((materialList.size() - materialList.size()%45)/45)+1;
         ClickType clickType = e.getClick();
         if (e.getClickedInventory() == e.getView().getTopInventory()) {
             switch (slot) {
                 case 0 -> {
-                    if (page > 0) {
-                        pageMap.put(p.getUniqueId(),page-1);
+                    if (page > 1) {
+                        holder.setPage(page-1);
                         updateGUI(p);
-                    } else {
-                        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new PMineGUI().getInv(p)));
+                        return;
                     }
+                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.openInventory(new PMineGUI().getInv(p)));
                 }
                 case 4 -> {
                     switch (clickType) {
                         case LEFT,SHIFT_LEFT -> {
-                            if (!(mine.getDisabledBlocks().size() <= 0)) {
+                            if (!(mine.getDisabledBlocks().size() == 0)) {
                                 mine.getDisabledBlocks().clear();
                                 updateGUI(p);
                             }
@@ -129,25 +132,28 @@ public class PMineBlocksGUI implements LunixInventory {
                 }
                 case 8 -> {
                     if (totalPages-1 > page) {
-                        pageMap.put(p.getUniqueId(),page+1);
+                        holder.setPage(page+1);
                         updateGUI(p);
                     }
                 }
+                case 1,2,3,5,6,7 -> {}
                 default -> {
-                    if (slot >= 9) {
-                        if (item != null && item.getType() != Material.AIR) {
-                            if (clickType == ClickType.LEFT || clickType == ClickType.SHIFT_LEFT) {
-                                editMap.put(p.getUniqueId(),item.getType());
-                                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),p::closeInventory);
-                                e.getWhoClicked().sendMessage("Type a number into chat to set the percentage.");
-                            } else if (clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT) {
-                                if (mine.getDisabledBlocks().contains(item.getType())) {
-                                    mine.getDisabledBlocks().remove(item.getType());
-                                    inv.setItem(slot,getBlockItem(item.getType(),p));
-                                } else {
-                                    mine.getDisabledBlocks().add(item.getType());
-                                    inv.setItem(slot,getBlockItem(item.getType(),p));
-                                }
+                    if (item == null || item.getType() == Material.AIR) {
+                        return;
+                    }
+                    switch (clickType) {
+                        case LEFT,SHIFT_LEFT ->{
+                            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),p::closeInventory);
+                            editMap.put(p.getUniqueId(),item.getType());
+                            e.getWhoClicked().sendMessage("Type a number into chat to set the percentage.");
+                        }
+                        case RIGHT,SHIFT_RIGHT -> {
+                            if (mine.getDisabledBlocks().contains(item.getType())) {
+                                mine.getDisabledBlocks().remove(item.getType());
+                                inv.setItem(slot,getBlockItem(item.getType(),p));
+                            } else {
+                                mine.getDisabledBlocks().add(item.getType());
+                                inv.setItem(slot,getBlockItem(item.getType(),p));
                             }
                         }
                     }
@@ -161,14 +167,14 @@ public class PMineBlocksGUI implements LunixInventory {
 
     }
 
+    @Override
     public void onOpen(InventoryOpenEvent e) {
-        Player player = (Player) e.getPlayer();
-        pageMap.put(player.getUniqueId(),0);
+        editMap.remove(e.getPlayer().getUniqueId());
     }
 
+    @Override
     public void onClose(InventoryCloseEvent e) {
-        Player player = (Player) e.getPlayer();
-        pageMap.remove(player.getUniqueId());
+
     }
 
     private ItemStack getBlockItem(Material material, Player p) {
@@ -188,16 +194,12 @@ public class PMineBlocksGUI implements LunixInventory {
         return ItemBuilder.createItem(null,material,lore);
     }
 
-    private ItemStack getMiddleButton() {
+    private ItemStack getToggleAllButton() {
         List<String> lore = new ArrayList<>();
         lore.add(" ");
         lore.add(StringUtil.color("&eL-Click to enable all"));
         lore.add(StringUtil.color("&aR-Click to disable all"));
         return ItemBuilder.createItem("&fToggle all blocks",Material.OBSIDIAN,lore);
-    }
-
-    public static Map<UUID, Material> getEditMap() {
-        return editMap;
     }
 
     private int getSlot(int index) {
@@ -207,15 +209,19 @@ public class PMineBlocksGUI implements LunixInventory {
         return slot-9;
     }
 
-    private ItemStack getPreviousPage(int slot) {
-        return slot <= 0 ? ItemBuilder.getGoBack() : ItemBuilder.getPreviousPage(slot);
+    private ItemStack getPreviousPage(int page) {
+        return page <= 0 ? ItemBuilder.getGoBack() : ItemBuilder.getPreviousPage(page);
     }
 
-    private ItemStack getNextPage(int slot, int totalPages) {
-        if (slot > totalPages) {
-            return ItemBuilder.createItem(" ",Material.BLACK_STAINED_GLASS_PANE,null);
+    private ItemStack getNextPage(int page, int totalPages) {
+        if (page > totalPages) {
+            return ItemBuilder.getDefaultFiller();
         } else {
-            return ItemBuilder.getNextPage(slot);
+            return ItemBuilder.getNextPage(page);
         }
+    }
+
+    public static Map<UUID, Material> getEditMap() {
+        return editMap;
     }
 }

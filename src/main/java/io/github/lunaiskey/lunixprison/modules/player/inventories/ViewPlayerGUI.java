@@ -14,7 +14,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -49,7 +48,7 @@ public class ViewPlayerGUI implements LunixInventory {
                 case 12 -> inv.setItem(i, lunixPlayer.getChestplate().getItemStack());
                 case 14 -> inv.setItem(i, lunixPlayer.getLeggings().getItemStack());
                 case 16 -> inv.setItem(i, lunixPlayer.getBoots().getItemStack());
-                case 30 -> inv.setItem(i, lunixPlayer.getPickaxe().getItemStack());
+                case 30 -> inv.setItem(i, lunixPlayer.getPickaxeStorage().getItemStack());
                 case 32 -> inv.setItem(i,getPlayerStats(p));
                 default -> inv.setItem(i, ItemBuilder.getDefaultFiller());
             }

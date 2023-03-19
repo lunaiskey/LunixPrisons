@@ -152,7 +152,7 @@ public class CommandArmor implements CommandExecutor {
             sender.sendMessage("Invalid number.");
             return;
         }
-        Ability ability = LunixPrison.getPlugin().getPlayerManager().getArmorAbilityMap().get(abilityType);
+        Ability ability = abilityType.getAbility();
         if (level < 0) {
             level = 0;
         } else if (level > ability.getMaxLevel()) {

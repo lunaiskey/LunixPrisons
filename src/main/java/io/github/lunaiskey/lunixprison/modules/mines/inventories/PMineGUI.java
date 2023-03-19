@@ -35,7 +35,7 @@ public class PMineGUI implements LunixInventory {
     private void init(Inventory inv, Player p) {
         for (int i = 0; i < inv.getSize();i++) {
             switch(i) {
-                case 0,9,18,27,36,45,8,17,26,35,44,53 -> inv.setItem(i, ItemBuilder.getDefaultEdgeFilder());
+                case 0,9,18,27,36,45,8,17,26,35,44,53 -> inv.setItem(i, ItemBuilder.getDefaultEdgeFiller());
                 case 11 -> inv.setItem(i, getPublicMines());
                 case 13 -> inv.setItem(i, getInvitedMines());
                 case 15 -> inv.setItem(i,getGangMines());

@@ -6,6 +6,7 @@ authors: [ Lunaiskey ]
 softdepend:
   - PlaceholderAPI
 description: A Continuation of the old PyrexPrison plugin.
+
 commands:
   gang:
     usage: /<command>
@@ -36,7 +37,8 @@ commands:
     usage: /<command>
   multiplier:
     usage: /<command>
-    aliases: [multi]
+    aliases:
+      - multi
   litem:
     usage: /<command>
   viewplayer:
@@ -58,6 +60,15 @@ commands:
     usage: /<command>
     aliases:
       - cb
+  settings:
+    usage: /<command>
+  namecolor:
+    usage: /<command>
+  chatcolor:
+    usage: /<command>
+  lunixdebug:
+    usage: /<command>
+
 permissions:
   lunix.*:
     description: Gives access to every command.

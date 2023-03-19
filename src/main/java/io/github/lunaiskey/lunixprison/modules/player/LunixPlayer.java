@@ -4,7 +4,7 @@ import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixPickaxe;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeStorage;
 import io.github.lunaiskey.lunixprison.modules.armor.Armor;
 import io.github.lunaiskey.lunixprison.modules.armor.ArmorSlot;
 import io.github.lunaiskey.lunixprison.modules.armor.upgrades.AbilityType;
@@ -12,11 +12,12 @@ import io.github.lunaiskey.lunixprison.modules.armor.upgrades.abilitys.SalesBoos
 import io.github.lunaiskey.lunixprison.modules.armor.upgrades.abilitys.XPBoost;
 import io.github.lunaiskey.lunixprison.modules.boosters.Booster;
 import io.github.lunaiskey.lunixprison.modules.boosters.BoosterType;
-import io.github.lunaiskey.lunixprison.util.StringUtil;
-import org.bukkit.Bukkit;
+import io.github.lunaiskey.lunixprison.modules.player.chatcolor.LunixChatColor;
+import io.github.lunaiskey.lunixprison.modules.player.datastorages.ArmorStorage;
+import io.github.lunaiskey.lunixprison.modules.player.datastorages.ChatColorStorage;
+import io.github.lunaiskey.lunixprison.modules.player.datastorages.CurrencyStorage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,66 +25,64 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class LunixPlayer {
-    private BigInteger tokens;
-    private long gems;
-    private long lunixPoints;
-    private int rank;
+
     private final UUID pUUID;
     private String name;
-    private LunixPickaxe pickaxe;
-    private Map<ArmorSlot,Armor> armor;
-    private boolean isArmorEquiped;
-    private ItemID selectedGemstone;
-    private int gemstoneCount;
-
+    private int rank;
+    private final CurrencyStorage currencyStorage;
+    private PickaxeStorage pickaxeStorage;
+    private final ArmorStorage armorStorage;
+    private ChatColorStorage chatColorStorage;
     private List<Booster> boosters;
-
     private Map<BoosterType,Integer> maxBooster;
-
     private ChatReplyType chatReplyType = null;
-    private BigInteger cashback;
 
-    public LunixPlayer(UUID pUUID, String name, BigInteger tokens, long gems, long lunixPoints, int rank, LunixPickaxe pickaxe, boolean isArmorEquiped, Map<ArmorSlot,Armor> armor, ItemID selectedGemstone, int gemstoneCount, List<Booster> boosters, BigInteger cashback) {
+
+    public LunixPlayer(UUID pUUID, String name, int rank,CurrencyStorage currencyStorage, PickaxeStorage pickaxeStorage, ArmorStorage armorStorage, ChatColorStorage chatColorStorage, List<Booster> boosters) {
         this.pUUID = pUUID;
         this.name = name;
-        this.tokens = tokens;
-        this.gems = gems;
-        this.lunixPoints = lunixPoints;
         this.rank = rank;
-        if (pickaxe == null) {
-            pickaxe = new LunixPickaxe(pUUID);
+        if (currencyStorage == null) {
+            currencyStorage = new CurrencyStorage();
         }
-        this.pickaxe = pickaxe;
-        this.isArmorEquiped = isArmorEquiped;
-        this.gemstoneCount = gemstoneCount;
-        this.armor = Objects.requireNonNullElseGet(armor, LinkedHashMap::new);
-        this.armor.putIfAbsent(ArmorSlot.HELMET,new Armor(ArmorSlot.HELMET));
-        this.armor.putIfAbsent(ArmorSlot.CHESTPLATE,new Armor(ArmorSlot.CHESTPLATE));
-        this.armor.putIfAbsent(ArmorSlot.LEGGINGS,new Armor(ArmorSlot.LEGGINGS));
-        this.armor.putIfAbsent(ArmorSlot.BOOTS,new Armor(ArmorSlot.BOOTS));
-        this.selectedGemstone = Objects.requireNonNullElse(selectedGemstone, ItemID.AMETHYST_GEMSTONE);
+        this.currencyStorage = currencyStorage;
+        if (pickaxeStorage == null) {
+            pickaxeStorage = new PickaxeStorage(pUUID);
+        }
+        this.pickaxeStorage = pickaxeStorage;
+        if (armorStorage == null) {
+            armorStorage = new ArmorStorage();
+        }
+        this.armorStorage = armorStorage;
+        if (chatColorStorage == null) {
+            chatColorStorage = new ChatColorStorage();
+        }
+        this.chatColorStorage = chatColorStorage;
         this.boosters = Objects.requireNonNullElseGet(boosters, ArrayList::new);
-        this.cashback = cashback;
     }
 
     public LunixPlayer(UUID pUUID, String name) {
-        this(pUUID,name,BigInteger.ZERO,0,0,0,new LunixPickaxe(pUUID),false,null,ItemID.AMETHYST_GEMSTONE,0,null,BigInteger.ZERO);
+        this(pUUID,name,0,null,null,null,null,null);
+    }
+
+    public UUID getpUUID() {
+        return pUUID;
     }
 
     public String getName() {
         return name;
     }
 
-    public long getGems() {
-        return gems;
+    public BigInteger getTokens() {
+        return currencyStorage.getTokens();
     }
 
-    public BigInteger getTokens() {
-        return tokens;
+    public long getGems() {
+        return currencyStorage.getGems();
     }
 
     public long getLunixPoints() {
-        return lunixPoints;
+        return currencyStorage.getLunixPoints();
     }
 
     public BigInteger getCurrency(CurrencyType type) {
@@ -100,32 +99,29 @@ public class LunixPlayer {
         return rank;
     }
 
-    public UUID getpUUID() {
-        return pUUID;
-    }
 
-    public LunixPickaxe getPickaxe() {
-        return pickaxe;
+    public PickaxeStorage getPickaxeStorage() {
+        return pickaxeStorage;
     }
 
     public Map<ArmorSlot, Armor> getArmor() {
-        return armor;
+        return armorStorage.getArmor();
     }
 
     public Armor getHelmet() {
-        return armor.get(ArmorSlot.HELMET);
+        return armorStorage.getArmor().get(ArmorSlot.HELMET);
     }
 
     public Armor getChestplate() {
-        return armor.get(ArmorSlot.CHESTPLATE);
+        return armorStorage.getArmor().get(ArmorSlot.CHESTPLATE);
     }
 
     public Armor getLeggings() {
-        return armor.get(ArmorSlot.LEGGINGS);
+        return armorStorage.getArmor().get(ArmorSlot.LEGGINGS);
     }
 
     public Armor getBoots() {
-        return armor.get(ArmorSlot.BOOTS);
+        return armorStorage.getArmor().get(ArmorSlot.BOOTS);
     }
 
     public List<Booster> getBoosters() {
@@ -137,23 +133,23 @@ public class LunixPlayer {
     }
 
     public BigInteger getCashback() {
-        return cashback;
+        return currencyStorage.getCashback();
     }
 
     public boolean isArmorEquiped() {
-        return isArmorEquiped;
+        return armorStorage.isArmorEquiped();
     }
 
     public void setGems(long gems) {
-        this.gems = gems;
+        currencyStorage.setGems(gems);
     }
 
     public void setTokens(BigInteger tokens) {
-        this.tokens = tokens;
+        currencyStorage.setTokens(tokens);
     }
 
     public void setLunixPoints(long lunixPoints) {
-        this.lunixPoints = lunixPoints;
+        currencyStorage.setLunixPoints(lunixPoints);
     }
 
     public void setName(String name) {
@@ -171,11 +167,11 @@ public class LunixPlayer {
     }
 
     public void setArmorEquiped(boolean armorEquiped) {
-        isArmorEquiped = armorEquiped;
+        armorStorage.setArmorEquiped(armorEquiped);
     }
 
-    public void setPickaxe(LunixPickaxe pickaxe) {
-        this.pickaxe = pickaxe;
+    public void setPickaxeStorage(PickaxeStorage pickaxeStorage) {
+        this.pickaxeStorage = pickaxeStorage;
     }
 
     public void setChatReplyType(ChatReplyType chatReplyType) {
@@ -183,57 +179,42 @@ public class LunixPlayer {
     }
 
     public void setCashback(BigInteger cashback) {
-        this.cashback = cashback;
+        currencyStorage.setCashback(cashback);
     }
 
-    public void giveTokens(BigInteger tokens) {this.tokens = this.tokens.add(tokens);}
-    public void giveTokens(long tokens) {this.tokens = this.tokens.add(BigInteger.valueOf(tokens));}
+    public void giveTokens(BigInteger tokens) { currencyStorage.giveTokens(tokens); }
+    public void giveTokens(long tokens) { currencyStorage.giveTokens(tokens); }
     public void giveGems(long gems) {
-        this.gems += gems;
+        currencyStorage.giveGems(gems);
     }
-    public void giveLunixPoints(long pyrexPoints) {
-        this.lunixPoints += pyrexPoints;
+    public void giveLunixPoints(long lunixPoints) {
+        currencyStorage.giveLunixPoints(lunixPoints);
     }
 
     public void giveCurrency(CurrencyType type, long amount) {
-        giveCurrency(type, BigInteger.valueOf(amount));
+        currencyStorage.giveCurrency(type,amount);
     }
 
     public void giveCurrency(CurrencyType type, BigInteger amount) {
-        switch (type) {
-            case GEMS -> giveGems(amount.longValue());
-            case LUNIX_POINTS -> giveLunixPoints(amount.longValue());
-            case TOKENS -> giveTokens(amount);
-        }
+        currencyStorage.giveCurrency(type,amount);
     }
 
     public void takeTokens(BigInteger tokens, boolean giveCashBack) {
-        if (giveCashBack) {
-            cashback = cashback.add(tokens.divide(new BigInteger("20")));
-            Player player = Bukkit.getPlayer(pUUID);
-            if (player != null) {
-                player.sendMessage(StringUtil.color("&aYou gained some cashback, check /cashback"));
-            }
-        }
-        this.tokens = this.tokens.subtract(tokens);
+        currencyStorage.takeTokens(tokens,giveCashBack,pUUID);
     }
     public void takeGems(long gems) {
-        this.gems -= gems;
+        currencyStorage.takeGems(gems);
     }
     public void takeLunixPoints(long lunixPoints) {
-        this.lunixPoints -= lunixPoints;
+        currencyStorage.takeLunixPoints(lunixPoints);
     }
 
     public void takeCurrency(CurrencyType type, BigInteger amount, boolean giveCashBack) {
-        switch (type) {
-            case GEMS -> takeGems(amount.longValue());
-            case LUNIX_POINTS -> takeLunixPoints(amount.longValue());
-            case TOKENS -> takeTokens(amount,giveCashBack);
-        }
+        currencyStorage.takeCurrency(type,amount,giveCashBack,pUUID);
     }
 
     public void setArmor(Map<ArmorSlot, Armor> armor) {
-        this.armor = armor;
+        armorStorage.setArmor(armor);
     }
 
     public double getBaseMultiplier() {
@@ -251,7 +232,7 @@ public class LunixPlayer {
 
     public double getArmorMultiplier() {
         double multiplier = 0;
-        SalesBoost boost = (SalesBoost) LunixPrison.getPlugin().getPlayerManager().getArmorAbilityMap().get(AbilityType.SALES_BOOST);
+        SalesBoost boost = (SalesBoost) AbilityType.SALES_BOOST.getAbility();
         for (Armor armor : getArmor().values()) {
             multiplier += boost.getMultiplier(armor.getAbilties().get(AbilityType.SALES_BOOST));
         }
@@ -273,7 +254,7 @@ public class LunixPlayer {
 
     public int getXPBoostTotal() {
         int total = 0;
-        XPBoost boost = (XPBoost) LunixPrison.getPlugin().getPlayerManager().getArmorAbilityMap().get(AbilityType.XP_BOOST);
+        XPBoost boost = (XPBoost) AbilityType.XP_BOOST.getAbility();
         for (Armor armor : getArmor().values()) {
             total += boost.getBoost(armor.getAbilties().get(AbilityType.XP_BOOST));
         }
@@ -289,27 +270,23 @@ public class LunixPlayer {
     }
 
     public ItemID getSelectedGemstone() {
-        if (selectedGemstone.name().contains("_GEMSTONE")) {
-            return selectedGemstone;
-        } else {
-            return ItemID.AMETHYST_GEMSTONE;
-        }
+        return armorStorage.getSelectedGemstone();
     }
 
     public void setSelectedGemstone(ItemID selectedGemstone) {
-        if (selectedGemstone.name().contains("_GEMSTONE")) {
-            this.selectedGemstone = selectedGemstone;
-        } else {
-            this.selectedGemstone = ItemID.AMETHYST_GEMSTONE;
-        }
+        armorStorage.setSelectedGemstone(selectedGemstone);
     }
 
     public int getGemstoneCount() {
-        return gemstoneCount;
+        return armorStorage.getGemstoneCount();
     }
 
     public void setGemstoneCount(int gemstoneCount) {
-        this.gemstoneCount = gemstoneCount;
+        armorStorage.setGemstoneCount(gemstoneCount);
+    }
+
+    public ChatColorStorage getChatColorStorage() {
+        return chatColorStorage;
     }
 
     public void save() {
@@ -319,6 +296,7 @@ public class LunixPlayer {
         saveCurrencyData(data);
         savePickaxeData(data);
         saveArmorData(data);
+        saveNameAndTextColorData(data);
         try {
             data.save(file);
         } catch (IOException e) {
@@ -330,40 +308,40 @@ public class LunixPlayer {
     private void saveRootData(FileConfiguration data) {
         data.set("name",name);
         data.set("rank",rank);
-        data.set("selectedGemstone",selectedGemstone.name());
-        data.set("gemstoneCount",gemstoneCount);
-        data.set("cashback",cashback);
+        data.set("selectedGemstone",armorStorage.getSelectedGemstone().name());
+        data.set("gemstoneCount",armorStorage.getGemstoneCount());
+        data.set("cashback",currencyStorage.getCashback());
     }
 
     private void saveCurrencyData(FileConfiguration data) {
         Map<String, Object> currencyMap = new LinkedHashMap<>();
-        currencyMap.put("tokens", tokens);
-        currencyMap.put("gems", gems);
-        currencyMap.put("lunixpoints", lunixPoints);
+        currencyMap.put("tokens", currencyStorage.getTokens());
+        currencyMap.put("gems", currencyStorage.getGems());
+        currencyMap.put("lunixpoints", currencyStorage.getLunixPoints());
         data.createSection("currencies", currencyMap);
     }
 
     private void savePickaxeData(FileConfiguration data) {
         Map<String, Object> pickaxeData = new LinkedHashMap<>();
-        pickaxeData.put("blocksBroken",pickaxe.getBlocksBroken());
+        pickaxeData.put("blocksBroken", pickaxeStorage.getBlocksBroken());
         Map<String, Object> enchantMap = new LinkedHashMap<>();
         List<String> disabledEnchantsList = new ArrayList<>();
-        for (EnchantType type : pickaxe.getEnchants().keySet()) {
-            enchantMap.put(type.name(),pickaxe.getEnchants().get(type));
+        for (EnchantType type : pickaxeStorage.getEnchants().keySet()) {
+            enchantMap.put(type.name(), pickaxeStorage.getEnchants().get(type));
         }
         pickaxeData.put("enchants",enchantMap);
-        for (EnchantType type : pickaxe.getDisabledEnchants()) {
+        for (EnchantType type : pickaxeStorage.getDisabledEnchants()) {
             disabledEnchantsList.add(type.name());
         }
         pickaxeData.put("disabledEnchants",disabledEnchantsList);
-        pickaxeData.put("rename",pickaxe.getRename());
+        pickaxeData.put("rename", pickaxeStorage.getRename());
         data.createSection("pickaxe", pickaxeData);
     }
 
     private void saveArmorData(FileConfiguration data) {
         Map<String, Object> armorData = new LinkedHashMap<>();
-        armorData.put("isArmorEquiped",isArmorEquiped);
-        for (Armor armor : armor.values()) {
+        armorData.put("isArmorEquiped",armorStorage.isArmorEquiped());
+        for (Armor armor : armorStorage.getArmor().values()) {
             Map<String, Object> pieceData = new LinkedHashMap<>();
             pieceData.put("tier",armor.getTier());
             if (armor.hasCustomColor()) {
@@ -379,8 +357,39 @@ public class LunixPlayer {
             if (abilityData.size() > 0) {
                 pieceData.put("abilities",abilityData);
             }
-            armorData.put(armor.getType().name(),pieceData);
+            armorData.put(armor.getSlot().name(),pieceData);
         }
         data.createSection("armor",armorData);
+    }
+
+    private void saveNameAndTextColorData(FileConfiguration data) {
+        Map<String, Object> nameAndTextColorData = new LinkedHashMap<>();
+
+        //Saves Chat UserName Color Data
+        Map<String,Object> nameColorData = new LinkedHashMap<>();
+        if (chatColorStorage.getSelectedNameColor() != null) nameColorData.put("selectedColor",chatColorStorage.getSelectedNameColor().name());
+        List<String> selectedFormats = new ArrayList<>();
+        for (LunixChatColor color : chatColorStorage.getSelectedNameFormats()) {
+            selectedFormats.add(color.name());
+        }
+        nameColorData.put("selectedFormats",selectedFormats);
+        List<String> unlockedNameColorAndFormats = new ArrayList<>();
+        for (LunixChatColor color : chatColorStorage.getUnlockedNameColorAndFormats()) {
+            unlockedNameColorAndFormats.add(color.name());
+        }
+        nameColorData.put("unlockedColorsAndFormats",unlockedNameColorAndFormats);
+        nameAndTextColorData.put("name",nameColorData);
+
+        //Saves Chat Text Color Data
+        Map<String,Object> textColorData = new LinkedHashMap<>();
+        if (chatColorStorage.getSelectedTextColor() != null) textColorData.put("selectedColor",chatColorStorage.getSelectedTextColor().name());
+        List<String> unlockedTextColorAndFormats = new ArrayList<>();
+        for (LunixChatColor color : chatColorStorage.getUnlockedTextColors()) {
+            unlockedTextColorAndFormats.add(color.name());
+        }
+        textColorData.put("unlockedColorsAndFormats",unlockedTextColorAndFormats);
+        nameAndTextColorData.put("text",textColorData);
+
+        data.createSection("chatcolor",nameAndTextColorData);
     }
 }

@@ -5,6 +5,7 @@ import io.github.lunaiskey.lunixprison.modules.mines.generator.PMineWorld;
 import io.github.lunaiskey.lunixprison.modules.mines.upgrades.PMineUpgradeType;
 import io.github.lunaiskey.lunixprison.util.nms.NMSBlockChange;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.util.nms.NMSWorldBorder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -433,5 +434,12 @@ public class PMine {
 
     public long getArea() {
         return ((long) max.getBlockX()-min.getBlockX()+1) * ((long) max.getBlockZ()-min.getBlockZ()+1) * ((long) max.getBlockY()-min.getBlockY()+1);
+    }
+
+    public void sendBorder(Player player) {
+        if (!player.getLocation().getWorld().getName().equals(PMineWorld.getWorldName())) {
+            return;
+        }
+        new NMSWorldBorder().sendBorder(player,225+1,getCenter().getBlockX(),getCenter().getBlockZ());
     }
 }

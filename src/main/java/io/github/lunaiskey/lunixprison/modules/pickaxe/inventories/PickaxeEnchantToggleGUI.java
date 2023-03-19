@@ -6,7 +6,7 @@ import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixEnchant;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixPickaxe;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeStorage;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -48,12 +48,12 @@ public class PickaxeEnchantToggleGUI implements LunixInventory {
     }
 
     private ItemStack getEnchantPlaceholder(EnchantType type, Player p) {
-        LunixPickaxe lunixPickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
+        PickaxeStorage pickaxeStorage = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxeStorage();
         LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type);
         String name = StringUtil.color("&b" + enchant.getName());
         String status;
         Material mat;
-        if (lunixPickaxe.getDisabledEnchants().contains(type)) {
+        if (pickaxeStorage.getDisabledEnchants().contains(type)) {
             status = "&cDisabled";
             mat = Material.GRAY_DYE;
         } else {
@@ -81,8 +81,8 @@ public class PickaxeEnchantToggleGUI implements LunixInventory {
     @Override
     public void onClick(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        LunixPickaxe lunixPickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxe();
-        Set<EnchantType> disabledEnchants = lunixPickaxe.getDisabledEnchants();
+        PickaxeStorage pickaxeStorage = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxeStorage();
+        Set<EnchantType> disabledEnchants = pickaxeStorage.getDisabledEnchants();
         e.setCancelled(true);
         int slot = e.getRawSlot();
         Inventory inv = e.getClickedInventory();

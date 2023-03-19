@@ -2,6 +2,7 @@ package io.github.lunaiskey.lunixprison.modules.mines.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
+import io.github.lunaiskey.lunixprison.modules.player.ChatReplyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
@@ -21,9 +22,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 
 public class PMineSettingsGUI implements LunixInventory {
-
-    private static Set<UUID> taxEditSet = new HashSet<>();
-    private static Set<UUID> kickPlayerSet = new HashSet<>();
 
     @Override
     public Inventory getInv(Player player) {
@@ -67,14 +65,14 @@ public class PMineSettingsGUI implements LunixInventory {
                 e.getClickedInventory().setItem(slot,getTogglePublic(player));
             }
             case 13 -> {
-                getTaxEditSet().add(player.getUniqueId());
-                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->player.closeInventory());
+                lunixPlayer.setChatReplyType(ChatReplyType.PMINE_TAX_EDIT);
+                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), player::closeInventory);
                 player.sendMessage(StringUtil.color("Type in your new tax value."));
             }
             case 14 -> {
-                kickPlayerSet.add(player.getUniqueId());
+                lunixPlayer.setChatReplyType(ChatReplyType.PMINE_KICK_PLAYER);
                 player.sendMessage(StringUtil.color("Type in the player's name that you want to kick."));
-                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()-> player.closeInventory());
+                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), player::closeInventory);
             }
             case 15 -> {
                 int counter = 0;
@@ -88,7 +86,7 @@ public class PMineSettingsGUI implements LunixInventory {
                     }
                 }
                 player.sendMessage(StringUtil.color("&aSuccessfully kicked "+counter+" Players."));
-                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()-> player.closeInventory());
+                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), player::closeInventory);
             }
         }
     }
@@ -163,15 +161,6 @@ public class PMineSettingsGUI implements LunixInventory {
         lore.add(StringUtil.color("&7are currently in your mine."));
         lore.add(" ");
         lore.add(StringUtil.color("&eClick to kick all!"));
-        return ItemBuilder.createItem(name,Material.PLAYER_HEAD,lore);
-    }
-
-
-    public static Set<UUID> getTaxEditSet() {
-        return taxEditSet;
-    }
-
-    public static Set<UUID> getKickPlayerSet() {
-        return kickPlayerSet;
+        return ItemBuilder.createItem(name, Material.PLAYER_HEAD, lore);
     }
 }

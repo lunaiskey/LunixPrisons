@@ -2,7 +2,7 @@ package io.github.lunaiskey.lunixprison.modules.items.gui;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixPickaxe;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeStorage;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
@@ -38,7 +38,7 @@ public class RenameTagConfirmGUI implements LunixInventory {
 
     @Override
     public Inventory getInv(Player player) {
-        Inventory inv = new LunixRenameTagHolder("Confirm Rename",27,LunixInvType.RENAME_TAG_CONFIRM,renameText).getInventory();
+        Inventory inv = new LunixRenameTagHolder("Confirm Rename", 27, LunixInvType.RENAME_TAG_CONFIRM, renameText).getInventory();
         init(inv,player);
         return inv;
     }
@@ -55,7 +55,7 @@ public class RenameTagConfirmGUI implements LunixInventory {
     }
 
     private ItemStack getPickaxePreview() {
-        ItemStack item = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(playerUUID).getPickaxe().getItemStack();
+        ItemStack item = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(playerUUID).getPickaxeStorage().getItemStack();
         ItemMeta itemMeta = item.getItemMeta();
         itemMeta.setDisplayName(StringUtil.color(renameText));
         item.setItemMeta(itemMeta);
@@ -71,11 +71,11 @@ public class RenameTagConfirmGUI implements LunixInventory {
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
         Player player = (Player) e.getWhoClicked();
-        LunixPickaxe lunixPickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId()).getPickaxe();
+        PickaxeStorage pickaxeStorage = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId()).getPickaxeStorage();
         LunixRenameTagHolder tagHolder = (LunixRenameTagHolder) e.getView().getTopInventory().getHolder();
         switch (e.getRawSlot()) {
             case 0,1,2,9,10,11,18,19,20 -> {
-                lunixPickaxe.setRename(StringUtil.color(tagHolder.getText()));
+                pickaxeStorage.setRename(StringUtil.color(tagHolder.getText()));
                 LunixPrison.getPlugin().getPickaxeHandler().updateInventoryPickaxe(player);
                 if (NBTTags.getItemID(player.getInventory().getItemInMainHand()) == ItemID.RENAME_TAG) {
                     ItemStack main = player.getInventory().getItemInMainHand();
@@ -86,11 +86,14 @@ public class RenameTagConfirmGUI implements LunixInventory {
                 } else {
                     ItemStack[] itemStacks = player.getInventory().getStorageContents();
                     for (int i = 0;i<itemStacks.length;i++) {
-                        if (NBTTags.getItemID(itemStacks[i]) == ItemID.RENAME_TAG) {
-                            ItemStack slotItem = itemStacks[i].clone();
-                            slotItem.setAmount(slotItem.getAmount()-1);
-                            player.getInventory().setItem(i,slotItem);
+                        ItemID itemID = NBTTags.getItemID(itemStacks[i]);
+                        if (itemID != ItemID.RENAME_TAG) {
+                            continue;
                         }
+                        ItemStack slotItem = itemStacks[i].clone();
+                        slotItem.setAmount(slotItem.getAmount()-1);
+                        player.getInventory().setItem(i,slotItem);
+                        break;
                     }
                 }
                 player.sendMessage(StringUtil.color("&aSuccessfully renamed your pickaxe to "+tagHolder.getText()+"&a."));
@@ -115,7 +118,7 @@ public class RenameTagConfirmGUI implements LunixInventory {
 
     }
 
-    public class LunixRenameTagHolder extends LunixHolder {
+    public static class LunixRenameTagHolder extends LunixHolder {
 
         private String text;
 

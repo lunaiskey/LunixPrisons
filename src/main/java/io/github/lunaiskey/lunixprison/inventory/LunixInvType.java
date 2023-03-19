@@ -8,7 +8,9 @@ import io.github.lunaiskey.lunixprison.modules.mines.inventories.*;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchantAddLevelsGUI;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchantGUI;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchantToggleGUI;
+import io.github.lunaiskey.lunixprison.modules.player.chatcolor.ChatColorSelectType;
 import io.github.lunaiskey.lunixprison.modules.player.inventories.*;
+import org.bukkit.block.PistonMoveReaction;
 
 public enum LunixInvType {
     PMINE_MAIN(new PMineGUI()),
@@ -28,6 +30,8 @@ public enum LunixInvType {
     LEADERBOARDS(new LeaderboardGUI()),
     RENAME_TAG_CONFIRM(new RenameTagConfirmGUI()),
     CASHBACK(new CashbackGUI()),
+    CHAT_NAME_COLOR_SELECT(new ChatNameTextColorGUI(ChatColorSelectType.NAME)),
+    CHAT_TEXT_COLOR_SELECT(new ChatNameTextColorGUI(ChatColorSelectType.TEXT)),
     ;
 
     private final LunixInventory inventory;

@@ -68,7 +68,7 @@ public class GemStoneGUI implements LunixInventory {
         LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
         switch (e.getRawSlot()) {
             case 11,12,13,14,15,20,21,22,23,24 -> {
-                GemStone gemStone = (GemStone) LunixPrison.getPlugin().getItemManager().getItemMap().get(gemStoneMap.get(e.getRawSlot()));
+                GemStone gemStone = (GemStone) LunixPrison.getPlugin().getItemManager().getLunixItem(gemStoneMap.get(e.getRawSlot()));
                 if (lunixPlayer.getRank() >= getRankRequirement(gemStoneMap.get(e.getRawSlot()))) {
                     if (!lunixPlayer.getSelectedGemstone().equals(gemStoneMap.get(e.getRawSlot()))) {
                         lunixPlayer.setSelectedGemstone(gemStoneMap.get(e.getRawSlot()));
@@ -118,7 +118,7 @@ public class GemStoneGUI implements LunixInventory {
     private ItemStack getGemstones(int slot, Player player) {
         LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId());
         ItemID gemstone = gemStoneMap.get(slot);
-        ItemStack item = LunixPrison.getPlugin().getItemManager().getItemMap().get(gemstone).getItemStack();
+        ItemStack item = LunixPrison.getPlugin().getItemManager().getLunixItem(gemstone).getItemStack();
         ItemMeta meta = item.getItemMeta();
         List<String> lore = new ArrayList<>(meta.getLore());
         lore.add(" ");

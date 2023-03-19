@@ -2,6 +2,7 @@ package io.github.lunaiskey.lunixprison.modules.items.items;
 
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
+import io.github.lunaiskey.lunixprison.modules.items.meta.LunixItemMeta;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.modules.player.inventories.PlayerMenuGUI;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
@@ -20,6 +21,11 @@ public class PlayerMenu extends LunixItem {
 
     public PlayerMenu() {
         super(ItemID.PLAYER_MENU, "&aPlayer Menu", null, Material.NETHER_STAR);
+    }
+
+    @Override
+    public List<String> getLore(LunixItemMeta meta) {
+        return null;
     }
 
     @Override

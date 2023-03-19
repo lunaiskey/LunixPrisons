@@ -35,9 +35,10 @@ public class LeaderboardGUI implements LunixInventory {
     public void init(Inventory inv, Player p) {
         for (int i = 0;i< inv.getSize();i++) {
             switch (i) {
-                case 12 -> inv.setItem(i,getTokenTop());
-                case 13 -> inv.setItem(i,getGemsTop());
+                case 10 -> inv.setItem(i,getTokenTop());
+                case 12 -> inv.setItem(i,getGemsTop());
                 case 14 -> inv.setItem(i,getRankTop());
+                case 16 -> inv.setItem(i,getGangTop());
                 default -> inv.setItem(i, ItemBuilder.getDefaultFiller());
             }
         }
@@ -110,7 +111,22 @@ public class LeaderboardGUI implements LunixInventory {
             }
             lore.add(StringUtil.color("&7"+(i+1)+". &f"+entry.getName()+"&7 - &f"+ Numbers.formattedNumber(entry.getValue())));
         }
-        return ItemBuilder.createItem("&bRank Top", Material.PAPER,lore);
+        return ItemBuilder.createItem("&bRank Top", Material.REDSTONE,lore);
+    }
+
+    public ItemStack getGangTop() {
+        ArrayList<LongEntry> gangTop = new ArrayList<>(LunixPrison.getPlugin().getLeaderboardManager().getGangTopCache().values());
+        List<String> lore = new ArrayList<>();
+        for (int i = 0;i<5;i++) {
+            LongEntry entry;
+            if (i < gangTop.size()) {
+                entry = gangTop.get(i);
+            } else {
+                entry = new LongEntry(null,"Empty", 0);
+            }
+            lore.add(StringUtil.color("&7"+(i+1)+". &f"+entry.getName()+"&7 - &f"+ Numbers.formattedNumber(entry.getValue())+" Trophies"));
+        }
+        return ItemBuilder.createItem("&dGang Top", Material.PAPER,lore);
     }
 
 }

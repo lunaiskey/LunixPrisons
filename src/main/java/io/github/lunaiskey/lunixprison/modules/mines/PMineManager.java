@@ -27,8 +27,6 @@ public class PMineManager {
     public static final int DEFAULT_RADIUS = 12;
     private final int GRID_ISLAND_DIAMETER;
     private final int GRID_ISLAND_RADIUS;
-
-
     private final Map<UUID, PMine> pMines = new HashMap<>();
     private final Map<Pair<Integer,Integer>, UUID> gridPosUUIDMap = new HashMap<>();
     private ImmutablePair<Integer,Integer> lastChunkChecked = new ImmutablePair<>(0,0);
@@ -189,6 +187,13 @@ public class PMineManager {
 
     public PMine getPMine(UUID owner) {
         return pMines.get(owner);
+    }
+    public PMine getPMineAtLocation(Location location) {
+        return getPMine(gridPosUUIDMap.get(getGridLocation(location.clone())));
+    }
+
+    public PMine getPMineAtPlayer(Player player) {
+        return getPMineAtLocation(player.getLocation().clone());
     }
 
     public Map<Pair<Integer, Integer>, UUID> getGridPosToUUIDMap() {
