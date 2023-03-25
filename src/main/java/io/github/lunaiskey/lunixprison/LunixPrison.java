@@ -15,6 +15,7 @@ import io.github.lunaiskey.lunixprison.modules.mines.generator.PMineWorld;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeManager;
 import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.modules.boosters.Boosters;
+import io.github.lunaiskey.lunixprison.modules.shop.ShopManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -36,6 +37,7 @@ public final class LunixPrison extends JavaPlugin {
     private GangManager gangManager;
     private LeaderboardManager leaderboardManager;
     private InventoryManager inventoryManager;
+    private ShopManager shopManager;
 
     private Boosters boosters;
     private Random rand = new Random();
@@ -63,6 +65,7 @@ public final class LunixPrison extends JavaPlugin {
 
         playerManager.checkPlayerData();
         leaderboardManager.startTasks();
+        shopManager.registerShops();
         bufferSaveTask();
 
         boolean isPlaceholderHookRegistered = new PlaceholderHook(this).registerHook();
@@ -87,6 +90,7 @@ public final class LunixPrison extends JavaPlugin {
         gangManager = new GangManager();
         inventoryManager = new InventoryManager();
         leaderboardManager = new LeaderboardManager();
+        shopManager = new ShopManager();
     }
 
     public static LunixPrison getPlugin() {
@@ -179,6 +183,10 @@ public final class LunixPrison extends JavaPlugin {
 
     public InventoryManager getInventoryManager() {
         return inventoryManager;
+    }
+
+    public ShopManager getShopManager() {
+        return shopManager;
     }
 
     public Random getRand() {

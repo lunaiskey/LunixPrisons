@@ -7,6 +7,7 @@ import io.github.lunaiskey.lunixprison.modules.items.meta.LunixItemMeta;
 import io.github.lunaiskey.lunixprison.modules.player.ChatReplyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -19,7 +20,7 @@ import java.util.List;
 
 public class RenameTag extends LunixItem {
     public RenameTag() {
-        super(ItemID.RENAME_TAG, "&6Rename Tag",List.of("&7Right click to rename pickaxe!") , null, Material.NAME_TAG);
+        super(ItemID.RENAME_TAG, "&6Rename Tag &7(Right Click)",List.of("Lets your rename your pickaxe.") , null, Material.NAME_TAG);
     }
 
     @Override
@@ -43,9 +44,10 @@ public class RenameTag extends LunixItem {
         e.setUseInteractedBlock(Event.Result.DENY);
         Player p = e.getPlayer();
         LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        InventoryType type = p.getOpenInventory().getType();
         if (lunixPlayer.getChatReplyType() != ChatReplyType.RENAME_TAG) {
-            if (p.getOpenInventory().getType() == InventoryType.CRAFTING) {
-                p.sendMessage(StringUtil.color("&bType in chat what you want to rename your pickaxe too."));
+            if (type == InventoryType.CRAFTING || type == InventoryType.CREATIVE) {
+                p.sendMessage(ChatColor.GREEN+"Type what you want your pickaxe to be renamed to, color codes are accepted.");
                 lunixPlayer.setChatReplyType(ChatReplyType.RENAME_TAG);
             }
         }

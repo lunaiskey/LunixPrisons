@@ -16,6 +16,7 @@ import io.github.lunaiskey.lunixprison.modules.player.commands.*;
 import io.github.lunaiskey.lunixprison.modules.rankup.commands.CommandRank;
 import io.github.lunaiskey.lunixprison.modules.rankup.commands.CommandRankup;
 import io.github.lunaiskey.lunixprison.modules.rankup.commands.CommandRankupMax;
+import io.github.lunaiskey.lunixprison.modules.shop.commands.CommandShop;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
@@ -61,6 +62,7 @@ public class CommandManager {
 
 
         registerCommand("lunixdebug", new CommandLunixDebug());
+        registerCommand("shop", new CommandShop());
     }
 
     private static void registerCommand(String command, CommandExecutor executor) {

@@ -10,6 +10,7 @@ import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchan
 import io.github.lunaiskey.lunixprison.modules.pickaxe.inventories.PickaxeEnchantToggleGUI;
 import io.github.lunaiskey.lunixprison.modules.player.chatcolor.ChatColorSelectType;
 import io.github.lunaiskey.lunixprison.modules.player.inventories.*;
+import io.github.lunaiskey.lunixprison.modules.shop.inventories.ShopGUI;
 import org.bukkit.block.PistonMoveReaction;
 
 public enum LunixInvType {
@@ -32,6 +33,8 @@ public enum LunixInvType {
     CASHBACK(new CashbackGUI()),
     CHAT_NAME_COLOR_SELECT(new ChatNameTextColorGUI(ChatColorSelectType.NAME)),
     CHAT_TEXT_COLOR_SELECT(new ChatNameTextColorGUI(ChatColorSelectType.TEXT)),
+
+    SHOP(new ShopGUI()),
     ;
 
     private final LunixInventory inventory;

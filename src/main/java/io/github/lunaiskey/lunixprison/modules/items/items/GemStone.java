@@ -24,12 +24,15 @@ public class GemStone extends LunixPlayerHeadItem {
     public GemStone(GemstoneType type) {
         super(type.getItemID(), "Gemstone", null, null);
         this.type = type;
+        /*
         switch (type) {
             case AMETHYST,JASPER,OPAL -> setRarity(Rarity.COMMON);
             case JADE,TOPAZ,AMBER -> setRarity(Rarity.UNCOMMON);
             case SAPPHIRE,EMERALD,RUBY -> setRarity(Rarity.RARE);
             case DIAMOND -> setRarity(Rarity.EPIC);
         }
+
+         */
         setDisplayName(StringUtil.color("&f" + getName() + " Gemstone"));
         List<String> desc = new ArrayList<>();
         desc.add(StringUtil.color("&7This Gemstone is used to upgrade"));

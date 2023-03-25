@@ -3,30 +3,48 @@ package io.github.lunaiskey.lunixprison.modules.items.items;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixPlayerHeadItem;
 import io.github.lunaiskey.lunixprison.modules.items.meta.LunixItemMeta;
+import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
-import io.github.lunaiskey.lunixprison.util.reward.Reward;
+import io.github.lunaiskey.lunixprison.util.reward.RewardStorage;
+import io.github.lunaiskey.lunixprison.util.reward.rewards.CurrencyReward;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class Geode extends LunixPlayerHeadItem {
 
-    private List<Reward> rewardList = new ArrayList<>();
+    private List<RewardStorage> rewardStorageList = new ArrayList<>();
 
     public Geode(GeodeRarity rarity) {
         super(rarity.getItemID(), rarity.getDisplayName(), null,null);
         switch (rarity) {
-            case COMMON -> rewardList.add(new Reward("5,000 Tokens, 50 Gems",1,null,List.of("tokens give %player% 5000","gems give %player% 50")));
-            case UNCOMMON -> rewardList.add(new Reward("10,000 Tokens, 75 Gems",1,null,List.of("tokens give %player% 10000","gems give %player% 75")));
-            case RARE -> rewardList.add(new Reward("15,000 Tokens, 100 Gems",1,null,List.of("tokens give %player% 15000","gems give %player% 100")));
-            case EPIC -> rewardList.add(new Reward("20,000 Tokens, 125 Gems",1,null,List.of("tokens give %player% 20000","gems give %player% 125")));
-            case LEGENDARY -> rewardList.add(new Reward("30,000 Tokens, 150 Gems",1,null,List.of("tokens give %player% 30000","gems give %player% 150")));
+            case COMMON -> rewardStorageList.add(new RewardStorage("5,000 Tokens, 50 Gems",1,List.of(
+                    new CurrencyReward(CurrencyType.TOKENS, BigInteger.valueOf(5000)),
+                    new CurrencyReward(CurrencyType.GEMS,BigInteger.valueOf(50))
+                    )));
+            case UNCOMMON -> rewardStorageList.add(new RewardStorage("10,000 Tokens, 75 Gems",1,List.of(
+                    new CurrencyReward(CurrencyType.TOKENS, BigInteger.valueOf(10000)),
+                    new CurrencyReward(CurrencyType.GEMS,BigInteger.valueOf(75))
+            )));
+            case RARE -> rewardStorageList.add(new RewardStorage("15,000 Tokens, 100 Gems",1,List.of(
+                    new CurrencyReward(CurrencyType.TOKENS, BigInteger.valueOf(15000)),
+                    new CurrencyReward(CurrencyType.GEMS,BigInteger.valueOf(100))
+            )));
+            case EPIC -> rewardStorageList.add(new RewardStorage("20,000 Tokens, 125 Gems",1,List.of(
+                    new CurrencyReward(CurrencyType.TOKENS, BigInteger.valueOf(20000)),
+                    new CurrencyReward(CurrencyType.GEMS,BigInteger.valueOf(125))
+            )));
+            case LEGENDARY -> rewardStorageList.add(new RewardStorage("30,000 Tokens, 150 Gems",1,List.of(
+                    new CurrencyReward(CurrencyType.TOKENS, BigInteger.valueOf(30000)),
+                    new CurrencyReward(CurrencyType.GEMS,BigInteger.valueOf(150))
+            )));
         }
     }
 
@@ -55,7 +73,7 @@ public class Geode extends LunixPlayerHeadItem {
         //Random rand = PyrexPrison.getPlugin().getRand();
         //PyrexPlayer pyrexPlayer = PyrexPrison.getPlugin().getPlayerManager().getPlayerMap().get(e.getPlayer().getUniqueId());
         //boolean success = false;
-        rewardList.get(0).giveReward(p);
+        rewardStorageList.get(0).giveReward(p);
         e.getItem().setAmount(e.getItem().getAmount()-1);
     }
 

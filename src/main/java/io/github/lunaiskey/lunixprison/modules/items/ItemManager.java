@@ -1,9 +1,11 @@
 package io.github.lunaiskey.lunixprison.modules.items;
 
+import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.items.*;
 import io.github.lunaiskey.lunixprison.modules.items.meta.MetaBoosterItem;
 import io.github.lunaiskey.lunixprison.modules.items.meta.MetaChatColorVoucher;
 import io.github.lunaiskey.lunixprison.modules.items.meta.MetaCurrencyVoucher;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeManager;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import org.bukkit.ChatColor;
@@ -67,6 +69,9 @@ public class ItemManager {
 
     public LunixItem getLunixItem(ItemStack itemStack) {
         ItemID itemID = NBTTags.getItemID(itemStack);
+        if (itemID == null) {
+            return null;
+        }
         LunixItem lunixItem = getLunixItem(itemID);
         if (lunixItem != null) {
             return lunixItem;
@@ -79,7 +84,18 @@ public class ItemManager {
         return null;
     }
 
-    public void updateItemStack(ItemStack itemStack) {
+    public void updateItemStack(ItemStack itemStack, Player player) {
+        ItemID itemID = NBTTags.getItemID(itemStack);
+        if (itemID != null) {
+            boolean hasCustomUpdate = true;
+            switch (itemID) {
+                case LUNIX_PICKAXE -> LunixPrison.getPlugin().getPickaxeHandler().updatePickaxe(itemStack,player.getUniqueId());
+                default -> hasCustomUpdate = false;
+            }
+            if (hasCustomUpdate) {
+                return;
+            }
+        }
         LunixItem lunixItem = getLunixItem(itemStack);
         if (lunixItem == null) {
             return;
@@ -120,14 +136,14 @@ public class ItemManager {
     public void updateInventory(Player player) {
         ItemStack[] contents = player.getInventory().getContents();
         for (ItemStack content : contents) {
-            updateItemStack(content);
+            updateItemStack(content,player);
         }
         player.getInventory().setContents(contents);
     }
 
     public void updateEquipmentSlot(Player player, EquipmentSlot slot) {
         ItemStack stack = player.getInventory().getItem(slot);
-        updateItemStack(stack);
+        updateItemStack(stack,player);
         player.getInventory().setItem(slot,stack);
     }
 }

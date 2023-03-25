@@ -47,8 +47,8 @@ public class CommandLItem implements CommandExecutor, TabCompleter {
 
     private void giveCommand(CommandSender sender, String label, String[] args, boolean isGiveSubCommand) {
         int argOffSet = isGiveSubCommand ? 2 : 0;
-        if (args.length == (1+argOffSet)) {
-            sender.sendMessage(StringUtil.color("Usage: /litem give <player> <id> [amount]"));
+        if (isGiveSubCommand && args.length == 1) {
+            sender.sendMessage(StringUtil.color("&cUsage: /litem give <player> <id> [amount]"));
             return;
         }
         Player toGive = isGiveSubCommand ? Bukkit.getPlayer(args[1]) : (Player) sender;

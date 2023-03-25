@@ -68,6 +68,8 @@ commands:
     usage: /<command>
   lunixdebug:
     usage: /<command>
+  shop:
+    usage: /<command>
 
 permissions:
   lunix.*:

@@ -54,16 +54,12 @@ public class BoosterItem extends LunixItem {
     }
 
     @Override
-    public ItemStack getItemStack() {
+    public ItemStack getItemStack(Player player) {
         ItemStack item = new ItemStack(getMaterial());
         item = NBTTags.addLunixData(item,"id",getItemID().name());
-        CompoundTag boosterData = new CompoundTag();
-        boosterData.putString("type",boosterType.name());
-        boosterData.putInt("length", lengthSeconds);
-        boosterData.putDouble("multiplier",multiplier);
-        item = NBTTags.addLunixData(item,"boosterData",boosterData);
         item = NBTTags.addLunixData(item, "uuid", UUID.randomUUID().toString());
-        LunixPrison.getPlugin().getItemManager().updateItemStack(item);
+        new MetaBoosterItem(boosterType,lengthSeconds,multiplier).applyMeta(item);
+        LunixPrison.getPlugin().getItemManager().updateItemStack(item,player);
         return item;
     }
 

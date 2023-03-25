@@ -15,6 +15,7 @@ import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class NMSBlockChange {
         for (LevelChunk chunk : chunks) {
              ClientboundForgetLevelChunkPacket unload = new ClientboundForgetLevelChunkPacket(chunk.getPos().x, chunk.getPos().z);
 
-            ClientboundLevelChunkWithLightPacket load = new ClientboundLevelChunkWithLightPacket(chunk,engine,null,null, true);
+            ClientboundLevelChunkWithLightPacket load = new ClientboundLevelChunkWithLightPacket(chunk,engine,new BitSet(),new BitSet(), true);
             //ClientboundLightUpdatePacket light = new ClientboundLightUpdatePacket(chunk.getPos(),engine,null,null, true);
 
 

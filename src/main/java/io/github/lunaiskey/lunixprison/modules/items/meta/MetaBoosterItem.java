@@ -11,6 +11,12 @@ public class MetaBoosterItem implements LunixItemMeta {
     private int lengthSeconds;
     private double multiplier;
 
+    public MetaBoosterItem(BoosterType boosterType, int lengthSeconds, double multiplier) {
+        this.boosterType = boosterType;
+        this.lengthSeconds = lengthSeconds;
+        this.multiplier = multiplier;
+    }
+
     public MetaBoosterItem(CompoundTag boosterData) {
         try {
             boosterType = BoosterType.valueOf(boosterData.getString("type"));

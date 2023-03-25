@@ -21,11 +21,12 @@ public class NMSWorldBorder {
         worldBorder.setWarningBlocks(0);
         ServerGamePacketListenerImpl connection = ((CraftPlayer) player).getHandle().connection;
         worldBorder.world = ((CraftPlayer) player).getHandle().getLevel();
-        connection.send(new ClientboundInitializeBorderPacket(worldBorder));
+
         sendPackets(connection,worldBorder);
     }
 
     private void sendPackets(ServerGamePacketListenerImpl connection, WorldBorder worldBorder) {
+        connection.send(new ClientboundInitializeBorderPacket(worldBorder));
         connection.send(new ClientboundSetBorderSizePacket(worldBorder));
         connection.send(new ClientboundSetBorderCenterPacket(worldBorder));
         connection.send(new ClientboundSetBorderWarningDistancePacket(worldBorder));

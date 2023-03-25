@@ -7,6 +7,7 @@ import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -36,7 +37,7 @@ public abstract class LunixItem {
         for (String str : description) {
             coloredDescription.add(ChatColor.GRAY+StringUtil.color(str));
         }
-        this.rarity = Objects.requireNonNullElse(rarity, Rarity.COMMON);
+        this.rarity = rarity;
         this.mat = mat;
     }
 
@@ -46,7 +47,7 @@ public abstract class LunixItem {
 
     public abstract List<String> getLore(LunixItemMeta meta);
 
-    public ItemStack getItemStack() {
+    public ItemStack getItemStack(Player player) {
         List<String> lore = new ArrayList<>(getDescription());
         /*
         if (rarity != null) {
@@ -58,8 +59,12 @@ public abstract class LunixItem {
          */
         ItemStack item = ItemBuilder.createItem(getDisplayName(),getMaterial(),lore);
         item = NBTTags.addLunixData(item,"id",getItemID().name());
-        LunixPrison.getPlugin().getItemManager().updateItemStack(item);
+        LunixPrison.getPlugin().getItemManager().updateItemStack(item,player);
         return item;
+    }
+
+    public ItemStack getItemStack() {
+        return getItemStack(null);
     }
 
     public abstract void onBlockBreak(BlockBreakEvent e);
@@ -76,7 +81,19 @@ public abstract class LunixItem {
         return displayName;
     }
 
+    public String getColoredDisplayName() {
+        return rarity.getChatColor()+getDisplayName();
+    }
+
     public List<String> getDescription() {
+        return getDescription(null);
+    }
+
+    public List<String> getDescription(Player player) {
+        List<String> description = new ArrayList<>(this.description);
+        if (player != null) {
+            description.replaceAll(s -> s.replaceAll("%%player_name%%", player.getName()));
+        }
         return description;
     }
 
@@ -102,6 +119,7 @@ public abstract class LunixItem {
 
     protected void setDescription(List<String> description) {
         this.description = description;
+        this.coloredDescription = new ArrayList<>(StringUtil.color(description));
     }
 
     protected void setRarity(Rarity rarity) {
