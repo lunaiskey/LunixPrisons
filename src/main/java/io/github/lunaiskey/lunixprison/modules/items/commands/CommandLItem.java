@@ -1,8 +1,8 @@
 package io.github.lunaiskey.lunixprison.modules.items.commands;
 
-import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.Messages;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -13,10 +13,8 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CommandLItem implements CommandExecutor, TabCompleter {
     @Override
@@ -62,17 +60,19 @@ public class CommandLItem implements CommandExecutor, TabCompleter {
             sender.sendMessage(StringUtil.color("&cInvalid ItemID."));
             return;
         }
-        LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(itemID);
+        LunixItem lunixItem = ItemManager.get().getLunixItem(itemID);
         if (lunixItem == null) {
             sender.sendMessage(StringUtil.color("&cItemID \""+itemID.name()+"\" doesn't have an item assigned to it."));
             return;
         }
         int amount = 1;
-        try {
-            amount = Integer.parseInt(args[1+argOffSet]);
-        } catch (NumberFormatException ignored) {
-            sender.sendMessage(StringUtil.color("&cInvalid Amount."));
-            return;
+        if (args.length >= 2+argOffSet) {
+            try {
+                amount = Integer.parseInt(args[1 + argOffSet]);
+            } catch (NumberFormatException ignored) {
+                sender.sendMessage(StringUtil.color("&cInvalid Amount."));
+                return;
+            }
         }
         if (amount <= 0) {
             sender.sendMessage(StringUtil.color("&cAmount has to be more then 0."));
@@ -83,7 +83,32 @@ public class CommandLItem implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return null;
+        if (!sender.hasPermission("lunix.admin.litem")) {
+            return Collections.emptyList();
+        }
+        List<String> completions = new ArrayList<>();
+        List<String> commands = new ArrayList<>();
+        List<String> itemIDs = ItemManager.get().getLunixItemsList();
+        if (args.length == 1) {
+            commands.add("give");
+            Collections.sort(itemIDs);
+            commands.addAll(itemIDs);
+        } else if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("give")) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    commands.add(player.getName());
+                }
+            } else {
+                commands.add("1");
+            }
+        } else if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("give")) {
+                commands.add("1");
+            }
+        }
+
+        org.bukkit.util.StringUtil.copyPartialMatches(args[0], commands,completions);
+        return completions;
     }
 
     private void giveItem(CommandSender giver, Player toGive, LunixItem lunixItem, int amount) {

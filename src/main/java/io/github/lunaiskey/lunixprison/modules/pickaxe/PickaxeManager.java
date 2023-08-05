@@ -4,6 +4,7 @@ import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.enchants.*;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.enchantments.Enchantment;
@@ -11,45 +12,33 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+
 public class PickaxeManager {
 
+    private static PickaxeManager instance;
+
     private static final String LUNIX_PICKAXE_ID = "LUNIX_PICKAXE";
-    private final Map<EnchantType, LunixEnchant> enchantments = new HashMap<>();
 
-    public PickaxeManager() {
-        registerEnchants();
+    private PickaxeManager() {
+
     }
 
-    private void registerEnchants() {
-        enchantments.put(EnchantType.EFFICIENCY,new Efficiency());
-        enchantments.put(EnchantType.FORTUNE,new Fortune());
-        enchantments.put(EnchantType.HASTE,new Haste());
-        enchantments.put(EnchantType.JUMP_BOOST,new JumpBoost());
-        enchantments.put(EnchantType.SPEED,new Speed());
-        enchantments.put(EnchantType.JACK_HAMMER,new JackHammer());
-        enchantments.put(EnchantType.KEY_FINDER,new KeyFinder());
-        enchantments.put(EnchantType.GEM_FINDER,new GemFinder());
-        enchantments.put(EnchantType.LOOT_FINDER,new LootFinder());
-        enchantments.put(EnchantType.STRIKE,new Strike());
-        enchantments.put(EnchantType.EXPLOSIVE,new Explosive());
-        enchantments.put(EnchantType.NUKE,new Nuke());
-        //enchantments.put(EnchantType.XP_BOOST,new XPBoost());
-        enchantments.put(EnchantType.NIGHT_VISION,new NightVision());
-        enchantments.put(EnchantType.MINE_BOMB,new MineBomb());
+    public static PickaxeManager get() {
+        if (instance == null) {
+            instance = new PickaxeManager();
+        }
+        return instance;
     }
-
-
-
-
 
     public ItemStack updatePickaxe(ItemStack item, UUID p) {
         ItemID id = NBTTags.getItemID(item);
         if (id != ItemID.LUNIX_PICKAXE) return item;
         ItemMeta meta = item.getItemMeta();
-        LunixPlayer player = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p);
+        LunixPlayer player = PlayerManager.get().getPlayerMap().get(p);
         PickaxeStorage pickaxe = player.getPickaxeStorage();
         if (pickaxe.getRename() == null) {
             meta.setDisplayName(StringUtil.color("&a"+player.getName()+"'s &fPickaxe"));
@@ -65,8 +54,8 @@ public class PickaxeManager {
         lore.add(StringUtil.color("&e&l| &fBlocks: "+pickaxe.getBlocksBroken()));
         lore.add(" ");
         lore.add(StringUtil.color("&b&lEnchants"));
-        for (EnchantType enchantType : EnchantType.getSortedEnchants()) {
-            LunixEnchant lunixEnchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(enchantType);
+        for (EnchantType enchantType : EnchantType.values()) {
+            LunixEnchant lunixEnchant = getLunixEnchant(enchantType);
             if (enchants.containsKey(enchantType) && enchants.get(enchantType) > 0) {
                 lore.add(StringUtil.color("&b&l| &f"+ lunixEnchant.getName()+" "+enchants.get(enchantType)));
                 if (enchantType == EnchantType.EFFICIENCY) {
@@ -108,13 +97,14 @@ public class PickaxeManager {
             }
         }
         if (!hasPickaxe) {
-            p.getInventory().addItem(LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxeStorage().getItemStack());
+            p.getInventory().addItem(PlayerManager.get().getPlayerMap().get(p.getUniqueId()).getPickaxeStorage().getItemStack());
         }
         return hasPickaxe;
     }
 
-    public Map<EnchantType, LunixEnchant> getEnchantments() {
-        return enchantments;
+    @NotNull
+    public LunixEnchant getLunixEnchant(EnchantType type) {
+        return type.getLunixEnchant();
     }
 
     public static String getLunixPickaxeId() {

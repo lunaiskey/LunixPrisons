@@ -1,12 +1,11 @@
 name: LunixPrisons
-version: '${project.version}'
+version: ${version}
 main: io.github.lunaiskey.lunixprison.LunixPrison
 api-version: 1.19
 authors: [ Lunaiskey ]
 softdepend:
   - PlaceholderAPI
 description: A Continuation of the old PyrexPrison plugin.
-
 commands:
   gang:
     usage: /<command>

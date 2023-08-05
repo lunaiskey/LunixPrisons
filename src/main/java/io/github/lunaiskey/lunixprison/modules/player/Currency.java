@@ -32,7 +32,7 @@ public class Currency {
         if (Objects.equals(amount, BigInteger.ZERO)) {
             return;
         }
-        LunixPlayer pPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(pUUID);
+        LunixPlayer pPlayer = PlayerManager.get().getPlayerMap().get(pUUID);
         switch (type) {
             case TOKENS -> pPlayer.giveTokens(amount);
             case GEMS -> pPlayer.giveGems(amount.longValue());
@@ -62,7 +62,7 @@ public class Currency {
         if (Objects.equals(amount, BigInteger.ZERO)) {
             return;
         }
-        LunixPlayer pPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(pUUID);
+        LunixPlayer pPlayer = PlayerManager.get().getPlayerMap().get(pUUID);
         switch (type) {
             case TOKENS -> {
                 if (amount.compareTo(pPlayer.getTokens()) >= 0) {
@@ -93,7 +93,7 @@ public class Currency {
         if (amount.compareTo(newAmount) > 0) {
             newAmount = amount;
         }
-        LunixPlayer pPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(pUUID);
+        LunixPlayer pPlayer = PlayerManager.get().getPlayerMap().get(pUUID);
         switch (type) {
             case TOKENS -> pPlayer.setTokens(newAmount);
             case GEMS -> pPlayer.setGems(newAmount.longValue());

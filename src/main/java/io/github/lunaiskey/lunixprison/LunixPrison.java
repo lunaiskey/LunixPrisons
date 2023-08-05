@@ -1,6 +1,5 @@
 package io.github.lunaiskey.lunixprison;
 
-import io.github.lunaiskey.lunixprison.inventory.InventoryManager;
 import io.github.lunaiskey.lunixprison.modules.gangs.Gang;
 import io.github.lunaiskey.lunixprison.modules.gangs.GangManager;
 import io.github.lunaiskey.lunixprison.hooks.PlaceholderHook;
@@ -12,17 +11,14 @@ import io.github.lunaiskey.lunixprison.modules.leaderboards.LeaderboardManager;
 import io.github.lunaiskey.lunixprison.listeners.PlayerEvents;
 import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.modules.mines.generator.PMineWorld;
-import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeManager;
 import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.modules.boosters.Boosters;
 import io.github.lunaiskey.lunixprison.modules.shop.ShopManager;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.util.*;
@@ -30,20 +26,11 @@ import java.util.*;
 public final class LunixPrison extends JavaPlugin {
 
     private static LunixPrison plugin;
-    private PMineManager playerMineManager;
-    private PlayerManager playerManager;
-    private PickaxeManager pickaxeManager;
-    private ItemManager itemManager;
-    private GangManager gangManager;
-    private LeaderboardManager leaderboardManager;
-    private InventoryManager inventoryManager;
-    private ShopManager shopManager;
-
+    private final Random rand = new Random();
     private Boosters boosters;
-    private Random rand = new Random();
     private final Set<UUID> savePending = new HashSet<>();
 
-    private int saveTaskID = -1;
+    private BukkitTask saveTask;
 
     @Override
     public void onEnable() {
@@ -52,45 +39,32 @@ public final class LunixPrison extends JavaPlugin {
             this.getLogger().severe("Directories failed to setup correctly, exiting...");
             return;
         }
-
         new PMineWorld().generateWorld();
-        registerManagers();
-
-        playerManager.loadPlayers();
-        playerMineManager.loadPMines();
-        gangManager.loadGangs();
-        itemManager.registerItems();
+        PlayerManager.get().loadPlayers();
+        PMineManager.get().loadPMines();
+        GangManager.get().loadGangs();
+        ItemManager.get().registerItems();
         new CommandManager(plugin);
         boosters = new Boosters();
 
-        playerManager.checkPlayerData();
-        leaderboardManager.startTasks();
-        shopManager.registerShops();
-        bufferSaveTask();
+        PlayerManager.get().checkPlayerData();
+        LeaderboardManager.get().startTasks();
+        ShopManager.get().registerShops();
+        startSaveTask();
 
         boolean isPlaceholderHookRegistered = new PlaceholderHook(this).registerHook();
 
         Bukkit.getPluginManager().registerEvents(new PlayerEvents(this),this);
-        getLogger().info("version " + getDescription().getVersion() + " enabled!");
+        //getLogger().info("version " + getDescription().getVersion() + " enabled!");
+        Bukkit.getBossBars().hasNext()
     }
 
     @Override
     public void onDisable() {
-        Bukkit.getScheduler().cancelTask(saveTaskID);
+        saveTask.cancel();
         closeAllLunixInvs();
         saveAll();
         getLogger().info("Saved "+savePending.size()+" Players.");
-    }
-
-    private void registerManagers() {
-        playerMineManager = new PMineManager();
-        playerManager = new PlayerManager();
-        pickaxeManager = new PickaxeManager();
-        itemManager = new ItemManager();
-        gangManager = new GangManager();
-        inventoryManager = new InventoryManager();
-        leaderboardManager = new LeaderboardManager();
-        shopManager = new ShopManager();
     }
 
     public static LunixPrison getPlugin() {
@@ -105,23 +79,22 @@ public final class LunixPrison extends JavaPlugin {
         }
     }
 
-    public void bufferSaveTask() {
-        BukkitScheduler scheduler = Bukkit.getScheduler();
-        if (saveTaskID != -1) {
+    public void startSaveTask() {
+        if (saveTask != null) {
             //Cancel old task
-            scheduler.cancelTask(saveTaskID);
+            saveTask.cancel();
         }
         //Schedule save
-        saveTaskID = scheduler.scheduleSyncRepeatingTask(LunixPrison.getPlugin(), this::saveAll, 5 * 60 * 20L,5 * 60 * 20L);
+        saveTask = Bukkit.getScheduler().runTaskTimer(this, this::saveAll, 5*60*20L,5*60*20L);
         this.getLogger().info("Buffered a save task to happen in 5 minutes.");
     }
 
     private void savePlayer(UUID player, boolean slient) {
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(player);
+        PMine mine = PMineManager.get().getPMine(player);
         if (mine != null) {
             mine.save();
         }
-        LunixPlayer lunixPlayer = playerManager.getPlayerMap().get(player);
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(player);
         if (lunixPlayer != null) {
             lunixPlayer.save();
         }
@@ -132,7 +105,7 @@ public final class LunixPrison extends JavaPlugin {
             savePlayer(uuid,true);
             savePending.removeIf(n -> (Bukkit.getPlayer(n) == null));
         }
-        for (Gang gang : gangManager.getGangMap().values()) {
+        for (Gang gang : GangManager.get().getGangMap().values()) {
             gang.save();
         }
         this.getLogger().info("Saving Player, Mine and Gang data...");
@@ -162,42 +135,11 @@ public final class LunixPrison extends JavaPlugin {
         return true;
     }
 
-
-    public PMineManager getPMineManager() {
-        return playerMineManager;
-    }
-
-    public GangManager getGangManager() { return gangManager;}
-
-    public PlayerManager getPlayerManager() {
-        return playerManager;
-    }
-
-    public PickaxeManager getPickaxeHandler() {
-        return pickaxeManager;
-    }
-
-    public ItemManager getItemManager() {
-        return itemManager;
-    }
-
-    public InventoryManager getInventoryManager() {
-        return inventoryManager;
-    }
-
-    public ShopManager getShopManager() {
-        return shopManager;
-    }
-
     public Random getRand() {
         return rand;
     }
 
     public Set<UUID> getSavePending() {
         return savePending;
-    }
-
-    public LeaderboardManager getLeaderboardManager() {
-        return leaderboardManager;
     }
 }

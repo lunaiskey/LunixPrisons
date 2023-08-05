@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.modules.player.inventories;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.modules.player.ViewPlayerHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
@@ -41,7 +42,7 @@ public class ViewPlayerGUI implements LunixInventory {
     }
 
     public void init(Inventory inv, Player p) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(otherPlayer.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(otherPlayer.getUniqueId());
         for(int i = 0;i<inv.getSize();i++) {
             switch(i) {
                 case 10 -> inv.setItem(i, lunixPlayer.getHelmet().getItemStack());
@@ -81,7 +82,7 @@ public class ViewPlayerGUI implements LunixInventory {
     }
 
     private ItemStack getPlayerStats(Player player) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(player.getUniqueId());
         ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(StringUtil.color("&ePlayer Stats"));

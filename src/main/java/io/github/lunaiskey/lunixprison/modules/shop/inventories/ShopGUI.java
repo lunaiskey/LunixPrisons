@@ -7,8 +7,10 @@ import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.shop.Shop;
 import io.github.lunaiskey.lunixprison.modules.shop.ShopGUIHolder;
 import io.github.lunaiskey.lunixprison.modules.shop.ShopItem;
+import io.github.lunaiskey.lunixprison.modules.shop.ShopManager;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.PlayerUtil;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -40,7 +42,7 @@ public class ShopGUI implements LunixInventory {
 
     private void init(Inventory inv, Player p) {
         ShopGUIHolder holder = (ShopGUIHolder) inv.getHolder();
-        Shop shop = LunixPrison.getPlugin().getShopManager().getShop(holder.getShopID());
+        Shop shop = ShopManager.get().getShop(holder.getShopID());
         for (int i = 0;i<54;i++) {
             switch (i) {
                 case 0 -> inv.setItem(i,getPreviousPage(holder.getPage()-1));
@@ -88,7 +90,7 @@ public class ShopGUI implements LunixInventory {
             return;
         }
         ShopGUIHolder holder = (ShopGUIHolder) e.getInventory().getHolder();
-        Shop shop = LunixPrison.getPlugin().getShopManager().getShop(holder.getShopID());
+        Shop shop = ShopManager.get().getShop(holder.getShopID());
         ShopItem shopItem = null;
         int maxPage = shop.getMaxPages();
         switch (shop.getType()) {

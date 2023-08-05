@@ -31,7 +31,7 @@ public class CommandLunixDebug implements CommandExecutor {
             sendHelpMessage(player);
             return true;
         }
-        ItemManager itemManager = LunixPrison.getPlugin().getItemManager();
+        ItemManager itemManager = ItemManager.get();
         switch (args[0].toLowerCase()) {
             case "updatemainhand" -> {
                 itemManager.updateEquipmentSlot(player, EquipmentSlot.HAND);

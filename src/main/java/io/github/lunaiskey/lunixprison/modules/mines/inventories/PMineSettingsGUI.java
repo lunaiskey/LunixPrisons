@@ -2,11 +2,13 @@ package io.github.lunaiskey.lunixprison.modules.mines.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
+import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.modules.player.ChatReplyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -53,8 +55,8 @@ public class PMineSettingsGUI implements LunixInventory {
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
         Player player = (Player) e.getWhoClicked();
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId());
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(player.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(player.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(player.getUniqueId());
         int slot = e.getRawSlot();
         switch (slot) {
             case 11 -> {
@@ -66,27 +68,27 @@ public class PMineSettingsGUI implements LunixInventory {
             }
             case 13 -> {
                 lunixPlayer.setChatReplyType(ChatReplyType.PMINE_TAX_EDIT);
-                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), player::closeInventory);
+                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), ()->player.closeInventory());
                 player.sendMessage(StringUtil.color("Type in your new tax value."));
             }
             case 14 -> {
                 lunixPlayer.setChatReplyType(ChatReplyType.PMINE_KICK_PLAYER);
                 player.sendMessage(StringUtil.color("Type in the player's name that you want to kick."));
-                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), player::closeInventory);
+                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), ()->player.closeInventory());
             }
             case 15 -> {
                 int counter = 0;
                 for (Player kickPlayer : Bukkit.getOnlinePlayers()) {
                     if (mine.isInMineIsland(kickPlayer)) {
                         if (kickPlayer.getUniqueId() != mine.getOwner()) {
-                            LunixPrison.getPlugin().getPMineManager().getPMine(kickPlayer.getUniqueId()).teleportToCenter(kickPlayer,false,true);
+                            PMineManager.get().getPMine(kickPlayer.getUniqueId()).teleportToCenter(kickPlayer,false,true);
                             kickPlayer.sendMessage(StringUtil.color("&eYou've been kicked from "+player.getName()+"'s mine. teleporting to your mine."));
                             counter++;
                         }
                     }
                 }
                 player.sendMessage(StringUtil.color("&aSuccessfully kicked "+counter+" Players."));
-                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), player::closeInventory);
+                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), ()->player.closeInventory());
             }
         }
     }
@@ -117,7 +119,7 @@ public class PMineSettingsGUI implements LunixInventory {
     }
 
     private ItemStack getTogglePublic(Player p) {
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         String name = StringUtil.color("&aToggle Public");
         String isPublic = mine.isPublic() ? StringUtil.color("&aPublic") : StringUtil.color("&cPrivate");
         Material mat = mine.isPublic() ? Material.LIME_DYE : Material.RED_DYE;
@@ -132,7 +134,7 @@ public class PMineSettingsGUI implements LunixInventory {
     }
 
     private ItemStack getMineTax(Player p) {
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         String name = StringUtil.color("&aMine Tax");
         List<String> lore = new ArrayList<>();
         lore.add(StringUtil.color("&7Modify the tax that's placed"));

@@ -4,8 +4,10 @@ import io.github.lunaiskey.lunixprison.Messages;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixEnchant;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeManager;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeStorage;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -65,7 +67,7 @@ public class CommandEnchant implements CommandExecutor {
             p.sendMessage(ChatColor.RED + "Invalid Enchant type.");
             return;
         }
-        LunixEnchant enchant = LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(enchantType);
+        LunixEnchant enchant = PickaxeManager.get().getLunixEnchant(enchantType);
         int level;
         try {
             level = Integer.parseInt(levelStr);
@@ -73,7 +75,7 @@ public class CommandEnchant implements CommandExecutor {
             p.sendMessage(ChatColor.RED + "Invalid Enchant level.");
             return;
         }
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(toEnchant.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(toEnchant.getUniqueId());
         PickaxeStorage pickaxe = lunixPlayer.getPickaxeStorage();
         if (level > 0) {
             pickaxe.getEnchants().put(enchantType,level);
@@ -82,6 +84,6 @@ public class CommandEnchant implements CommandExecutor {
             pickaxe.getEnchants().remove(enchantType);
             p.sendMessage(ChatColor.GREEN+"Removed "+enchant.getName()+" from pickaxe.");
         }
-        LunixPrison.getPlugin().getPickaxeHandler().updateInventoryPickaxe(toEnchant);
+        PickaxeManager.get().updateInventoryPickaxe(toEnchant);
     }
 }

@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.modules.player.commands;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.Messages;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.modules.player.inventories.ViewPlayerGUI;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -30,7 +31,7 @@ public class CommandViewPlayer implements CommandExecutor {
             p.sendMessage(StringUtil.color("&cPlayer \""+args[0]+"\" is offline."));
             return true;
         }
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(toView.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(toView.getUniqueId());
         if (lunixPlayer == null) {
             p.sendMessage(ChatColor.RED+"Unable to view "+toView.getName()+".");
             return true;

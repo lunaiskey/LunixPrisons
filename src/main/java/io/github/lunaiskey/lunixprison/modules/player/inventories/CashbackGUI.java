@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.modules.player.inventories;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
@@ -42,7 +43,7 @@ public class CashbackGUI implements LunixInventory {
     }
 
     private ItemStack getCashBackButton(Player player) {
-        BigInteger cashback = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId()).getCashback();
+        BigInteger cashback = PlayerManager.get().getPlayerMap().get(player.getUniqueId()).getCashback();
         CurrencyType type = CurrencyType.TOKENS;
         List<String> lore = new ArrayList<>();
         lore.add(StringUtil.color("&7When spending &eTokens &7on some"));
@@ -66,8 +67,8 @@ public class CashbackGUI implements LunixInventory {
     @Override
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
-        Player player1 = (Player) e.getWhoClicked();
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player1.getUniqueId());
+        Player player = (Player) e.getWhoClicked();
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(player.getUniqueId());
         int slot = e.getRawSlot();
         if (slot != 13) {
             return;
@@ -77,11 +78,11 @@ public class CashbackGUI implements LunixInventory {
         if (cashback.compareTo(BigInteger.ZERO) > 0) {
             lunixPlayer.giveTokens(cashback);
             lunixPlayer.setCashback(BigInteger.ZERO);
-            player1.sendMessage(StringUtil.color("&aSuccessfully claimed &e"+type.getColorCode()+type.getUnicode()+"&f"+Numbers.formattedNumber(cashback)+"&a."));
+            player.sendMessage(StringUtil.color("&aSuccessfully claimed &e"+type.getColorCode()+type.getUnicode()+"&f"+Numbers.formattedNumber(cashback)+"&a."));
         } else {
-            player1.sendMessage(StringUtil.color("&cYou have nothing to claim."));
+            player.sendMessage(StringUtil.color("&cYou have nothing to claim."));
         }
-        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), player1::closeInventory);
+        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), ()->player.closeInventory());
     }
 
     @Override

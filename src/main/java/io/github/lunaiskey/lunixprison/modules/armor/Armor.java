@@ -4,6 +4,7 @@ import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.armor.upgrades.Ability;
 import io.github.lunaiskey.lunixprison.modules.armor.upgrades.AbilityType;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
 import io.github.lunaiskey.lunixprison.modules.items.items.GemStone;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
@@ -54,7 +55,7 @@ public class Armor {
         if (tier == 0) {
             meta.setDisplayName(StringUtil.color("&fStarter "+ slot.getName()));
         } else {
-            meta.setDisplayName(((GemStone) LunixPrison.getPlugin().getItemManager().getLunixItem(getGemstone(tier))).getName()+" "+ slot.getName());
+            meta.setDisplayName(((GemStone) ItemManager.get().getLunixItem(getGemstone(tier))).getName()+" "+ slot.getName());
         }
         List<String> lore = new ArrayList<>();
         lore.add(" ");
@@ -163,7 +164,7 @@ public class Armor {
         if (tier == 0) {
             return Color.WHITE;
         } else if (tier <= getTierMax()) {
-            return Color.fromRGB(((GemStone) LunixPrison.getPlugin().getItemManager().getLunixItem(getGemstone(tier))).getIntFromHex());
+            return Color.fromRGB(((GemStone) ItemManager.get().getLunixItem(getGemstone(tier))).getIntFromHex());
         } else {
             return Color.BLACK;
         }

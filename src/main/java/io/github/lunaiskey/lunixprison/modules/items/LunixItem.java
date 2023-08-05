@@ -59,7 +59,7 @@ public abstract class LunixItem {
          */
         ItemStack item = ItemBuilder.createItem(getDisplayName(),getMaterial(),lore);
         item = NBTTags.addLunixData(item,"id",getItemID().name());
-        LunixPrison.getPlugin().getItemManager().updateItemStack(item,player);
+        ItemManager.get().updateItemStack(item,player);
         return item;
     }
 

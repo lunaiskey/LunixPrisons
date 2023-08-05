@@ -7,10 +7,10 @@ import java.util.Map;
 
 public class Shop {
 
-    private String shopID;
-    private String shopTitle;
-    private int size;
-    private ShopType type;
+    private final String shopID;
+    private final String shopTitle;
+    private final int size;
+    private final ShopType type;
     private List<ShopItem> shopItems = new ArrayList<>();
     private Map<Integer,Map<Integer,ShopItem>> shopSlotedMap = new HashMap<>();
 

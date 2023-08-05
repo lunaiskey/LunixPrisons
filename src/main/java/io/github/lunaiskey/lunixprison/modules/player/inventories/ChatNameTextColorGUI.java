@@ -5,6 +5,7 @@ import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.modules.player.chatcolor.ChatColorSelectType;
 import io.github.lunaiskey.lunixprison.modules.player.chatcolor.LunixChatColor;
 import io.github.lunaiskey.lunixprison.modules.player.datastorages.ChatColorStorage;
@@ -38,7 +39,7 @@ public class ChatNameTextColorGUI implements LunixInventory {
     }
 
     public void init(Inventory inv, Player p) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getLunixPlayer(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getLunixPlayer(p.getUniqueId());
         for (int i = 0; i < inv.getSize(); i++) {
             ItemStack s;
             switch (i) {
@@ -82,7 +83,7 @@ public class ChatNameTextColorGUI implements LunixInventory {
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
         Player player = (Player) e.getWhoClicked();
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getLunixPlayer(player.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getLunixPlayer(player.getUniqueId());
         ChatColorSelectType selectType = ((LunixChatColorHolder) e.getInventory().getHolder()).getSelectType();
         ChatColorStorage storage = lunixPlayer.getChatColorStorage();
 

@@ -1,6 +1,7 @@
 package io.github.lunaiskey.lunixprison.modules.gangs;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,11 +17,24 @@ import java.util.*;
 
 public class GangManager {
 
+    private static GangManager instance;
+
     private Map<UUID, Gang> gangMap = new HashMap<>();
     private Map<String, UUID> gangNameMap = new HashMap<>();
 
     private Map<UUID, UUID> playerGangMap = new HashMap<>();
-    public static String GANG_FILE_NAME = "gangdata";
+    public static final String GANG_FILE_NAME = "gangdata";
+
+    private GangManager() {
+
+    }
+
+    public static GangManager get() {
+        if (instance == null) {
+            instance = new GangManager();
+        }
+        return instance;
+    }
 
 
     public void loadGangs(){
@@ -40,7 +54,7 @@ public class GangManager {
                 try {
                     UUID memberUUID = UUID.fromString(str);
                     GangRankType rankType = GangRankType.valueOf((String) rawMemberMap.get(str));
-                    memberMap.put(memberUUID,new GangMember(memberUUID, LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(memberUUID).getName(),rankType));
+                    memberMap.put(memberUUID,new GangMember(memberUUID, PlayerManager.get().getPlayerMap().get(memberUUID).getName(),rankType));
                 } catch (Exception ignored) {}
             }
 
@@ -99,7 +113,7 @@ public class GangManager {
         if (members == null) {
             members = new LinkedHashMap<>();
         }
-        members.put(owner,new GangMember(owner, LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(owner).getName(),GangRankType.OWNER) );
+        members.put(owner,new GangMember(owner, PlayerManager.get().getPlayerMap().get(owner).getName(),GangRankType.OWNER) );
         for (UUID member : members.keySet()) {
             playerGangMap.put(member,uuid);
         }

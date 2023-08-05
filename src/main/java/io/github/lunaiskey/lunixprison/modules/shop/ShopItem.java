@@ -2,9 +2,11 @@ package io.github.lunaiskey.lunixprison.modules.shop;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.PlayerUtil;
@@ -138,7 +140,7 @@ public class ShopItem {
                 boolean invalidVanillaItem;
                 try {
                     ItemID itemID = ItemID.valueOf(entry.getKey());
-                    LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(itemID);
+                    LunixItem lunixItem = ItemManager.get().getLunixItem(itemID);
                     invalidLunixItem = lunixItem == null;
                 } catch (IllegalArgumentException ignored) {
                     invalidLunixItem = true;
@@ -150,7 +152,7 @@ public class ShopItem {
                     invalidVanillaItem = true;
                 }
                 if (!invalidLunixItem) {
-                    LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(ItemID.valueOf(entry.getKey()));
+                    LunixItem lunixItem = ItemManager.get().getLunixItem(ItemID.valueOf(entry.getKey()));
                     itemDisplayName = lunixItem.getColoredDisplayName();
                 } else if (!invalidVanillaItem) {
                     itemDisplayName = WordUtils.capitalizeFully(entry.getKey().replace("_"," "));
@@ -181,7 +183,7 @@ public class ShopItem {
             return;
         }
         Map<String,Integer> map = PlayerUtil.getInventoryContentsCounts(player);
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getLunixPlayer(player.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getLunixPlayer(player.getUniqueId());
         boolean playerHasCurrency = true;
         ShopItemCostCurrencyType notEnough = null;
         for (Map.Entry<ShopItemCostCurrencyType,BigInteger> entry : costCurrency.entrySet()) {

@@ -5,6 +5,7 @@ import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
+import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -58,7 +59,7 @@ public class PMineGUI implements LunixInventory {
         e.setCancelled(true);
         int slot = e.getRawSlot();
         Player p = (Player) e.getWhoClicked();
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         if (mine == null) {
             p.sendMessage(ChatColor.RED+"Your Mine hasn't loaded correctly, Please contact an administrator.");
             return;
@@ -66,8 +67,8 @@ public class PMineGUI implements LunixInventory {
         switch (slot) {
             case 11 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMinePublicGUI().getInv(p)));
             case 13,15 -> p.sendMessage(ChatColor.RED + "This feature is currently a work in progress, Please try again later.");
-            case 29 -> {mine.teleportToCenter(p,false,false);Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), p::closeInventory);}
-            case 30 -> {mine.reset();Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), p::closeInventory);}
+            case 29 -> {mine.teleportToCenter(p,false,false);Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), ()->p.closeInventory());}
+            case 30 -> {mine.reset();Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), ()->p.closeInventory());}
             case 31 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineUpgradesGUI().getInv(p)));
             case 32 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineBlocksGUI().getInv(p)));
             case 33 -> Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),() -> p.openInventory(new PMineSettingsGUI().getInv(p)));

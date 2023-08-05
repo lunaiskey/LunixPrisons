@@ -1,71 +1,74 @@
 package io.github.lunaiskey.lunixprison.modules.pickaxe;
 
+import io.github.lunaiskey.lunixprison.modules.pickaxe.enchants.*;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public enum EnchantType {
-    EFFICIENCY,
-    FORTUNE,
-    HASTE,
-    SPEED,
-    NIGHT_VISION,
-    JUMP_BOOST,
-    MINE_BOMB,
-    JACK_HAMMER,
-    GEM_FINDER,
-    KEY_FINDER,
-    LOOT_FINDER,
-    STRIKE,
-    EXPLOSIVE,
-    XP_BOOST,
-    NUKE,
+    EFFICIENCY(Efficiency.class,11,100),
+    FORTUNE(Fortune.class,20,5),
+    HASTE(Haste.class,12,6),
+    SPEED(Speed.class,13,3),
+    JUMP_BOOST(JumpBoost.class,14,3),
+    NIGHT_VISION(NightVision.class,15,1),
+    MINE_BOMB(MineBomb.class,24),
+    JACK_HAMMER(JackHammer.class,21),
+    STRIKE(Strike.class,22),
+    EXPLOSIVE(Explosive.class,23),
+    NUKE(Nuke.class,29),
+    GEM_FINDER(GemFinder.class,30),
+    KEY_FINDER(KeyFinder.class,31),
+    LOOT_FINDER(LootFinder.class,32),
+    XP_BOOST(XPBoost.class,33),
     //HORIZONTAL_BREAK,
     //VERTICAL_BREAK,
     ;
 
-    private static final Set<EnchantType> SORTED_ENCHANTS = new LinkedHashSet<>();
+    private final int enchantGUISlot;
+    private final int minLevel;
+    private final Class<?> lunixEnchantClass;
+    private LunixEnchant lunixEnchant;
     private static final Map<EnchantType,Integer> DEFAULT_ENCHANTS = new HashMap<>();
+    private static final Map<Integer,EnchantType> INTEGER_ENCHANT_TYPE_MAP = new HashMap<>();
+
+    EnchantType(Class<?> lunixEnchantClass, int enchantGUISlot, int minLevel) {
+        this.lunixEnchantClass = lunixEnchantClass;
+        this.enchantGUISlot = enchantGUISlot;
+        this.minLevel = minLevel;
+    }
+
+    EnchantType(Class<?> lunixEnchantClass, int enchantGUISlot) {
+        this(lunixEnchantClass, enchantGUISlot, 0);
+    }
+
+
+
+    public LunixEnchant getLunixEnchant() {
+        return lunixEnchant;
+    }
 
     static {
-        SORTED_ENCHANTS.addAll(List.of(
-                EFFICIENCY,FORTUNE,HASTE,SPEED,JUMP_BOOST,NIGHT_VISION,
-                MINE_BOMB,JACK_HAMMER,STRIKE,EXPLOSIVE,NUKE,
-                GEM_FINDER,KEY_FINDER,LOOT_FINDER,XP_BOOST
-        ));
-        DEFAULT_ENCHANTS.put(EnchantType.EFFICIENCY, 100);
-        DEFAULT_ENCHANTS.put(EnchantType.HASTE,6);
-        DEFAULT_ENCHANTS.put(EnchantType.SPEED,3);
-        DEFAULT_ENCHANTS.put(EnchantType.JUMP_BOOST,3);
-        DEFAULT_ENCHANTS.put(EnchantType.NIGHT_VISION,1);
-        DEFAULT_ENCHANTS.put(EnchantType.FORTUNE,5);
+        for (EnchantType type : values()) {
+            try {
+                //Fixes LunixEnchant objects having EnchantType reference being null when object created, is a weird fix might change.
+                type.lunixEnchant = (LunixEnchant) type.lunixEnchantClass.getDeclaredConstructor().newInstance();
+            } catch (Exception ignored) {
+            }
+            if (type.minLevel > 0) {
+                DEFAULT_ENCHANTS.put(type,type.minLevel);
+            }
+            INTEGER_ENCHANT_TYPE_MAP.put(type.enchantGUISlot,type);
+        }
     }
 
 
-    public static Set<EnchantType> getSortedEnchants() {
-        return SORTED_ENCHANTS;
-    }
 
     public static Map<EnchantType,Integer> getDefaultEnchants() {
         return DEFAULT_ENCHANTS;
     }
 
     public static EnchantType getEnchantFromSlot(int slot) {
-        return switch (slot) {
-            case 11 -> EFFICIENCY;
-            case 12 -> HASTE;
-            case 13 -> SPEED;
-            case 14 -> JUMP_BOOST;
-            case 15 -> NIGHT_VISION;
-            case 20 -> FORTUNE;
-            case 21 -> JACK_HAMMER;
-            case 22 -> STRIKE;
-            case 23 -> EXPLOSIVE;
-            case 24 -> MINE_BOMB;
-            case 29 -> NUKE;
-            case 30 -> GEM_FINDER;
-            case 31 -> KEY_FINDER;
-            case 32 -> LOOT_FINDER;
-            //case 33 -> XP_BOOST;
-            default -> null;
-        };
+        return INTEGER_ENCHANT_TYPE_MAP.get(slot);
     }
 }

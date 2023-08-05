@@ -2,9 +2,14 @@ package io.github.lunaiskey.lunixprison.modules.pickaxe.enchants;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixChanceEnchant;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
+import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.util.nms.NMSBlockChange;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -15,47 +20,48 @@ import java.util.List;
 import java.util.Random;
 
 
-public class GemFinder extends LunixEnchant {
+public class GemFinder extends LunixChanceEnchant {
     public GemFinder() {
-        super("Gemstone Finder", List.of("Increases your chances of finding Gemstones."),1000, CurrencyType.TOKENS,  true);
+        super("Gemstone Finder", EnchantType.GEM_FINDER, List.of("Gives a chance to find a random Gemstone."),1000, CurrencyType.TOKENS,  true);
     }
 
     @Override
-    public void onBlockBreak(BlockBreakEvent e, int level) {
+    public void onBlockBreak(BlockBreakEvent e, LunixPlayer lunixPlayer, int level, NMSBlockChange nmsBlockChange) {
         Player player = e.getPlayer();
         Random rand = LunixPrison.getPlugin().getRand();
         double roll = rand.nextDouble();
-        if (roll*100 <= getChance(level)) {
+        if (roll*100 <= getChance(level,player)) {
             if (level > getMaxLevel()) {
                 level = getMaxLevel();
             }
             int j = getMaxLevel()/10;
             int gemNum = rand.nextInt((((level-1)-((level-1) % j))/j)+1)+1;
             //int gemNum = (int) (Math.random() * (level / 100)) + 1;
-            LunixItem gemstone =  LunixPrison.getPlugin().getItemManager().getLunixItem(getGemstone(gemNum));
+            LunixItem gemstone = ItemManager.get().getLunixItem(getGemstone(gemNum));
             ItemStack gemstoneItem = gemstone.getItemStack();
             player.getInventory().addItem(gemstoneItem);
-            //player.sendMessage("GEM_FINDER: "+gemstone.getItemID());
+            onActivationEnd(player,lunixPlayer);
         }
         //PyrexPrison.getPlugin().getPlayerManager().getPlayerMap().get(e.getPlayer().getUniqueId()).giveGems(0);
     }
 
-    private double getChance(int level) {
+    @Override
+    public double getChance(int level, Player player) {
         return 0.001D * level;
     }
 
     @Override
-    public void onDrop(PlayerDropItemEvent e, int level) {
+    public void onDrop(PlayerDropItemEvent e, LunixPlayer lunixPlayer, int level) {
 
     }
 
     @Override
-    public void onEquip(Player player, ItemStack pickaxe, int level) {
+    public void onEquip(Player player, LunixPlayer lunixPlayer, ItemStack pickaxe, int level) {
 
     }
 
     @Override
-    public void onUnEquip(Player player, ItemStack pickaxe, int level) {
+    public void onUnEquip(Player player, LunixPlayer lunixPlayer, ItemStack pickaxe, int level) {
 
     }
 

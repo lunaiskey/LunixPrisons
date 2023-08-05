@@ -5,6 +5,7 @@ import io.github.lunaiskey.lunixprison.inventory.LunixPagedHolder;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
+import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -31,7 +32,7 @@ public class PMineBlocksGUI implements LunixInventory {
     }
 
     public void init(Inventory inv, Player p) {
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         LunixPagedHolder holder = (LunixPagedHolder) inv.getHolder();
         if (mine == null) {
             return;
@@ -63,7 +64,7 @@ public class PMineBlocksGUI implements LunixInventory {
             return;
         }
         LunixPagedHolder holder = (LunixPagedHolder) inv.getHolder();
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         List<Material> materialList = new ArrayList<>(mine.getComposition().keySet());
         int totalPages = (((materialList.size()-materialList.size()% blocksPerPageSize)/blocksPerPageSize)+1);
         int page = holder.getPage();
@@ -97,7 +98,7 @@ public class PMineBlocksGUI implements LunixInventory {
         Player p = (Player) e.getWhoClicked();
         ItemStack item = e.getCurrentItem();
         Inventory inv = e.getClickedInventory();
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         List<Material> materialList = new ArrayList<>(mine.getComposition().keySet());
         Map<Material,Double> mineComposition = mine.getComposition();
         int slot = e.getRawSlot();
@@ -143,7 +144,7 @@ public class PMineBlocksGUI implements LunixInventory {
                     }
                     switch (clickType) {
                         case LEFT,SHIFT_LEFT ->{
-                            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),p::closeInventory);
+                            Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.closeInventory());
                             editMap.put(p.getUniqueId(),item.getType());
                             e.getWhoClicked().sendMessage("Type a number into chat to set the percentage.");
                         }
@@ -178,7 +179,7 @@ public class PMineBlocksGUI implements LunixInventory {
     }
 
     private ItemStack getBlockItem(Material material, Player p) {
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         double chance = mine.getComposition().get(material);
         List<String> lore = new ArrayList<>();
         String status = !mine.getDisabledBlocks().contains(material) ? "&aEnabled" : "&cDisabled";

@@ -43,8 +43,8 @@ public class CommandGang implements CommandExecutor {
     public CommandGang(LunixPrison plugin) {
         this.plugin = plugin;
         this.log = plugin.getLogger();
-        this.playerManager = plugin.getPlayerManager();
-        this.gangManager = plugin.getGangManager();
+        this.playerManager = PlayerManager.get();
+        this.gangManager = GangManager.get();
     }
 
     @Override
@@ -299,12 +299,12 @@ public class CommandGang implements CommandExecutor {
         }
         String otherPlayerName = args[1];
         Player otherPlayer = Bukkit.getPlayer(otherPlayerName);
-        UUID otherPlayerUUID = otherPlayer != null ? otherPlayer.getUniqueId() : LunixPrison.getPlugin().getPlayerManager().getPlayerUUID(otherPlayerName);
+        UUID otherPlayerUUID = otherPlayer != null ? otherPlayer.getUniqueId() : PlayerManager.get().getPlayerUUID(otherPlayerName);
         if (otherPlayerUUID == null) {
             p.sendMessage(StringUtil.color("&cSomething is off and we couldn't find player..."));
             return;
         }
-        String otherPlayerNameFormatted = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(otherPlayerUUID).getName();
+        String otherPlayerNameFormatted = PlayerManager.get().getPlayerMap().get(otherPlayerUUID).getName();
         GangRankType otherPlayerRank = gang.getMembers().get(otherPlayerUUID).getType();
         if (otherPlayerRank.getWeight() >= rank.getWeight()) {
             p.sendMessage(StringUtil.color("&cYou can't kick Gang members that have the same or higher rank then you."));

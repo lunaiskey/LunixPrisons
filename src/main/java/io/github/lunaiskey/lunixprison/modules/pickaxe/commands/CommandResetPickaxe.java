@@ -1,8 +1,10 @@
 package io.github.lunaiskey.lunixprison.modules.pickaxe.commands;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeManager;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeStorage;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,10 +19,10 @@ public class CommandResetPickaxe implements CommandExecutor {
             return true;
         }
         Player p = (Player) sender;
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         lunixPlayer.setPickaxeStorage(new PickaxeStorage(p.getUniqueId()));
         p.sendMessage(ChatColor.GREEN+"Your pickaxe has been reset to its default state!");
-        LunixPrison.getPlugin().getPickaxeHandler().updateInventoryPickaxe(p);
+        PickaxeManager.get().updateInventoryPickaxe(p);
         return true;
     }
 }

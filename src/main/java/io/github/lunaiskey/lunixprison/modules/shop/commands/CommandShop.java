@@ -2,6 +2,7 @@ package io.github.lunaiskey.lunixprison.modules.shop.commands;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.shop.Shop;
+import io.github.lunaiskey.lunixprison.modules.shop.ShopManager;
 import io.github.lunaiskey.lunixprison.modules.shop.inventories.ShopGUI;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -47,7 +48,7 @@ public class CommandShop implements CommandExecutor {
             player.sendMessage(ChatColor.RED+"Usage: /shop open <ShopID>");
             return;
         }
-        Shop shop = LunixPrison.getPlugin().getShopManager().getShop(args[1]);
+        Shop shop = ShopManager.get().getShop(args[1]);
         if (shop == null) {
             player.sendMessage(ChatColor.RED+"Invalid ShopID.");
             return;
@@ -59,7 +60,7 @@ public class CommandShop implements CommandExecutor {
     private void listSubCommand(CommandSender sender, String label, String[] args) {
         Player player = (Player) sender;
         StringBuilder stringBuilder = new StringBuilder(ChatColor.GREEN+"Available Shops: ");
-        List<String> shopIDList = LunixPrison.getPlugin().getShopManager().getAlphabeticallySortedShopIDs();
+        List<String> shopIDList = ShopManager.get().getAlphabeticallySortedShopIDs();
         for (ListIterator<String> i = shopIDList.listIterator(); i.hasNext();) {
             stringBuilder.append(ChatColor.WHITE).append(i.next()).append(ChatColor.GREEN).append(!i.hasNext() ? ".":",");
         }

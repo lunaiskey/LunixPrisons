@@ -2,9 +2,14 @@ package io.github.lunaiskey.lunixprison.modules.pickaxe.enchants;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
+import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixChanceEnchant;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
+import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
+import io.github.lunaiskey.lunixprison.util.nms.NMSBlockChange;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -15,37 +20,36 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
 
-public class Nuke extends LunixEnchant {
+public class Nuke extends LunixChanceEnchant {
     public Nuke() {
-        super("Nuke", List.of("Obliterates the entire mine."), 5000, CurrencyType.TOKENS, true);
+        super("Nuke", EnchantType.NUKE, List.of("Obliterates the entire mine."), 5000, CurrencyType.TOKENS, true);
     }
 
     @Override
-    public void onBlockBreak(BlockBreakEvent e, int level) {
+    public void onBlockBreak(BlockBreakEvent e, LunixPlayer lunixPlayer, int level, NMSBlockChange nmsBlockChange) {
         Random rand = LunixPrison.getPlugin().getRand();
         Player p = e.getPlayer();
-        if (rand.nextDouble()*100 <= getChance(level)) {
-            Pair<Integer,Integer> pair = LunixPrison.getPlugin().getPMineManager().getGridLocation(e.getBlock().getLocation());
-            PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(pair.getLeft(),pair.getRight());
+        if (rand.nextDouble()*100 <= getChance(level,p)) {
+            Pair<Integer,Integer> pair = PMineManager.get().getGridLocation(e.getBlock().getLocation());
+            PMine mine = PMineManager.get().getPMine(pair.getLeft(),pair.getRight());
             long blocks = mine.getArea()-mine.getBlocksBroken();
-            LunixPrison.getPlugin().getPlayerManager().payForBlocks(e.getPlayer(),blocks);
+            onActivationEnd(p,lunixPlayer,mine,blocks);
             mine.reset();
-            p.sendMessage(StringUtil.color("&b&lYou have activated nuke in this mine!"));
         }
     }
 
     @Override
-    public void onDrop(PlayerDropItemEvent e, int level) {
+    public void onDrop(PlayerDropItemEvent e, LunixPlayer lunixPlayer, int level) {
 
     }
 
     @Override
-    public void onEquip(Player player, ItemStack pickaxe, int level) {
+    public void onEquip(Player player, LunixPlayer lunixPlayer, ItemStack pickaxe, int level) {
 
     }
 
     @Override
-    public void onUnEquip(Player player, ItemStack pickaxe, int level) {
+    public void onUnEquip(Player player, LunixPlayer lunixPlayer, ItemStack pickaxe, int level) {
 
     }
 
@@ -54,7 +58,8 @@ public class Nuke extends LunixEnchant {
         return BigInteger.valueOf(50000L+(75000L*n));
     }
 
-    private double getChance(int level) {
+    @Override
+    public double getChance(int level,Player player) {
         return 0.000002D*level;
     }
 }

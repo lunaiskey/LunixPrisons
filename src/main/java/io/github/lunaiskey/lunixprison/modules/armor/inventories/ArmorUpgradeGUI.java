@@ -2,6 +2,7 @@ package io.github.lunaiskey.lunixprison.modules.armor.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
 import io.github.lunaiskey.lunixprison.modules.player.ChatReplyType;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
@@ -62,7 +63,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
     }
 
     public void init(Inventory inv, Player p) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         for (int i = 0;i<inv.getSize();i++) {
             switch (i) {
                 case 13 -> inv.setItem(i, lunixPlayer.getArmor().get(armorSlot).getItemStack());
@@ -84,7 +85,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
         Player p = (Player) e.getWhoClicked();
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         Inventory inv = e.getClickedInventory();
         Armor armor = lunixPlayer.getArmor().get(armorSlot);
         int slot = e.getRawSlot();
@@ -118,7 +119,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
                 }
                 int cost = armor.getCostAmount(armor.getTier()+1);
                 ItemID gemStoneType = armor.getGemstone(armor.getTier()+1);
-                PlayerManager playerManager = LunixPrison.getPlugin().getPlayerManager();
+                PlayerManager playerManager = PlayerManager.get();
                 if (playerManager.getLunixItemCount(p,gemStoneType) < cost) {
                     p.sendMessage(StringUtil.color("&cYou don't have enough of this type of Gemstone."));
                     return;
@@ -134,7 +135,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
             case 15 -> {
                 switch (e.getClick()) {
                     case LEFT,SHIFT_LEFT -> {
-                        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), p::closeInventory);
+                        Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()->p.closeInventory());
                         p.sendMessage("Type in the hex code you want for your piece.");
                         lunixPlayer.setChatReplyType(ChatReplyType.ARMOR_CUSTOM_COLOR_EDIT);
                         customColorSlotMap.put(p.getUniqueId(),armorSlot);
@@ -173,7 +174,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
     private ItemStack getUpgradeButton(AbilityType abilityType,Player p) {
         Material mat = abilityType.getMaterial();
         String name = abilityType.getFormattedName();
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         Armor armor = lunixPlayer.getArmor().get(armorSlot);
         int level = armor.getAbilties().get(abilityType);
         Ability ability = abilityType.getAbility();
@@ -198,7 +199,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
     }
 
     private ItemStack getTierUpButton(Player p) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         Armor armor = lunixPlayer.getArmor().get(armorSlot);
         ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
@@ -208,7 +209,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
         lore.add(StringUtil.color("&7Armor Piece's Tier."));
         lore.add(" ");
         if (armor.getTier() < armor.getTierMax()) {
-            GemStone gemStone = (GemStone) LunixPrison.getPlugin().getItemManager().getLunixItem(armor.getGemstone(armor.getTier()+1));
+            GemStone gemStone = (GemStone) ItemManager.get().getLunixItem(armor.getGemstone(armor.getTier()+1));
             lore.add(StringUtil.color("&7Cost:"));
             lore.add(StringUtil.color("&8- "+gemStone.getName()+" &7x")+armor.getCostAmount(armor.getTier()+1));
             lore.add(" ");
@@ -223,7 +224,7 @@ public class ArmorUpgradeGUI implements LunixInventory {
     }
 
     private ItemStack getColorButton(Player p) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         ItemStack item = new ItemStack(Material.YELLOW_DYE);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(StringUtil.color("&aChange "+armorSlot.getName()+" Color"));

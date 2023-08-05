@@ -39,7 +39,7 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender,  Command command,  String label,  String[] args) {
         if (sender instanceof Player) {
             Player p = (Player) sender;
-            PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+            PMine mine = PMineManager.get().getPMine(p.getUniqueId());
             if (args.length == 0) {
                 p.openInventory(new PMineGUI().getInv(p));
                 return true;
@@ -64,7 +64,7 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
             return;
         }
         Player p = (Player) sender;
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         if (mine == null) {
             p.sendMessage(ChatColor.RED+"PMine not found. Please report this to an admin.");
             return;
@@ -102,7 +102,7 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
             return;
         }
         Player p = (Player) sender;
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         p.teleport(mine.getCenter().add(0.5,1,0.5));
         p.sendMessage(ChatColor.GREEN+"Teleporting to mine...");
     }
@@ -121,16 +121,13 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
         if (!(p.hasPermission("lunix.debug"))) {
             return;
         }
-        p.sendMessage(
-
-        );
     }
     public void checkMineBlocksCommand(CommandSender sender, String label, String[] args) {
         if (!(sender instanceof Player)) {
             return;
         }
         Player p = (Player) sender;
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         mine.checkMineBlocks();
         p.sendMessage("&aChecked your blocks, You have "+mine.getComposition().size()+" Available blocks.");
     }
@@ -140,7 +137,7 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
             return;
         }
         Player p = (Player) sender;
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         if (!(p.hasPermission("lunix.debug"))) {
             p.sendMessage(Messages.NO_PERMISSION.getText());
             return;
@@ -163,8 +160,8 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
             }
             case "getgridposition" -> {
                 Location l = p.getLocation().clone();
-                Pair<Integer, Integer> loc = new PMineManager().getGridLocation(l);
-                PMine pMine = LunixPrison.getPlugin().getPMineManager().getPMine(loc.getLeft(), loc.getRight());
+                Pair<Integer, Integer> loc = PMineManager.get().getGridLocation(l);
+                PMine pMine = PMineManager.get().getPMine(loc.getLeft(), loc.getRight());
                 if (pMine != null && l.getWorld().getName().equalsIgnoreCase("mines")) {
                     p.sendMessage("Owner: " + Bukkit.getOfflinePlayer(pMine.getOwner()).getName());
                 } else {
@@ -175,8 +172,8 @@ public class CommandPMine implements CommandExecutor, TabCompleter {
             case "genbedrock" -> {
                 if (debug) {
                     Location l = p.getLocation().clone();
-                    Pair<Integer, Integer> loc = new PMineManager().getGridLocation(l);
-                    PMine pMine = LunixPrison.getPlugin().getPMineManager().getPMine(loc.getLeft(), loc.getRight());
+                    Pair<Integer, Integer> loc = PMineManager.get().getGridLocation(l);
+                    PMine pMine = PMineManager.get().getPMine(loc.getLeft(), loc.getRight());
                     pMine.genBedrock();
                 }
             }

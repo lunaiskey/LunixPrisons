@@ -2,12 +2,14 @@ package io.github.lunaiskey.lunixprison.modules.items.items;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
 import io.github.lunaiskey.lunixprison.modules.items.meta.LunixItemMeta;
 import io.github.lunaiskey.lunixprison.modules.items.meta.MetaBoosterItem;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.modules.boosters.Booster;
 import io.github.lunaiskey.lunixprison.modules.boosters.BoosterType;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
@@ -59,7 +61,7 @@ public class BoosterItem extends LunixItem {
         item = NBTTags.addLunixData(item,"id",getItemID().name());
         item = NBTTags.addLunixData(item, "uuid", UUID.randomUUID().toString());
         new MetaBoosterItem(boosterType,lengthSeconds,multiplier).applyMeta(item);
-        LunixPrison.getPlugin().getItemManager().updateItemStack(item,player);
+        ItemManager.get().updateItemStack(item,player);
         return item;
     }
 
@@ -94,7 +96,7 @@ public class BoosterItem extends LunixItem {
             p.sendMessage(StringUtil.color("&eThis Booster is invalid."));
             return;
         }
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getLunixPlayer(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getLunixPlayer(p.getUniqueId());
         if (lunixPlayer == null) {
             p.sendMessage(ChatColor.RED+"Unable to apply Booster while player data is unloaded.");
             return;

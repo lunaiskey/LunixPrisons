@@ -8,6 +8,7 @@ import io.github.lunaiskey.lunixprison.modules.armor.upgrades.Ability;
 import io.github.lunaiskey.lunixprison.modules.armor.upgrades.AbilityType;
 import io.github.lunaiskey.lunixprison.modules.armor.inventories.ArmorGUI;
 import io.github.lunaiskey.lunixprison.modules.armor.Armor;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -74,7 +75,7 @@ public class CommandArmor implements CommandExecutor {
     }
 
     private void setTierCommand(Player sender, Player toModify, ArmorSlot slot, int offset, String label, String[] args) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(toModify.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(toModify.getUniqueId());
         int tier;
         if (args.length < (5+offset)) {
             sender.sendMessage(Messages.NOT_ENOUGH_ARGS.getText());
@@ -100,7 +101,7 @@ public class CommandArmor implements CommandExecutor {
     }
 
     private void setColorCommand(Player sender, Player toModify, ArmorSlot slot, int offset, String label, String[] args) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(toModify.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(toModify.getUniqueId());
         if (args.length < (5+offset)) {
             sender.sendMessage(Messages.NOT_ENOUGH_ARGS.getText());
             return;
@@ -133,7 +134,7 @@ public class CommandArmor implements CommandExecutor {
     }
 
     private void setAbilityCommand(Player sender, Player toModify, ArmorSlot slot, int offset, String label, String[] args) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(toModify.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(toModify.getUniqueId());
         AbilityType abilityType;
         if (args.length < (6+offset)) {
             sender.sendMessage(Messages.NOT_ENOUGH_ARGS.getText());

@@ -2,7 +2,9 @@ package io.github.lunaiskey.lunixprison.util;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeManager;
 import io.github.lunaiskey.lunixprison.util.nms.NBTTags;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -52,7 +54,7 @@ public class PlayerUtil {
             if (itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0) {
                 continue;
             }
-            LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(itemStack);
+            LunixItem lunixItem = ItemManager.get().getLunixItem(itemStack);
             if (lunixItem != null) {
                 if (!lunixItem.getItemID().name().equals(itemID)) {
                     continue;

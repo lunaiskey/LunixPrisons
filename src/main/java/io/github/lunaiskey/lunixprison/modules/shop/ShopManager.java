@@ -2,6 +2,8 @@ package io.github.lunaiskey.lunixprison.modules.shop;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,8 +15,21 @@ import java.util.stream.Collectors;
 
 public class ShopManager {
 
+    private static ShopManager instance;
+
     private Map<String,Shop> shopMap = new HashMap<>();
     private List<String> sortedShopIDs = new ArrayList<>();
+
+    private ShopManager() {
+
+    }
+
+    public static ShopManager get() {
+        if (instance == null) {
+            instance = new ShopManager();
+        }
+        return instance;
+    }
 
     public void registerShops() {
         registerHardCodedShops();
@@ -23,7 +38,7 @@ public class ShopManager {
     public void registerHardCodedShops() {
         addShop(new Shop("SCIENTIST","The Scientist",54,ShopType.LISTED)
             .addShopItem(new ShopItem(22,2)
-                .setItemStack(LunixPrison.getPlugin().getItemManager().getLunixItem(ItemID.LEGENDARY_GEODE).getItemStack())
+                .setItemStack(ItemManager.get().getLunixItem(ItemID.LEGENDARY_GEODE).getItemStack())
                 .addCostItemStack(ItemID.BLAN_NOES,32)
             )
             .addShopItem(new ShopItem(0,0)

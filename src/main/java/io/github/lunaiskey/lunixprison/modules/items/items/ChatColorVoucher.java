@@ -5,6 +5,7 @@ import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
 import io.github.lunaiskey.lunixprison.modules.items.meta.LunixItemMeta;
 import io.github.lunaiskey.lunixprison.modules.items.meta.MetaChatColorVoucher;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.modules.player.chatcolor.ChatColorSelectType;
 import io.github.lunaiskey.lunixprison.modules.player.chatcolor.LunixChatColor;
 import io.github.lunaiskey.lunixprison.modules.player.datastorages.ChatColorStorage;
@@ -69,7 +70,7 @@ public class ChatColorVoucher extends LunixItem {
     @Override
     public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        ChatColorStorage s = LunixPrison.getPlugin().getPlayerManager().getLunixPlayer(p.getUniqueId()).getChatColorStorage();
+        ChatColorStorage s = PlayerManager.get().getLunixPlayer(p.getUniqueId()).getChatColorStorage();
         ItemStack item = e.getItem();
         MetaChatColorVoucher meta = new MetaChatColorVoucher(item);
         ChatColorSelectType selectType = meta.getType();

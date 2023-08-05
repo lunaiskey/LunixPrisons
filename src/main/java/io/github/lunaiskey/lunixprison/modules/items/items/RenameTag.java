@@ -6,6 +6,7 @@ import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
 import io.github.lunaiskey.lunixprison.modules.items.meta.LunixItemMeta;
 import io.github.lunaiskey.lunixprison.modules.player.ChatReplyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -43,7 +44,7 @@ public class RenameTag extends LunixItem {
         e.setUseItemInHand(Event.Result.DENY);
         e.setUseInteractedBlock(Event.Result.DENY);
         Player p = e.getPlayer();
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         InventoryType type = p.getOpenInventory().getType();
         if (lunixPlayer.getChatReplyType() != ChatReplyType.RENAME_TAG) {
             if (type == InventoryType.CRAFTING || type == InventoryType.CREATIVE) {

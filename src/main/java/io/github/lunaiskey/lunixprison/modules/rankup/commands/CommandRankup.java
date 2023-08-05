@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.modules.rankup.commands;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.modules.rankup.Rankup;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
@@ -22,7 +23,7 @@ public class CommandRankup implements CommandExecutor {
             return true;
         }
         Player p = (Player) sender;
-        LunixPlayer player = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer player = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         Rankup rankup = new Rankup();
         CurrencyType type = CurrencyType.TOKENS;
         BigInteger cost = Rankup.getLevelCost(player.getRank()+1);

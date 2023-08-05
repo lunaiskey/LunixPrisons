@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.modules.player.commands;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.Messages;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.Numbers;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.command.Command;
@@ -26,7 +27,7 @@ public class CommandMultiplier implements CommandExecutor {
             return true;
         }
         Player p = (Player) sender;
-        LunixPlayer lunixPlayer = plugin.getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         double baseMulti = lunixPlayer.getBaseMultiplier();
         double rankMultiplier = lunixPlayer.getRankMultiplier();
         double armorMultiplier = lunixPlayer.getArmorMultiplier();

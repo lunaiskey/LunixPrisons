@@ -2,11 +2,13 @@ package io.github.lunaiskey.lunixprison.modules.player.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.items.items.GemStone;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -65,10 +67,10 @@ public class GemStoneGUI implements LunixInventory {
     public void onClick(InventoryClickEvent e) {
         e.setCancelled(true);
         Player p = (Player) e.getWhoClicked();
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         switch (e.getRawSlot()) {
             case 11,12,13,14,15,20,21,22,23,24 -> {
-                GemStone gemStone = (GemStone) LunixPrison.getPlugin().getItemManager().getLunixItem(gemStoneMap.get(e.getRawSlot()));
+                GemStone gemStone = (GemStone) ItemManager.get().getLunixItem(gemStoneMap.get(e.getRawSlot()));
                 if (lunixPlayer.getRank() >= getRankRequirement(gemStoneMap.get(e.getRawSlot()))) {
                     if (!lunixPlayer.getSelectedGemstone().equals(gemStoneMap.get(e.getRawSlot()))) {
                         lunixPlayer.setSelectedGemstone(gemStoneMap.get(e.getRawSlot()));
@@ -116,9 +118,9 @@ public class GemStoneGUI implements LunixInventory {
     }
 
     private ItemStack getGemstones(int slot, Player player) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(player.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(player.getUniqueId());
         ItemID gemstone = gemStoneMap.get(slot);
-        ItemStack item = LunixPrison.getPlugin().getItemManager().getLunixItem(gemstone).getItemStack();
+        ItemStack item = ItemManager.get().getLunixItem(gemstone).getItemStack();
         ItemMeta meta = item.getItemMeta();
         List<String> lore = new ArrayList<>(meta.getLore());
         lore.add(" ");

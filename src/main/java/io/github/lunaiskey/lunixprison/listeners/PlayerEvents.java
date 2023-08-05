@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.listeners;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.inventory.InventoryManager;
 import io.github.lunaiskey.lunixprison.modules.armor.inventories.ArmorUpgradeGUI;
+import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
 import io.github.lunaiskey.lunixprison.modules.items.gui.RenameTagConfirmGUI;
 import io.github.lunaiskey.lunixprison.modules.items.meta.MetaBoosterItem;
 import io.github.lunaiskey.lunixprison.modules.items.meta.MetaCurrencyVoucher;
@@ -31,6 +32,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.apache.commons.lang3.tuple.*;
 
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftRecipe;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -42,6 +44,7 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.RecipeChoice;
 
 import java.math.BigInteger;
 import java.util.Map;
@@ -57,9 +60,9 @@ public class PlayerEvents implements Listener {
 
     public PlayerEvents(LunixPrison plugin) {
         this.plugin = plugin;
-        pMineManager = plugin.getPMineManager();
-        playerManager = plugin.getPlayerManager();
-        inventoryManager = plugin.getInventoryManager();
+        pMineManager = PMineManager.get();
+        playerManager = PlayerManager.get();
+        inventoryManager = InventoryManager.get();
         playerMap = playerManager.getPlayerMap();
     }
 
@@ -84,7 +87,7 @@ public class PlayerEvents implements Listener {
                     } else {
                         if (blockLoc.getWorld() == Bukkit.getWorld(PMineWorld.getWorldName())) {
                             Pair<Integer,Integer> gridLoc = pMineManager.getGridLocation(block.getLocation());
-                            PMine pMine = LunixPrison.getPlugin().getPMineManager().getPMine(gridLoc.getLeft(), gridLoc.getRight());
+                            PMine pMine = PMineManager.get().getPMine(gridLoc.getLeft(), gridLoc.getRight());
                             if (pMine != null) {
                                 if (pMine.isInMineRegion(block.getLocation())) {
                                     e.setDropItems(false);
@@ -96,7 +99,7 @@ public class PlayerEvents implements Listener {
                     }
                 }
                 default -> {
-                    LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(itemID);
+                    LunixItem lunixItem = ItemManager.get().getLunixItem(itemID);
                     if (lunixItem != null) {
                         lunixItem.onBlockBreak(e);
                     }
@@ -110,7 +113,7 @@ public class PlayerEvents implements Listener {
         Player p = e.getPlayer();
         ItemID itemID = NBTTags.getItemID(e.getItemInHand());
         if (itemID != null) {
-            LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(itemID);
+            LunixItem lunixItem = ItemManager.get().getLunixItem(itemID);
             if (lunixItem != null) {
                 lunixItem.onBlockPlace(e);
             }
@@ -123,28 +126,28 @@ public class PlayerEvents implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        Map<UUID, LunixPlayer> playerMap = LunixPrison.getPlugin().getPlayerManager().getPlayerMap();
+        Map<UUID, LunixPlayer> playerMap = PlayerManager.get().getPlayerMap();
         if (!playerMap.containsKey(p.getUniqueId())) {
-            LunixPrison.getPlugin().getPlayerManager().createLunixPlayer(p.getUniqueId());
+            PlayerManager.get().createLunixPlayer(p.getUniqueId());
         } else {
             LunixPlayer lunixPlayer = playerMap.get(p.getUniqueId());
             if (!lunixPlayer.getName().equals(p.getName())) {
                 lunixPlayer.setName(p.getName());
             }
         }
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         if (mine == null) {
-            LunixPrison.getPlugin().getPMineManager().newPMine(p.getUniqueId());
+            PMineManager.get().newPMine(p.getUniqueId());
         } else {
             mine.scheduleReset();
         }
-        LunixPrison.getPlugin().getPickaxeHandler().updateInventoryPickaxe(p);
-        LunixPrison.getPlugin().getPickaxeHandler().hasOrGivePickaxe(p);
+        PickaxeManager.get().updateInventoryPickaxe(p);
+        PickaxeManager.get().hasOrGivePickaxe(p);
         LunixPrison.getPlugin().getSavePending().add(p.getUniqueId());
         if (p.getWorld().getName().equals(PMineWorld.getWorldName())) {
             p.setAllowFlight(true);
             p.setFlying(true);
-            PMine currentPMine = LunixPrison.getPlugin().getPMineManager().getPMineAtPlayer(p);
+            PMine currentPMine = PMineManager.get().getPMineAtPlayer(p);
             if (currentPMine != null) {
                 Bukkit.getScheduler().runTask(plugin,()->currentPMine.sendBorder(p));
             }
@@ -169,13 +172,15 @@ public class PlayerEvents implements Listener {
         if (to == null || to.getWorld() == null) {
             return;
         }
-        PMine fromPMine = LunixPrison.getPlugin().getPMineManager().getPMineAtPlayer(player);
-        PMine toPMine = LunixPrison.getPlugin().getPMineManager().getPMineAtLocation(to);
+        PMine fromPMine = PMineManager.get().getPMineAtPlayer(player);
+        PMine toPMine = PMineManager.get().getPMineAtLocation(to);
         if (to.getWorld().getName().equals(PMineWorld.getWorldName())) {
             if (e.getCause() == PlayerTeleportEvent.TeleportCause.PLUGIN || e.getCause() == PlayerTeleportEvent.TeleportCause.COMMAND) {
                 Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()-> {
-                    player.setAllowFlight(true);
-                    player.setFlying(true);
+                    if (!player.getAllowFlight()) {
+                        player.setAllowFlight(true);
+                        player.setFlying(true);
+                    }
                     if (toPMine == null) {
                         player.setWorldBorder(null);
                         return;
@@ -233,14 +238,14 @@ public class PlayerEvents implements Listener {
         if (id == null) return;
         switch (id) {
             case LUNIX_PICKAXE -> {
-                LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+                LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
                 if (lunixPlayer == null) return;
                 lunixPlayer.getPickaxeStorage().onInteract(e);
             }
             case BOOSTER -> new BoosterItem().onInteract(e);
             case CURRENCY_VOUCHER -> new CurrencyVoucher().onInteract(e);
             default -> {
-                LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(id);
+                LunixItem lunixItem = ItemManager.get().getLunixItem(id);
                 if (lunixItem == null) return;
                 lunixItem.onInteract(e);
             }
@@ -250,17 +255,18 @@ public class PlayerEvents implements Listener {
     @EventHandler
     public void onDrop(PlayerDropItemEvent e) {
         Player p = e.getPlayer();
+        LunixPlayer lunixPlayer = PlayerManager.get().getLunixPlayer(p.getUniqueId());
         ItemStack item = e.getItemDrop().getItemStack();
         CompoundTag pyrexData = NBTTags.getLunixDataTag(item);
         if (pyrexData.contains("id")) {
             if (pyrexData.getString("id").equalsIgnoreCase(PickaxeManager.getLunixPickaxeId())) {
                 e.setCancelled(true);
-                PickaxeStorage pickaxe = plugin.getPlayerManager().getPlayerMap().get(p.getUniqueId()).getPickaxeStorage();
+                PickaxeStorage pickaxe =lunixPlayer.getPickaxeStorage();
                 for (EnchantType enchantType : pickaxe.getEnchants().keySet()) {
                     if (!pickaxe.getDisabledEnchants().contains(enchantType)) {
-                        LunixEnchant enchant = plugin.getPickaxeHandler().getEnchantments().get(enchantType);
+                        LunixEnchant enchant = PickaxeManager.get().getLunixEnchant(enchantType);
                         if (enchant.isEnabled()) {
-                            enchant.onDrop(e,pickaxe.getEnchants().get(enchantType));
+                            enchant.onDrop(e,lunixPlayer,pickaxe.getEnchants().get(enchantType));
                         }
                     }
                 }
@@ -271,7 +277,7 @@ public class PlayerEvents implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         String strippedMessage = ChatColor.stripColor(e.getMessage());
         if (lunixPlayer.getChatReplyType() != null) {
             e.setCancelled(true);
@@ -342,9 +348,9 @@ public class PlayerEvents implements Listener {
                     Player kickPlayer = Bukkit.getPlayer(strippedMessage);
                     if (kickPlayer != null) {
                         if (kickPlayer.getUniqueId() != p.getUniqueId()) {
-                            PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+                            PMine mine = PMineManager.get().getPMine(p.getUniqueId());
                             if (mine.isInMineIsland(kickPlayer)) {
-                                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()-> LunixPrison.getPlugin().getPMineManager().getPMine(kickPlayer.getUniqueId()).teleportToCenter(kickPlayer,false,true));
+                                Bukkit.getScheduler().runTask(LunixPrison.getPlugin(),()-> PMineManager.get().getPMine(kickPlayer.getUniqueId()).teleportToCenter(kickPlayer,false,true));
                                 kickPlayer.sendMessage(StringUtil.color("&eYou've been kicked from "+p.getName()+"'s mine. teleporting to your mine."));
                                 p.sendMessage(StringUtil.color("&aSuccessfully kicked &f"+kickPlayer.getName()+" &afrom your mine."));
                             } else {
@@ -420,12 +426,13 @@ public class PlayerEvents implements Listener {
         ItemStack newItem = p.getInventory().getItem(e.getNewSlot()) != null ? p.getInventory().getItem(e.getNewSlot()) : new ItemStack(Material.AIR);
         CompoundTag oldMap = NBTTags.getLunixDataTag(oldItem);
         CompoundTag newMap = NBTTags.getLunixDataTag(newItem);
-        PickaxeStorage pickaxe = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(e.getPlayer().getUniqueId()).getPickaxeStorage();
+        LunixPlayer lunixPlayer = PlayerManager.get().getLunixPlayer(p.getUniqueId());
+        PickaxeStorage pickaxe = lunixPlayer.getPickaxeStorage();
         if (oldMap.contains("id")) {
             // is custom pickaxe
             if (oldMap.getString("id").equals(PickaxeManager.getLunixPickaxeId())) {
                 for (EnchantType type : pickaxe.getEnchants().keySet()) {
-                    LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type).onUnEquip(p,oldItem,pickaxe.getEnchants().get(type));
+                    PickaxeManager.get().getLunixEnchant(type).onUnEquip(p,lunixPlayer,oldItem,pickaxe.getEnchants().get(type));
                 }
             }
         }
@@ -434,7 +441,7 @@ public class PlayerEvents implements Listener {
             if (newMap.getString("id").equals(PickaxeManager.getLunixPickaxeId())) {
                 for (EnchantType type : pickaxe.getEnchants().keySet()) {
                     if (!pickaxe.getDisabledEnchants().contains(type)) {
-                        LunixPrison.getPlugin().getPickaxeHandler().getEnchantments().get(type).onEquip(p,newItem,pickaxe.getEnchants().get(type));
+                        PickaxeManager.get().getLunixEnchant(type).onEquip(p,lunixPlayer,newItem,pickaxe.getEnchants().get(type));
                     }
                 }
             }

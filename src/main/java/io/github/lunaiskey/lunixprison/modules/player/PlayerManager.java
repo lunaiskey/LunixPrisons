@@ -2,9 +2,8 @@ package io.github.lunaiskey.lunixprison.modules.player;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
+import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
-import io.github.lunaiskey.lunixprison.modules.leaderboards.BigIntegerEntry;
-import io.github.lunaiskey.lunixprison.modules.leaderboards.LongEntry;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.modules.player.chatcolor.LunixChatColor;
@@ -24,7 +23,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -34,8 +32,21 @@ import java.util.*;
 
 public class PlayerManager {
 
+    private static PlayerManager instance;
     private Map<UUID, LunixPlayer> playerMap = new HashMap<>();
     private Map<String, UUID> playerNameMap = new HashMap<>();
+
+    private PlayerManager() {
+
+    }
+
+    public static PlayerManager get() {
+        if (instance == null) {
+            instance = new PlayerManager();
+        }
+        return instance;
+    }
+
 
     public LunixPlayer getLunixPlayer(UUID playerUUID) {
         return playerMap.get(playerUUID);
@@ -123,16 +134,25 @@ public class PlayerManager {
         for (String enchant : pickaxeEnchant.keySet()) {
             pickaxeEnchantMap.put(EnchantType.valueOf(enchant),(int)pickaxeEnchant.get(enchant));
         }
-        List<String> pickaxeDisabledEnchantList = (List<String>) pickaxeMap.get("disabledEnchants");
+        Object pickaxeDisabledEnchantsObject = pickaxeMap.get("disabledEnchants");
+        List<String> pickaxeDisabledEnchantList = pickaxeDisabledEnchantsObject == null ? new ArrayList<>() : (List<String>) pickaxeDisabledEnchantsObject;
         Set<EnchantType> pickaxeDisabledEnchants = new HashSet<>();
         for (String str : pickaxeDisabledEnchantList) {
             try {
                 pickaxeDisabledEnchants.add(EnchantType.valueOf(str));
             } catch (Exception ignored) {}
         }
+        Object pickaxeDisabledMessagesObject = pickaxeMap.get("disabledMessages");
+        List<String> pickaxeDisabledMessagesList = pickaxeDisabledMessagesObject == null ? new ArrayList<>() : (List<String>) pickaxeDisabledMessagesObject;
+        Set<EnchantType> pickaxeDisabledMessages = new HashSet<>();
+        for (String str : pickaxeDisabledMessagesList) {
+            try {
+                pickaxeDisabledMessages.add(EnchantType.valueOf(str));
+            } catch (Exception ignored) {}
+        }
         long blocksBroken = ((Number) pickaxeMap.getOrDefault("blocksBroken",0L)).longValue();
         String rename = (String) pickaxeMap.getOrDefault("rename",null);
-        PickaxeStorage pickaxe = new PickaxeStorage(lunixPlayer.getpUUID(),pickaxeEnchantMap,pickaxeDisabledEnchants,blocksBroken,rename);
+        PickaxeStorage pickaxe = new PickaxeStorage(lunixPlayer.getpUUID(),pickaxeEnchantMap,pickaxeDisabledEnchants,pickaxeDisabledMessages,blocksBroken,rename);
         lunixPlayer.setPickaxeStorage(pickaxe);
     }
 
@@ -283,7 +303,7 @@ public class PlayerManager {
         int combined = amount + player.getGemstoneCount();
         int ticks = (combined - combined%(getGemstoneCountMax(p)))/(getGemstoneCountMax(p));
         if (ticks > 0) {
-            LunixItem lunixItem = LunixPrison.getPlugin().getItemManager().getLunixItem(player.getSelectedGemstone());
+            LunixItem lunixItem = ItemManager.get().getLunixItem(player.getSelectedGemstone());
             while (ticks > 0) {
                 p.getInventory().addItem(lunixItem.getItemStack());
                 ticks--;
@@ -303,11 +323,17 @@ public class PlayerManager {
         return getPlayerNameMap().get(name.toUpperCase());
     }
 
-    public void payForBlocks(Player p,long amount) {
-        LunixPlayer lunixPlayer = playerMap.get(p.getUniqueId());
+    public void payForBlocks(Player player, long amount) {
+        payForBlocks(player,PlayerManager.get().getLunixPlayer(player.getUniqueId()),amount);
+    }
 
-        Pair<Integer,Integer> pair = LunixPrison.getPlugin().getPMineManager().getGridLocation(p.getLocation());
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(pair.getLeft(),pair.getRight());
+    public void payForBlocks(LunixPlayer lunixPlayer, long amount) {
+        payForBlocks(Bukkit.getPlayer(lunixPlayer.getpUUID()),lunixPlayer,amount);
+    }
+
+    public void payForBlocks(Player p, LunixPlayer lunixPlayer,long amount) {
+        Pair<Integer,Integer> pair = PMineManager.get().getGridLocation(p.getLocation());
+        PMine mine = PMineManager.get().getPMine(pair.getLeft(),pair.getRight());
 
         PickaxeStorage pickaxe = lunixPlayer.getPickaxeStorage();
         double multiplier = lunixPlayer.getTotalMultiplier();
@@ -319,7 +345,7 @@ public class PlayerManager {
         if (mine.getOwner() == lunixPlayer.getpUUID()) {
             lunixPlayer.giveTokens(tokens);
         } else {
-            LunixPlayer mineOwner = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(mine.getOwner());
+            LunixPlayer mineOwner = PlayerManager.get().getPlayerMap().get(mine.getOwner());
             double tax = mine.getMineTax()/100D;
             double mineOwnerAmount = 1-tax;
             lunixPlayer.giveTokens(new BigDecimal(tokens).multiply(BigDecimal.valueOf(mineOwnerAmount)).toBigInteger());
@@ -329,7 +355,7 @@ public class PlayerManager {
     }
 
     public void checkPlayerData() {
-        PMineManager pMineManager = LunixPrison.getPlugin().getPMineManager();
+        PMineManager pMineManager = PMineManager.get();
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (!(getPlayerMap().containsKey(p.getUniqueId()))) {
                 createLunixPlayer(p.getUniqueId());

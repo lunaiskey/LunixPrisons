@@ -1,7 +1,10 @@
 package io.github.lunaiskey.lunixprison.modules.pickaxe.enchants;
 
+import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
+import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.util.nms.NMSBlockChange;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -14,26 +17,26 @@ public class Fortune extends LunixEnchant {
 
 
     public Fortune() {
-        super("Fortune", List.of("Increases blocks received while mining"),  1000, CurrencyType.TOKENS,  true);
+        super("Fortune", EnchantType.FORTUNE, List.of("Increases blocks received while mining"),  1000, CurrencyType.TOKENS,  true);
     }
 
     @Override
-    public void onBlockBreak(BlockBreakEvent e, int level) {
-
-    }
-
-    @Override
-    public void onDrop(PlayerDropItemEvent e, int level) {
+    public void onBlockBreak(BlockBreakEvent e, LunixPlayer lunixPlayer, int level, NMSBlockChange nmsBlockChange) {
 
     }
 
     @Override
-    public void onEquip(Player player, ItemStack pickaxe, int level) {
+    public void onDrop(PlayerDropItemEvent e, LunixPlayer lunixPlayer, int level) {
 
     }
 
     @Override
-    public void onUnEquip(Player player, ItemStack pickaxe, int level) {
+    public void onEquip(Player player, LunixPlayer lunixPlayer, ItemStack pickaxe, int level) {
+
+    }
+
+    @Override
+    public void onUnEquip(Player player, LunixPlayer lunixPlayer, ItemStack pickaxe, int level) {
 
     }
 

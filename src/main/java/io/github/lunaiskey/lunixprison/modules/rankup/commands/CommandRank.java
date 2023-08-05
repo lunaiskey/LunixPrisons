@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.modules.rankup.commands;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.Messages;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,7 +20,7 @@ public class CommandRank implements CommandExecutor {
             return true;
         }
         Player p = (Player) sender;
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         if (args.length == 0) {
             p.sendMessage(StringUtil.color("&bYour rank is: &f"+ lunixPlayer.getRank()));
             return true;
@@ -58,7 +59,7 @@ public class CommandRank implements CommandExecutor {
             p.sendMessage(ChatColor.RED+"&cValue cannot be smaller then 0!");
             return;
         }
-        LunixPlayer otherLunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(otherPlayer.getUniqueId());
+        LunixPlayer otherLunixPlayer = PlayerManager.get().getPlayerMap().get(otherPlayer.getUniqueId());
         otherLunixPlayer.setRank(rank);
         p.sendMessage(ChatColor.GREEN+"Successfully set "+otherPlayer.getName()+"'s rank to "+rank+"!");
     }
@@ -70,7 +71,7 @@ public class CommandRank implements CommandExecutor {
         if (otherPlayer == null) {
             p.sendMessage(StringUtil.color("&cPlayer "+args[0]+" isn't online."));
         }
-        LunixPlayer otherLunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(otherPlayer.getUniqueId());
+        LunixPlayer otherLunixPlayer = PlayerManager.get().getPlayerMap().get(otherPlayer.getUniqueId());
         p.sendMessage(StringUtil.color("&b"+otherPlayer.getName()+"'s rank is: &f"+ otherLunixPlayer.getRank()));
     }
 }

@@ -31,7 +31,7 @@ public class CommandCurrency implements CommandExecutor, TabCompleter {
 
     public CommandCurrency(LunixPrison plugin, CurrencyType type) {
         this.plugin = plugin;
-        this.playerManager = plugin.getPlayerManager();
+        this.playerManager = PlayerManager.get();
         this.type = type;
         this.unicode = type.getUnicode();
     }
@@ -57,7 +57,7 @@ public class CommandCurrency implements CommandExecutor, TabCompleter {
         if (sender instanceof Player) {
             Player p = (Player) sender;
             if (otherPlayer != null) {
-                LunixPlayer otherLunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(otherPlayer.getUniqueId());
+                LunixPlayer otherLunixPlayer = PlayerManager.get().getPlayerMap().get(otherPlayer.getUniqueId());
                 p.sendMessage(StringUtil.color(type.getColorCode()+otherPlayer.getName()+" has "+unicode+"&f"+Numbers.formattedNumber(otherLunixPlayer.getCurrency(type))+" "+type.getColorCode()+name()+"."));
             } else {
                 p.sendMessage(StringUtil.color("&c"+args[0]+" isn't online."));

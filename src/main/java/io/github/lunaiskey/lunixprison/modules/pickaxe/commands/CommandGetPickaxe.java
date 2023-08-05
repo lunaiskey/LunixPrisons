@@ -1,6 +1,7 @@
 package io.github.lunaiskey.lunixprison.modules.pickaxe.commands;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeManager;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -16,7 +17,7 @@ public class CommandGetPickaxe implements CommandExecutor {
             return true;
         }
         Player p = (Player) sender;
-        if (LunixPrison.getPlugin().getPickaxeHandler().hasOrGivePickaxe(p)) {
+        if (PickaxeManager.get().hasOrGivePickaxe(p)) {
             p.sendMessage(StringUtil.color("&cYou already have a pickaxe."));
             return true;
         }

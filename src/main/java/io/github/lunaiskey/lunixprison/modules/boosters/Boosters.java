@@ -2,6 +2,7 @@ package io.github.lunaiskey.lunixprison.modules.boosters;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.modules.player.inventories.PersonalBoosterGUI;
 import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
@@ -20,7 +21,7 @@ public class Boosters {
     private void scheduleTask() {
         Bukkit.getScheduler().runTaskTimer(LunixPrison.getPlugin(),() -> {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+                LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
                 if (lunixPlayer != null) {
                     List<Booster> boosters = lunixPlayer.getBoosters();
                     if (boosters.size() > 0) {

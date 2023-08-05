@@ -1,6 +1,7 @@
 package io.github.lunaiskey.lunixprison.modules.gangs;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -51,22 +52,22 @@ public class Gang {
     public void removeMember(UUID uuid) {
         if (owner != uuid) {
             getMembers().remove(uuid);
-            LunixPrison.getPlugin().getGangManager().getPlayerGangMap().remove(uuid);
+            GangManager.get().getPlayerGangMap().remove(uuid);
         }
     }
 
     public void addMember(UUID uuid) {
         if (!getMembers().containsKey(uuid)) {
-            getMembers().put(uuid,new GangMember(uuid, LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(uuid).getName(),GangRankType.MEMBER));
-            LunixPrison.getPlugin().getGangManager().getPlayerGangMap().put(uuid,this.uuid);
+            getMembers().put(uuid,new GangMember(uuid, PlayerManager.get().getPlayerMap().get(uuid).getName(),GangRankType.MEMBER));
+            GangManager.get().getPlayerGangMap().put(uuid,this.uuid);
             pendingInvites.remove(uuid);
         }
     }
 
     public void setName(String name) {
-        LunixPrison.getPlugin().getGangManager().getGangNameMap().remove(this.name.toUpperCase());
+        GangManager.get().getGangNameMap().remove(this.name.toUpperCase());
         this.name = name.replace(" ","");
-        LunixPrison.getPlugin().getGangManager().getGangNameMap().put(this.name.toUpperCase(),this.uuid);
+        GangManager.get().getGangNameMap().put(this.name.toUpperCase(),this.uuid);
     }
 
     public void setOwner(UUID owner) {

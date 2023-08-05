@@ -14,12 +14,22 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ItemManager {
+
+    private static ItemManager instance;
+
+    private ItemManager() {
+
+    }
+
+    public static ItemManager get() {
+        if (instance == null) {
+            instance = new ItemManager();
+        }
+        return instance;
+    }
 
     private Map<ItemID, LunixItem> itemMap = new LinkedHashMap<>();
 
@@ -89,7 +99,7 @@ public class ItemManager {
         if (itemID != null) {
             boolean hasCustomUpdate = true;
             switch (itemID) {
-                case LUNIX_PICKAXE -> LunixPrison.getPlugin().getPickaxeHandler().updatePickaxe(itemStack,player.getUniqueId());
+                case LUNIX_PICKAXE -> PickaxeManager.get().updatePickaxe(itemStack,player.getUniqueId());
                 default -> hasCustomUpdate = false;
             }
             if (hasCustomUpdate) {
@@ -145,5 +155,17 @@ public class ItemManager {
         ItemStack stack = player.getInventory().getItem(slot);
         updateItemStack(stack,player);
         player.getInventory().setItem(slot,stack);
+    }
+
+    public Set<ItemID> getLunixItems() {
+        return itemMap.keySet();
+    }
+
+    public List<String> getLunixItemsList() {
+        List<String> items = new ArrayList<>();
+        for (ItemID itemID : getLunixItems()) {
+            items.add(itemID.name());
+        }
+        return items;
     }
 }

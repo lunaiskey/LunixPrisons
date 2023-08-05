@@ -1,6 +1,11 @@
 package io.github.lunaiskey.lunixprison.modules.pickaxe;
 
+import io.github.lunaiskey.lunixprison.LunixPrison;
+import io.github.lunaiskey.lunixprison.modules.mines.PMine;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
+import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
+import io.github.lunaiskey.lunixprison.util.nms.NMSBlockChange;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.entity.Player;
@@ -14,24 +19,25 @@ import java.util.*;
 public abstract class LunixEnchant {
 
     private String name;
+    private final EnchantType enchantID;
     private int maxLevel;
-    private double chance;
     private boolean enabled;
     private List<String> description;
     private CurrencyType currencyType;
 
-    public LunixEnchant(String name, List<String> description, int maxLevel, CurrencyType currencyType, boolean enabled) {
+    public LunixEnchant(String name, EnchantType enchantID, List<String> description, int maxLevel, CurrencyType currencyType, boolean enabled) {
         this.name = name;
+        this.enchantID = enchantID;
         this.description = description;
         this.maxLevel = maxLevel;
         this.enabled = enabled;
         this.currencyType = currencyType;
     }
 
-    public abstract void onBlockBreak(BlockBreakEvent e, int level);
-    public abstract void onDrop(PlayerDropItemEvent e, int level);
-    public abstract void onEquip(Player player, ItemStack pickaxe, int level);
-    public abstract void onUnEquip(Player player, ItemStack pickaxe, int level);
+    public abstract void onBlockBreak(BlockBreakEvent e, LunixPlayer lunixPlayer, int level, NMSBlockChange nmsBlockChange);
+    public abstract void onDrop(PlayerDropItemEvent e, LunixPlayer lunixPlayer, int level);
+    public abstract void onEquip(Player player, LunixPlayer lunixPlayer, ItemStack pickaxe, int level);
+    public abstract void onUnEquip(Player player, LunixPlayer lunixPlayer, ItemStack pickaxe, int level);
 
     public abstract BigInteger getCost(int n);
 
@@ -53,6 +59,17 @@ public abstract class LunixEnchant {
 
     public CurrencyType getCurrencyType() {
         return currencyType;
+    }
+
+    public EnchantType getEnchantID() {
+        return enchantID;
+    }
+
+    protected void onActivationEnd(Player player, LunixPlayer lunixPlayer, PMine pMine, long blocksBroken) {
+        if (pMine != null) {
+            pMine.addMineBlocks(blocksBroken);
+        }
+        PlayerManager.get().payForBlocks(player,lunixPlayer,blocksBroken);
     }
 
     public BigInteger getTotalCost(int level) {

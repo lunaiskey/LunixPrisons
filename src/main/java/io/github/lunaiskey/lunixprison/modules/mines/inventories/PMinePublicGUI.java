@@ -2,10 +2,12 @@ package io.github.lunaiskey.lunixprison.modules.mines.inventories;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
+import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Bukkit;
@@ -23,7 +25,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 
 public class PMinePublicGUI implements LunixInventory {
-    private final List<UUID> sortedList = LunixPrison.getPlugin().getPMineManager().getPublicSortedByRankList();
+    private final List<UUID> sortedList = PMineManager.get().getPublicSortedByRankList();
     private final int totalPages = (((sortedList.size() - sortedList.size()%28)/28)+1);
 
     private static final Map<UUID,Integer> pageMap = new HashMap<>();
@@ -76,9 +78,9 @@ public class PMinePublicGUI implements LunixInventory {
             case 10,11,12,13,14,15,16,19,20,21,22,23,24,25,28,29,30,31,32,33,34,37,38,39,40,41,42,43 -> {
                 int place = getPlace(slot) + (28 * pageMap.get(p.getUniqueId()));
                 if (place < sortedList.size()) {
-                    PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(sortedList.get(place));
+                    PMine mine = PMineManager.get().getPMine(sortedList.get(place));
                     mine.teleportToCenter(p,false,false);
-                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), p::closeInventory);
+                    Bukkit.getScheduler().runTask(LunixPrison.getPlugin(), ()->p.closeInventory());
                 }
             }
             case 0 -> {
@@ -134,8 +136,8 @@ public class PMinePublicGUI implements LunixInventory {
 
     private ItemStack getMineIcon(UUID puuid) {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(puuid);
-        LunixPlayer iconPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(puuid);
-        PMine minePlayer = LunixPrison.getPlugin().getPMineManager().getPMine(puuid);
+        LunixPlayer iconPlayer = PlayerManager.get().getPlayerMap().get(puuid);
+        PMine minePlayer = PMineManager.get().getPMine(puuid);
         ItemStack item = ItemBuilder.getPlayerSkull(offlinePlayer);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(StringUtil.color("&d"+offlinePlayer.getName()+"'s PMine"));

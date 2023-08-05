@@ -3,32 +3,30 @@ package io.github.lunaiskey.lunixprison.modules.player;
 import org.bukkit.ChatColor;
 
 public enum CurrencyType {
-    TOKENS,
-    GEMS,
-    LUNIX_POINTS,
+    TOKENS("Tokens","⛁",ChatColor.YELLOW),
+    GEMS("Gems","◎",ChatColor.GREEN),
+    LUNIX_POINTS("Lunix Points","☀",ChatColor.AQUA),
     ;
 
+    private String unicode;
+    private ChatColor color;
+    private String name;
+
+    CurrencyType(String name, String unicode, ChatColor color) {
+        this.name = name;
+        this.unicode = unicode;
+        this.color = color;
+    }
+
     public String getUnicode() {
-        return switch (this) {
-            case TOKENS -> "⛁";
-            case GEMS -> "◎";
-            case LUNIX_POINTS -> "☀";
-        };
+        return unicode;
     }
 
     public ChatColor getColorCode() {
-        return switch (this) {
-            case TOKENS -> ChatColor.YELLOW;
-            case GEMS -> ChatColor.GREEN;
-            case LUNIX_POINTS -> ChatColor.AQUA;
-        };
+        return color;
     }
 
     public String getName() {
-        return switch (this) {
-            case TOKENS -> "Tokens";
-            case GEMS -> "Gems";
-            case LUNIX_POINTS -> "Lunix Points";
-        };
+        return name;
     }
 }

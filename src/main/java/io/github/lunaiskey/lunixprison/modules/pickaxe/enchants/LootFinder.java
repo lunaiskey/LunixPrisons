@@ -4,8 +4,12 @@ import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.items.ItemManager;
 import io.github.lunaiskey.lunixprison.modules.items.LunixItem;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
+import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixChanceEnchant;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.LunixEnchant;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
+import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.util.nms.NMSBlockChange;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -16,36 +20,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class LootFinder extends LunixEnchant {
+public class LootFinder extends LunixChanceEnchant {
     public LootFinder() {
-        super("Loot Finder", List.of("Gives a chance to find Geodes."), 250, CurrencyType.TOKENS, true);
+        super("Loot Finder", EnchantType.LOOT_FINDER, List.of("Gives a chance to find Geodes."), 250, CurrencyType.TOKENS, true);
     }
 
     @Override
-    public void onBlockBreak(BlockBreakEvent e, int level) {
-        Random rand = LunixPrison.getPlugin().getRand();
+    public void onBlockBreak(BlockBreakEvent e, LunixPlayer lunixPlayer, int level, NMSBlockChange nmsBlockChange) {
         Player p = e.getPlayer();
-        if (rand.nextDouble()*100 <= getChance(level)) {
+        Random rand = LunixPrison.getPlugin().getRand();
+        double roll = rand.nextDouble();
+        if (roll*100 <= getChance(level,p)) {
             if (level > getMaxLevel()) {
                 level = getMaxLevel();
             }
             int bound = (((level-1) - ((level-1)%(getMaxLevel()/5)))/(getMaxLevel()/5))+1;
             p.getInventory().addItem(getGeode(rand.nextInt(bound)));
+            onActivationEnd(p,lunixPlayer);
         }
     }
 
     @Override
-    public void onDrop(PlayerDropItemEvent e, int level) {
+    public void onDrop(PlayerDropItemEvent e, LunixPlayer lunixPlayer, int level) {
 
     }
 
     @Override
-    public void onEquip(Player player, ItemStack pickaxe, int level) {
+    public void onEquip(Player player, LunixPlayer lunixPlayer, ItemStack pickaxe, int level) {
 
     }
 
     @Override
-    public void onUnEquip(Player player, ItemStack pickaxe, int level) {
+    public void onUnEquip(Player player, LunixPlayer lunixPlayer, ItemStack pickaxe, int level) {
 
     }
 
@@ -60,12 +66,13 @@ public class LootFinder extends LunixEnchant {
         }
     }
 
-    private double getChance(int level) {
+    @Override
+    public double getChance(int level, Player player) {
         return 0.001*level;
     }
 
     private ItemStack getGeode(int rarity) {
-        ItemManager itemManager = LunixPrison.getPlugin().getItemManager();
+        ItemManager itemManager = ItemManager.get();
         return switch(rarity) {
             case 0 -> itemManager.getLunixItem(ItemID.COMMON_GEODE).getItemStack();
             case 1 -> itemManager.getLunixItem(ItemID.UNCOMMON_GEODE).getItemStack();

@@ -5,6 +5,7 @@ import io.github.lunaiskey.lunixprison.inventory.LunixHolder;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.leaderboards.BigIntegerEntry;
+import io.github.lunaiskey.lunixprison.modules.leaderboards.LeaderboardManager;
 import io.github.lunaiskey.lunixprison.modules.leaderboards.LongEntry;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.Numbers;
@@ -70,7 +71,7 @@ public class LeaderboardGUI implements LunixInventory {
     }
 
     public ItemStack getTokenTop() {
-        ArrayList<BigIntegerEntry> tokenTop = new ArrayList<>(LunixPrison.getPlugin().getLeaderboardManager().getTokenTopCache().values());
+        ArrayList<BigIntegerEntry> tokenTop = new ArrayList<>(LeaderboardManager.get().getTokenTopCache().values());
         List<String> lore = new ArrayList<>();
         for (int i = 0;i<5;i++) {
             BigIntegerEntry entry;
@@ -85,7 +86,7 @@ public class LeaderboardGUI implements LunixInventory {
     }
 
     public ItemStack getGemsTop() {
-        ArrayList<LongEntry> gemsTop = new ArrayList<>(LunixPrison.getPlugin().getLeaderboardManager().getGemsTopCache().values());
+        ArrayList<LongEntry> gemsTop = new ArrayList<>(LeaderboardManager.get().getGemsTopCache().values());
         List<String> lore = new ArrayList<>();
         for (int i = 0;i<5;i++) {
             LongEntry entry;
@@ -100,7 +101,7 @@ public class LeaderboardGUI implements LunixInventory {
     }
 
     public ItemStack getRankTop() {
-        ArrayList<LongEntry> rankTop = new ArrayList<>(LunixPrison.getPlugin().getLeaderboardManager().getRankTopCache().values());
+        ArrayList<LongEntry> rankTop = new ArrayList<>(LeaderboardManager.get().getRankTopCache().values());
         List<String> lore = new ArrayList<>();
         for (int i = 0;i<5;i++) {
             LongEntry entry;
@@ -115,7 +116,7 @@ public class LeaderboardGUI implements LunixInventory {
     }
 
     public ItemStack getGangTop() {
-        ArrayList<LongEntry> gangTop = new ArrayList<>(LunixPrison.getPlugin().getLeaderboardManager().getGangTopCache().values());
+        ArrayList<LongEntry> gangTop = new ArrayList<>(LeaderboardManager.get().getGangTopCache().values());
         List<String> lore = new ArrayList<>();
         for (int i = 0;i<5;i++) {
             LongEntry entry;

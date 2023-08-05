@@ -7,6 +7,7 @@ import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.modules.boosters.Booster;
 import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import io.github.lunaiskey.lunixprison.util.TimeUtil;
@@ -65,7 +66,7 @@ public class PersonalBoosterGUI implements LunixInventory {
     }
 
     private ItemStack getBoosterItem(int index, Player p) {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         List<Booster> boosters = lunixPlayer.getBoosters();
         if (index < boosters.size()) {
             Booster booster = boosters.get(index);

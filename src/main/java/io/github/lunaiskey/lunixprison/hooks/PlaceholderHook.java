@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.hooks;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.player.CurrencyType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.modules.player.chatcolor.LunixChatColor;
 import io.github.lunaiskey.lunixprison.modules.rankup.Rankup;
 import io.github.lunaiskey.lunixprison.util.Numbers;
@@ -59,7 +60,7 @@ public class PlaceholderHook extends PlaceholderExpansion implements LunixHook {
 
     @Override
     public String onRequest(OfflinePlayer player, String params) {
-        LunixPlayer lunixPlayer = plugin.getPlayerManager().getPlayerMap().get(player.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(player.getUniqueId());
         if (lunixPlayer == null) {
             return null;
         }
@@ -73,15 +74,15 @@ public class PlaceholderHook extends PlaceholderExpansion implements LunixHook {
             case "tokens_unicode" -> CurrencyType.TOKENS.getUnicode();
             case "gems_unicode" -> CurrencyType.GEMS.getUnicode();
             case "points_unicode" -> CurrencyType.LUNIX_POINTS.getUnicode();
-            case "tokens_color" -> CurrencyType.TOKENS.getColorCode()+"";
-            case "gems_color" -> CurrencyType.GEMS.getColorCode()+"";
-            case "points_color" -> CurrencyType.LUNIX_POINTS.getColorCode()+"";
+            case "tokens_color" -> String.valueOf(CurrencyType.TOKENS.getColorCode());
+            case "gems_color" -> String.valueOf(CurrencyType.GEMS.getColorCode());
+            case "points_color" -> String.valueOf(CurrencyType.LUNIX_POINTS.getColorCode());
             case "rank" -> String.valueOf(lunixPlayer.getRank());
             case "rank_next" -> String.valueOf(Math.min(lunixPlayer.getRank() + 1, Rankup.getMaxRankup()));
             case "rank_percentage" -> Numbers.formatDouble(Rankup.getRankUpPercentage(Objects.requireNonNull(player.getPlayer())));
             case "rank_progressbar" -> Rankup.getRankUpProgressBar(Objects.requireNonNull(player.getPlayer()));
             case "gemstone_progress" -> String.valueOf(lunixPlayer.getGemstoneCount());
-            case "gemstone_max" -> String.valueOf(LunixPrison.getPlugin().getPlayerManager().getGemstoneCountMax((Player) player));
+            case "gemstone_max" -> String.valueOf(PlayerManager.get().getGemstoneCountMax((Player) player));
             case "name_colors" -> lunixPlayer.getChatColorStorage().getNameColors();
             case "text_colors" -> lunixPlayer.getChatColorStorage().getTextColors();
             default -> null;

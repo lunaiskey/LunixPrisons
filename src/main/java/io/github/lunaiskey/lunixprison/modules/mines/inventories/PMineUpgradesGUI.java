@@ -11,6 +11,7 @@ import io.github.lunaiskey.lunixprison.inventory.LunixInvType;
 import io.github.lunaiskey.lunixprison.inventory.LunixInventory;
 import io.github.lunaiskey.lunixprison.modules.mines.upgrades.PMineUpgrade;
 import io.github.lunaiskey.lunixprison.modules.mines.upgrades.PMineUpgradeType;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.ItemBuilder;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.Material;
@@ -68,7 +69,7 @@ public class PMineUpgradesGUI implements LunixInventory {
 
     public void onClose(InventoryCloseEvent e) {
         Player p = (Player) e.getPlayer();
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         if (pendingSizeReset.contains(p.getUniqueId())) {
             mine.genBedrock();
             mine.reset();
@@ -85,8 +86,8 @@ public class PMineUpgradesGUI implements LunixInventory {
         e.setCancelled(true);
         Player p = (Player) e.getWhoClicked();
         int slot = e.getRawSlot();
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(e.getWhoClicked().getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(e.getWhoClicked().getUniqueId());
         Map<PMineUpgradeType,Integer> upgradeLevelMap = mine.getUpgradeMap();
         switch (slot) {
             case 20 -> {
@@ -125,7 +126,7 @@ public class PMineUpgradesGUI implements LunixInventory {
     }
 
     private ItemStack getUpgradeIcon(PMineUpgradeType type, Player p) {
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(p.getUniqueId());
+        PMine mine = PMineManager.get().getPMine(p.getUniqueId());
         Map<PMineUpgradeType,Integer> upgradeLevelMap = mine.getUpgradeMap();
         CurrencyType currencyType = CurrencyType.GEMS;
         PMineUpgrade upgrade = PMineUpgradeType.getUpgradeMap().get(type);

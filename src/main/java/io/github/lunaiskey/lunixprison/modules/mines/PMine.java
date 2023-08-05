@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.modules.mines;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.mines.generator.PMineWorld;
 import io.github.lunaiskey.lunixprison.modules.mines.upgrades.PMineUpgradeType;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.nms.NMSBlockChange;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
 import io.github.lunaiskey.lunixprison.util.nms.NMSWorldBorder;
@@ -37,11 +38,14 @@ public class PMine {
     private long maxMineBlocks;
     private long blocksBroken = 0;
     private BukkitTask resetTask = null;
-    private int resetTime = 10; // in minutes
-    private float resetPercentage = 0.70F;
+    private int resetTimeMinutes = 10; // in minutes
+    private float minPercentageToReset = 0.90F;
     private Map<Material,Double> composition;
     private Set<Material> disabledBlocks;
     private Map<PMineUpgradeType,Integer> upgradeMap;
+
+    private static final int DEFAULT_MINE_SIZE = 12;
+    private int customSize;
 
     private boolean isPublic;
     private double mineTax;
@@ -57,10 +61,10 @@ public class PMine {
         for (PMineUpgradeType upgradeType : PMineUpgradeType.values()) {
             this.upgradeMap.putIfAbsent(upgradeType, 0);
         }
-        this.mineRadius = mineRadius+this.upgradeMap.get(PMineUpgradeType.SIZE);
-        this.min = new Location(center.getWorld(), center.getBlockX() - this.mineRadius, 51, center.getBlockZ() - this.mineRadius);
-        this.max = new Location(center.getWorld(), center.getBlockX() + this.mineRadius, 100, center.getBlockZ() + this.mineRadius);
-        this.maxMineBlocks = (this.mineRadius * 2L +1)*(this.mineRadius * 2L +1)*(max.getBlockY()-min.getBlockY()+1);
+        this.customSize = mineRadius;
+
+        checkMineSize();
+
         Player p = Bukkit.getPlayer(owner);
         if (p != null) {
             if (new Location(center.getWorld(),center.getBlockX()+ this.mineRadius +1,max.getBlockY(),center.getBlockZ()+ this.mineRadius +1).getBlock().getType() != Material.BEDROCK) {
@@ -71,10 +75,11 @@ public class PMine {
         this.disabledBlocks = Objects.requireNonNullElseGet(disabledBlocks, HashSet::new);
         this.composition = Objects.requireNonNullElseGet(comp, LinkedHashMap::new);
         Map<Material,Integer> sortedBlocks = PMineManager.getBlockRankMap();
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(owner);
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(owner);
         if (lunixPlayer != null) {
-            for(Material mat : sortedBlocks.keySet()) {
-                if (lunixPlayer.getRank() >= sortedBlocks.get(mat)) {
+            for (Map.Entry<Material,Integer> entry : sortedBlocks.entrySet()) {
+                Material mat = entry.getKey();
+                if (lunixPlayer.getRank() >= entry.getValue()) {
                     this.composition.putIfAbsent(mat,1D);
                 } else {
                     this.composition.remove(mat);
@@ -92,13 +97,23 @@ public class PMine {
         this(owner,chunkX,chunkZ,12,false,10F,null,null,null,null);
     }
 
+    public void checkMineSize() {
+        if (customSize <= 0) {
+            customSize = DEFAULT_MINE_SIZE;
+        }
+        this.mineRadius = customSize+this.upgradeMap.get(PMineUpgradeType.SIZE);
+        this.min = new Location(center.getWorld(), center.getBlockX() - this.mineRadius, 51, center.getBlockZ() - this.mineRadius);
+        this.max = new Location(center.getWorld(), center.getBlockX() + this.mineRadius, 100, center.getBlockZ() + this.mineRadius);
+        this.maxMineBlocks = (this.mineRadius * 2L +1)*(this.mineRadius * 2L +1)*(max.getBlockY()-min.getBlockY()+1);
+    }
+
     public void checkMineBlocks() {
         Map<Material,Integer> sortedBlocks = PMineManager.getBlockRankMap();
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(owner);
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(owner);
         Map<Material,Double> replaceMap = new LinkedHashMap<>();
-        for (Material mat : sortedBlocks.keySet()) {
-            if (lunixPlayer.getRank() >= sortedBlocks.get(mat)) {
-                replaceMap.put(mat, composition.getOrDefault(mat, 1D));
+        for (Map.Entry<Material,Integer> entry : sortedBlocks.entrySet()) {
+            if (lunixPlayer.getRank() >= entry.getValue()) {
+                replaceMap.put(entry.getKey(), composition.getOrDefault(entry.getKey(), 1D));
             } else {
                 break;
             }
@@ -143,7 +158,7 @@ public class PMine {
     }
 
     public double getSellPrice() {
-        LunixPlayer lunixPlayer = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(owner);
+        LunixPlayer lunixPlayer = PlayerManager.get().getPlayerMap().get(owner);
         return 1+(lunixPlayer.getRank()*0.005);
     }
 
@@ -162,9 +177,9 @@ public class PMine {
     public void setPublic(boolean isPublic) {
         this.isPublic = isPublic;
         if (isPublic) {
-            LunixPrison.getPlugin().getPMineManager().getPublicMines().add(owner);
+            PMineManager.get().getPublicMines().add(owner);
         } else {
-            LunixPrison.getPlugin().getPMineManager().getPublicMines().remove(owner);
+            PMineManager.get().getPublicMines().remove(owner);
         }
     }
 
@@ -174,6 +189,16 @@ public class PMine {
 
     public void setDisabledBlocks(Set<Material> disabledBlocks) {
         this.disabledBlocks = disabledBlocks;
+    }
+
+    public void setUpgradeMap(Map<PMineUpgradeType, Integer> upgradeMap) {
+        this.upgradeMap = upgradeMap;
+        Integer i = this.upgradeMap.get(PMineUpgradeType.SIZE);
+        if (i == null) {
+            return;
+        }
+        this.mineRadius = mineRadius+i;
+        checkMineSize();
     }
 
     public void save() {
@@ -305,7 +330,7 @@ public class PMine {
         if (!(loc.getWorld().getName().equals(PMineWorld.getWorldName()))) {
             return false;
         }
-        Pair<Integer,Integer> pair = LunixPrison.getPlugin().getPMineManager().getGridLocation(loc);
+        Pair<Integer,Integer> pair = PMineManager.get().getGridLocation(loc);
         return pair.getLeft() == chunkX && pair.getRight() == chunkZ;
     }
 
@@ -351,7 +376,7 @@ public class PMine {
             return;
         }
         blocksBroken += amount;
-        if (blocksBroken >= maxMineBlocks*resetPercentage) {
+        if (blocksBroken >= maxMineBlocks* minPercentageToReset) {
             reset();
         }
     }
@@ -369,7 +394,7 @@ public class PMine {
                 return;
             }
             resetTask = null;
-        },20L*60L*resetTime);
+        },20L*60L* resetTimeMinutes);
     }
 
     public void checkBlocksBroken() {

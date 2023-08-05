@@ -2,6 +2,7 @@ package io.github.lunaiskey.lunixprison.modules.rankup;
 
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import io.github.lunaiskey.lunixprison.util.StringUtil;
 import org.bukkit.entity.Player;
 
@@ -18,7 +19,7 @@ public class Rankup {
     }
 
     public int rankup(Player p, int amount) {
-        LunixPlayer player = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer player = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         int newRank = player.getRank()+amount;
         player.setRank(newRank);
         return newRank;
@@ -43,7 +44,7 @@ public class Rankup {
 
 
     public static double getRankUpPercentage(Player p) {
-        LunixPlayer player = LunixPrison.getPlugin().getPlayerManager().getPlayerMap().get(p.getUniqueId());
+        LunixPlayer player = PlayerManager.get().getPlayerMap().get(p.getUniqueId());
         double percentage = new BigDecimal(player.getTokens()).divide(new BigDecimal(getLevelCost(player.getRank()+1)),4,RoundingMode.HALF_UP).doubleValue() * 100;
         return percentage > 100 ? 100 : percentage;
     }

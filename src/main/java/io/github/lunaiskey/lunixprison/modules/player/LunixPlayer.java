@@ -3,6 +3,7 @@ package io.github.lunaiskey.lunixprison.modules.player;
 import io.github.lunaiskey.lunixprison.LunixPrison;
 import io.github.lunaiskey.lunixprison.modules.items.ItemID;
 import io.github.lunaiskey.lunixprison.modules.mines.PMine;
+import io.github.lunaiskey.lunixprison.modules.mines.PMineManager;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.EnchantType;
 import io.github.lunaiskey.lunixprison.modules.pickaxe.PickaxeStorage;
 import io.github.lunaiskey.lunixprison.modules.armor.Armor;
@@ -153,14 +154,14 @@ public class LunixPlayer {
     }
 
     public void setName(String name) {
-        LunixPrison.getPlugin().getPlayerManager().getPlayerNameMap().remove(this.name);
+        PlayerManager.get().getPlayerNameMap().remove(this.name);
         this.name = name;
-        LunixPrison.getPlugin().getPlayerManager().getPlayerNameMap().put(name.toUpperCase(),this.pUUID);
+        PlayerManager.get().getPlayerNameMap().put(name.toUpperCase(),this.pUUID);
     }
 
     public void setRank(int rank) {
         this.rank = rank;
-        PMine mine = LunixPrison.getPlugin().getPMineManager().getPMine(pUUID);
+        PMine mine = PMineManager.get().getPMine(pUUID);
         if (mine != null) {
             mine.checkMineBlocks();
         }
@@ -325,15 +326,20 @@ public class LunixPlayer {
         Map<String, Object> pickaxeData = new LinkedHashMap<>();
         pickaxeData.put("blocksBroken", pickaxeStorage.getBlocksBroken());
         Map<String, Object> enchantMap = new LinkedHashMap<>();
-        List<String> disabledEnchantsList = new ArrayList<>();
         for (EnchantType type : pickaxeStorage.getEnchants().keySet()) {
             enchantMap.put(type.name(), pickaxeStorage.getEnchants().get(type));
         }
         pickaxeData.put("enchants",enchantMap);
+        List<String> disabledEnchantsList = new ArrayList<>();
         for (EnchantType type : pickaxeStorage.getDisabledEnchants()) {
             disabledEnchantsList.add(type.name());
         }
         pickaxeData.put("disabledEnchants",disabledEnchantsList);
+        List<String> disabledMessagesList = new ArrayList<>();
+        for (EnchantType type : pickaxeStorage.getDisabledMessages()) {
+            disabledMessagesList.add(type.name());
+        }
+        pickaxeData.put("disabledMessages",disabledMessagesList);
         pickaxeData.put("rename", pickaxeStorage.getRename());
         data.createSection("pickaxe", pickaxeData);
     }

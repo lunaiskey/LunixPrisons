@@ -11,6 +11,7 @@ import io.github.lunaiskey.lunixprison.modules.mines.generator.PMineWorld;
 import io.github.lunaiskey.lunixprison.modules.mines.inventories.PMinePublicGUI;
 import io.github.lunaiskey.lunixprison.modules.mines.upgrades.PMineUpgradeType;
 import io.github.lunaiskey.lunixprison.modules.player.LunixPlayer;
+import io.github.lunaiskey.lunixprison.modules.player.PlayerManager;
 import org.bukkit.Material;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,18 +25,91 @@ import org.bukkit.entity.Player;
 
 public class PMineManager {
 
+    private static PMineManager instance;
+
     public static final int DEFAULT_RADIUS = 12;
     private final int GRID_ISLAND_DIAMETER;
     private final int GRID_ISLAND_RADIUS;
     private final Map<UUID, PMine> pMines = new HashMap<>();
     private final Map<Pair<Integer,Integer>, UUID> gridPosUUIDMap = new HashMap<>();
-    private ImmutablePair<Integer,Integer> lastChunkChecked = new ImmutablePair<>(0,0);
+    private Pair<Integer,Integer> lastChunkChecked = new ImmutablePair<>(0,0);
     private Set<UUID> publicMines = new HashSet<>();
     private List<UUID> sortedList = new ArrayList<>();
 
-    public PMineManager() {
+    private static final Map<Material,Integer> rankBlockMap;
+
+
+    private PMineManager() {
         GRID_ISLAND_DIAMETER = 225; //ALWAYS BE ODD
         GRID_ISLAND_RADIUS = (GRID_ISLAND_DIAMETER - (GRID_ISLAND_DIAMETER % 2))/2;
+    }
+
+    static {
+        Map<Material,Integer> map = new LinkedHashMap<>();
+        map.put(Material.COBBLESTONE,0);
+        map.put(Material.STONE,5);
+        map.put(Material.GRANITE,10);
+        map.put(Material.POLISHED_GRANITE,15);
+        map.put(Material.DIORITE,20);
+        map.put(Material.POLISHED_DIORITE,25);
+        map.put(Material.ANDESITE,30);
+        map.put(Material.POLISHED_ANDESITE,35);
+        map.put(Material.COBBLED_DEEPSLATE,40);
+        map.put(Material.DEEPSLATE,50);
+        map.put(Material.POLISHED_DEEPSLATE,60);
+        map.put(Material.COAL_ORE,70);
+        map.put(Material.DEEPSLATE_COAL_ORE,80);
+        map.put(Material.COAL_BLOCK,90);
+        map.put(Material.COPPER_ORE,100);
+        map.put(Material.DEEPSLATE_COPPER_ORE,110);
+        map.put(Material.RAW_COPPER_BLOCK,120);
+        map.put(Material.COPPER_BLOCK,130);
+        map.put(Material.IRON_ORE,140);
+        map.put(Material.DEEPSLATE_IRON_ORE,150);
+        map.put(Material.RAW_IRON_BLOCK,160);
+        map.put(Material.IRON_BLOCK,170);
+        map.put(Material.GOLD_ORE,180);
+        map.put(Material.DEEPSLATE_GOLD_ORE,190);
+        map.put(Material.RAW_GOLD_BLOCK,200);
+        map.put(Material.GOLD_BLOCK,210);
+        map.put(Material.DIAMOND_ORE,220);
+        map.put(Material.DEEPSLATE_DIAMOND_ORE,230);
+        map.put(Material.DIAMOND_BLOCK,240);
+        map.put(Material.EMERALD_ORE,250);
+        map.put(Material.DEEPSLATE_EMERALD_ORE,260);
+        map.put(Material.EMERALD_BLOCK,270);
+        map.put(Material.AMETHYST_BLOCK,280);
+        map.put(Material.NETHERRACK,290);
+        map.put(Material.NETHER_BRICKS,300);
+        map.put(Material.RED_NETHER_BRICKS,310);
+        map.put(Material.QUARTZ_BLOCK,320);
+        map.put(Material.SMOOTH_QUARTZ,330);
+        map.put(Material.CHISELED_QUARTZ_BLOCK,340);
+        map.put(Material.WHITE_TERRACOTTA,350);
+        map.put(Material.ORANGE_TERRACOTTA,360);
+        map.put(Material.MAGENTA_TERRACOTTA,370);
+        map.put(Material.LIGHT_BLUE_TERRACOTTA,380);
+        map.put(Material.YELLOW_TERRACOTTA,390);
+        map.put(Material.LIME_TERRACOTTA,400);
+        map.put(Material.PINK_TERRACOTTA,410);
+        map.put(Material.GRAY_TERRACOTTA,420);
+        map.put(Material.LIGHT_GRAY_TERRACOTTA,430);
+        map.put(Material.CYAN_TERRACOTTA,440);
+        map.put(Material.PURPLE_TERRACOTTA,450);
+        map.put(Material.BLUE_TERRACOTTA,460);
+        map.put(Material.BROWN_TERRACOTTA,470);
+        map.put(Material.GREEN_TERRACOTTA,480);
+        map.put(Material.RED_TERRACOTTA,490);
+        map.put(Material.BLACK_TERRACOTTA,500);
+        map.put(Material.TERRACOTTA,525);
+        rankBlockMap = Collections.unmodifiableMap(map);
+    }
+
+    public static PMineManager get() {
+        if (instance == null) {
+            instance = new PMineManager();
+        }
+        return instance;
     }
 
     public void loadPMines() {
@@ -77,6 +151,7 @@ public class PMineManager {
         for (String str : section.keySet()) {
             upgradesMap.put(PMineUpgradeType.valueOf(str), ((Number) section.get(str)).intValue());
         }
+        mine.setUpgradeMap(upgradesMap);
     }
 
     private void loadBlocksData(PMine mine, Map<String, Object> map) {
@@ -129,7 +204,7 @@ public class PMineManager {
     }
 
     private List<UUID> getSortedPublicByRank() {
-        Map<UUID, LunixPlayer> playerMap = LunixPrison.getPlugin().getPlayerManager().getPlayerMap();
+        Map<UUID, LunixPlayer> playerMap = PlayerManager.get().getPlayerMap();
         List<UUID> sortedList = new ArrayList<>(publicMines);
         sortedList.sort(Collections.reverseOrder(Comparator.comparingInt(o -> playerMap.get(o).getRank())));
         return sortedList;
@@ -257,63 +332,6 @@ public class PMineManager {
     }
 
     public static Map<Material,Integer> getBlockRankMap() {
-        Map<Material,Integer> map = new LinkedHashMap<>();
-        map.put(Material.COBBLESTONE,0);
-        map.put(Material.STONE,5);
-        map.put(Material.GRANITE,10);
-        map.put(Material.POLISHED_GRANITE,15);
-        map.put(Material.DIORITE,20);
-        map.put(Material.POLISHED_DIORITE,25);
-        map.put(Material.ANDESITE,30);
-        map.put(Material.POLISHED_ANDESITE,35);
-        map.put(Material.COBBLED_DEEPSLATE,40);
-        map.put(Material.DEEPSLATE,50);
-        map.put(Material.POLISHED_DEEPSLATE,60);
-        map.put(Material.COAL_ORE,70);
-        map.put(Material.DEEPSLATE_COAL_ORE,80);
-        map.put(Material.COAL_BLOCK,90);
-        map.put(Material.COPPER_ORE,100);
-        map.put(Material.DEEPSLATE_COPPER_ORE,110);
-        map.put(Material.RAW_COPPER_BLOCK,120);
-        map.put(Material.COPPER_BLOCK,130);
-        map.put(Material.IRON_ORE,140);
-        map.put(Material.DEEPSLATE_IRON_ORE,150);
-        map.put(Material.RAW_IRON_BLOCK,160);
-        map.put(Material.IRON_BLOCK,170);
-        map.put(Material.GOLD_ORE,180);
-        map.put(Material.DEEPSLATE_GOLD_ORE,190);
-        map.put(Material.RAW_GOLD_BLOCK,200);
-        map.put(Material.GOLD_BLOCK,210);
-        map.put(Material.DIAMOND_ORE,220);
-        map.put(Material.DEEPSLATE_DIAMOND_ORE,230);
-        map.put(Material.DIAMOND_BLOCK,240);
-        map.put(Material.EMERALD_ORE,250);
-        map.put(Material.DEEPSLATE_EMERALD_ORE,260);
-        map.put(Material.EMERALD_BLOCK,270);
-        map.put(Material.AMETHYST_BLOCK,280);
-        map.put(Material.NETHERRACK,290);
-        map.put(Material.NETHER_BRICKS,300);
-        map.put(Material.RED_NETHER_BRICKS,310);
-        map.put(Material.QUARTZ_BLOCK,320);
-        map.put(Material.SMOOTH_QUARTZ,330);
-        map.put(Material.CHISELED_QUARTZ_BLOCK,340);
-        map.put(Material.WHITE_TERRACOTTA,350);
-        map.put(Material.ORANGE_TERRACOTTA,360);
-        map.put(Material.MAGENTA_TERRACOTTA,370);
-        map.put(Material.LIGHT_BLUE_TERRACOTTA,380);
-        map.put(Material.YELLOW_TERRACOTTA,390);
-        map.put(Material.LIME_TERRACOTTA,400);
-        map.put(Material.PINK_TERRACOTTA,410);
-        map.put(Material.GRAY_TERRACOTTA,420);
-        map.put(Material.LIGHT_GRAY_TERRACOTTA,430);
-        map.put(Material.CYAN_TERRACOTTA,440);
-        map.put(Material.PURPLE_TERRACOTTA,450);
-        map.put(Material.BLUE_TERRACOTTA,460);
-        map.put(Material.BROWN_TERRACOTTA,470);
-        map.put(Material.GREEN_TERRACOTTA,480);
-        map.put(Material.RED_TERRACOTTA,490);
-        map.put(Material.BLACK_TERRACOTTA,500);
-        map.put(Material.TERRACOTTA,525);
-        return map;
+        return rankBlockMap;
     }
 }
